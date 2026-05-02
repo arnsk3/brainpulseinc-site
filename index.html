@@ -573,136 +573,154 @@ document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{if(a.getAttribute('onclick'))return;e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t){t.scrollIntoView({behavior:'smooth'});document.getElementById('nm')?.classList.remove('open')}})});
 </script>
 
-<!-- ═══ FEEDBACK WIDGET ═══ -->
+<!-- ═══ CHATBOT ═══ -->
 <style>
-.fb-toggle{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--teal);color:#fff;border:none;padding:0;width:56px;height:56px;border-radius:50%;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(13,115,119,.25);transition:all .3s}
-.fb-toggle:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(13,115,119,.35)}
-.fb-toggle:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-.fb-toggle .fb-badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:var(--rose);border-radius:50%;font-size:.55rem;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff;border:2px solid var(--bg)}
-.fb-panel{position:fixed;bottom:5.5rem;right:1.5rem;z-index:9000;width:360px;max-height:calc(100vh - 7rem);background:var(--w);border:1px solid var(--b2);border-radius:var(--rl);box-shadow:0 12px 48px rgba(28,25,23,.12);display:none;flex-direction:column;overflow:hidden}
-.fb-panel.open{display:flex}
-.fb-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--b1);position:relative}
-.fb-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--peach),var(--rose));border-radius:var(--rl) var(--rl) 0 0}
-.fb-header h3{font-family:var(--serif);font-size:1.05rem;color:var(--ink)}
-.fb-header p{font-size:.72rem;color:var(--mt);margin-top:.15rem}
-.fb-close{position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;width:32px;height:32px;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--mt);font-size:1.1rem;padding:6px}
-.fb-close:hover{background:var(--bg2);color:var(--ink)}
-.fb-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1}
-.fb-group{margin-bottom:1.25rem}
-.fb-label{font-size:.75rem;font-weight:700;color:var(--ink);margin-bottom:.4rem;display:block}
-.fb-stars{display:flex;gap:.3rem}
-.fb-star{background:none;border:2px solid var(--b2);width:40px;height:40px;min-height:44px;border-radius:10px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--mt);padding:2px}
-.fb-star:hover,.fb-star.active{border-color:var(--peach);background:var(--ps);color:var(--peach)}
-.fb-star:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
-.fb-select{width:100%;padding:.65rem .85rem;border:1.5px solid var(--b2);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.78rem;min-height:44px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2344403C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.fb-select:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-color:var(--teal)}
-.fb-textarea{width:100%;padding:.65rem .85rem;border:1.5px solid var(--b2);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.78rem;min-height:88px;resize:vertical}
-.fb-textarea::placeholder{color:var(--dm)}
-.fb-textarea:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-color:var(--teal)}
-.fb-input{width:100%;padding:.65rem .85rem;border:1.5px solid var(--b2);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.78rem;min-height:44px}
-.fb-input::placeholder{color:var(--dm)}
-.fb-input:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-color:var(--teal)}
-.fb-submit{width:100%;background:var(--teal);color:#fff;border:none;padding:.75rem;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;min-height:44px;transition:all .3s}
-.fb-submit:hover{background:#0A5F62;transform:translateY(-1px)}
-.fb-submit:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-.fb-success{text-align:center;padding:2rem 1.5rem}
-.fb-success-icon{font-size:2.5rem;margin-bottom:.75rem}
-.fb-success h4{font-family:var(--serif);font-size:1.1rem;color:var(--ink);margin-bottom:.3rem}
-.fb-success p{font-size:.78rem;color:var(--mt);line-height:1.6}
-@media(max-width:480px){.fb-panel{left:1rem;right:1rem;width:auto;bottom:5rem}}
+.cb-toggle{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--teal);color:#fff;border:none;padding:0;width:56px;height:56px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(13,115,119,.25);transition:all .3s}
+.cb-toggle:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(13,115,119,.35)}
+.cb-toggle:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.cb-toggle .cb-pulse{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--teal);animation:cb-ring 2.5s ease-out infinite;opacity:0}
+@keyframes cb-ring{0%{transform:scale(.9);opacity:.6}100%{transform:scale(1.3);opacity:0}}
+.cb-panel{position:fixed;bottom:5.5rem;right:1.5rem;z-index:9000;width:380px;height:520px;max-height:calc(100vh - 7rem);background:var(--w);border:1px solid var(--b2);border-radius:var(--rl);box-shadow:0 12px 48px rgba(28,25,23,.15);display:none;flex-direction:column;overflow:hidden}
+.cb-panel.open{display:flex}
+.cb-head{padding:1rem 1.25rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:.65rem;position:relative}
+.cb-head::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--peach),var(--rose));border-radius:var(--rl) var(--rl) 0 0}
+.cb-avatar{width:36px;height:36px;border-radius:10px;background:var(--ts);border:1px solid var(--tm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cb-avatar svg{width:20px;height:20px}
+.cb-info{flex:1}
+.cb-info h3{font-size:.88rem;font-weight:700;color:var(--ink);line-height:1.2}
+.cb-info p{font-size:.62rem;color:var(--teal);display:flex;align-items:center;gap:.3rem}
+.cb-info .cb-dot{width:5px;height:5px;background:var(--teal);border-radius:50%}
+.cb-close{background:none;border:none;cursor:pointer;width:36px;height:36px;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--mt);font-size:1.1rem;padding:4px}
+.cb-close:hover{background:var(--bg2);color:var(--ink)}
+.cb-close:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.cb-msgs{flex:1;overflow-y:auto;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.6rem;scroll-behavior:smooth}
+.cb-msg{max-width:85%;padding:.7rem 1rem;border-radius:14px;font-size:.8rem;line-height:1.6;animation:cb-fade .3s var(--ease)}
+@keyframes cb-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.cb-msg.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--b1);color:var(--ink);border-bottom-left-radius:4px}
+.cb-msg.user{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:4px}
+.cb-msg a{color:inherit;font-weight:700;text-underline-offset:2px}
+.cb-msg.bot a{color:var(--teal)}
+.cb-typing{align-self:flex-start;padding:.6rem 1rem;display:flex;gap:.25rem}
+.cb-typing span{width:6px;height:6px;background:var(--mt);border-radius:50%;animation:cb-bounce .8s ease-in-out infinite}
+.cb-typing span:nth-child(2){animation-delay:.15s}
+.cb-typing span:nth-child(3){animation-delay:.3s}
+@keyframes cb-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.cb-quick{display:flex;flex-wrap:wrap;gap:.3rem;padding:.5rem 1.25rem;border-top:1px solid var(--b1);background:var(--bg)}
+.cb-quick button{font-size:.65rem;padding:.35rem .65rem;border-radius:100px;border:1px solid var(--b2);background:var(--w);color:var(--mt);cursor:pointer;font-family:var(--sans);font-weight:500;transition:all .2s;min-height:32px}
+.cb-quick button:hover{border-color:var(--teal);color:var(--teal);background:var(--ts)}
+.cb-quick button:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.cb-input{display:flex;gap:.4rem;padding:.75rem 1.25rem;border-top:1px solid var(--b1);background:var(--w)}
+.cb-input input{flex:1;padding:.6rem .85rem;border:1.5px solid var(--b2);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.8rem;outline:none;min-height:44px}
+.cb-input input::placeholder{color:var(--dm)}
+.cb-input input:focus{border-color:var(--teal)}
+.cb-input button{background:var(--teal);color:#fff;border:none;padding:.6rem .85rem;border-radius:10px;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cb-input button:hover{background:#0A5F62}
+.cb-input button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+@media(max-width:480px){.cb-panel{left:.75rem;right:.75rem;width:auto;bottom:5rem;height:480px}}
 </style>
 
-<button class="fb-toggle" onclick="document.getElementById('fb-panel').classList.toggle('open');this.querySelector('.fb-badge').style.display='none'" aria-label="Give feedback on this design" aria-haspopup="dialog">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <span class="fb-badge">!</span>
+<button class="cb-toggle" onclick="toggleChat()" aria-label="Chat with BrainPulse" aria-haspopup="dialog">
+  <span class="cb-pulse"></span>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
 </button>
 
-<div class="fb-panel" id="fb-panel" role="dialog" aria-label="Design feedback form">
-  <div class="fb-header">
-    <h3>Share your feedback</h3>
-    <p>Help us make this design even better</p>
-    <button class="fb-close" onclick="document.getElementById('fb-panel').classList.remove('open')" aria-label="Close feedback">&times;</button>
+<div class="cb-panel" id="cb-panel" role="dialog" aria-label="BrainPulse assistant chat">
+  <div class="cb-head">
+    <div class="cb-avatar"><svg viewBox="0 0 52 52" fill="none"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke="#0D7377" stroke-width="1.6" stroke-linejoin="round"/><circle cx="26" cy="23" r="5" stroke="#0D7377" stroke-width="1.8" fill="none"/><circle cx="26" cy="23" r="2" fill="#0D7377"/></svg></div>
+    <div class="cb-info"><h3>BrainPulse Assistant</h3><p><span class="cb-dot"></span> Online — typically replies instantly</p></div>
+    <button class="cb-close" onclick="toggleChat()" aria-label="Close chat">&times;</button>
   </div>
-  <div class="fb-body" id="fb-form-area">
-    <div class="fb-group">
-      <label class="fb-label">Overall impression</label>
-      <div class="fb-stars" role="radiogroup" aria-label="Rate from 1 to 5 stars">
-        <button class="fb-star" role="radio" aria-checked="false" aria-label="1 star" onclick="setRating(1)">★</button>
-        <button class="fb-star" role="radio" aria-checked="false" aria-label="2 stars" onclick="setRating(2)">★</button>
-        <button class="fb-star" role="radio" aria-checked="false" aria-label="3 stars" onclick="setRating(3)">★</button>
-        <button class="fb-star" role="radio" aria-checked="false" aria-label="4 stars" onclick="setRating(4)">★</button>
-        <button class="fb-star" role="radio" aria-checked="false" aria-label="5 stars" onclick="setRating(5)">★</button>
-      </div>
-    </div>
-    <div class="fb-group">
-      <label class="fb-label" for="fb-section">Which section are you commenting on?</label>
-      <select class="fb-select" id="fb-section">
-        <option value="">Overall website</option>
-        <option value="hero">Hero & first impression</option>
-        <option value="logos">Client logos</option>
-        <option value="services">Service pillars</option>
-        <option value="expertise">Design expertise</option>
-        <option value="case-studies">Case studies</option>
-        <option value="industries">Industries</option>
-        <option value="tech">Technology stack</option>
-        <option value="testimonials">Testimonials</option>
-        <option value="faq">FAQ</option>
-        <option value="cta">Contact / CTA</option>
-        <option value="branding">Logo & branding</option>
-        <option value="colors">Colors & typography</option>
-        <option value="accessibility">Accessibility</option>
-      </select>
-    </div>
-    <div class="fb-group">
-      <label class="fb-label" for="fb-comment">Your feedback</label>
-      <textarea class="fb-textarea" id="fb-comment" placeholder="What works well? What would you change? Be specific — we read every comment."></textarea>
-    </div>
-    <div class="fb-group">
-      <label class="fb-label" for="fb-name">Your name (optional)</label>
-      <input class="fb-input" id="fb-name" type="text" placeholder="Jane Doe" autocomplete="name">
-    </div>
-    <div class="fb-group">
-      <label class="fb-label" for="fb-email">Your email (optional)</label>
-      <input class="fb-input" id="fb-email" type="email" placeholder="jane@company.com" autocomplete="email">
-    </div>
-    <button class="fb-submit" onclick="submitFeedback()">Submit feedback</button>
+  <div class="cb-msgs" id="cb-msgs" role="log" aria-live="polite"></div>
+  <div class="cb-quick" id="cb-quick"></div>
+  <div class="cb-input">
+    <label for="cb-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Type your message</label>
+    <input type="text" id="cb-in" placeholder="Ask me anything..." autocomplete="off">
+    <button onclick="sendMsg()" aria-label="Send message"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg></button>
   </div>
 </div>
 
 <script>
-let currentRating=0;
-function setRating(n){
-  currentRating=n;
-  document.querySelectorAll('.fb-star').forEach((s,i)=>{
-    const active=i<n;
-    s.classList.toggle('active',active);
-    s.setAttribute('aria-checked',active?'true':'false');
-  });
+let chatOpen=false;
+function toggleChat(){chatOpen=!chatOpen;document.getElementById('cb-panel').classList.toggle('open',chatOpen);if(chatOpen&&!document.getElementById('cb-msgs').children.length)startChat();document.querySelector('.cb-pulse').style.display=chatOpen?'none':'block'}
+function startChat(){addBot("Hi! I'm the BrainPulse Assistant. I can help you learn about our services, process, expertise, and how we can help your project. What would you like to know?");showQuick(["What services do you offer?","Tell me about AI governance","How does your process work?","What industries do you serve?"])}
+
+function addBot(text){const d=document.getElementById('cb-msgs');const m=document.createElement('div');m.className='cb-msg bot';m.innerHTML=text;d.appendChild(m);d.scrollTop=d.scrollHeight}
+function addUser(text){const d=document.getElementById('cb-msgs');const m=document.createElement('div');m.className='cb-msg user';m.textContent=text;d.appendChild(m);d.scrollTop=d.scrollHeight}
+function showTyping(){const d=document.getElementById('cb-msgs');const t=document.createElement('div');t.className='cb-typing';t.id='typing';t.innerHTML='<span></span><span></span><span></span>';d.appendChild(t);d.scrollTop=d.scrollHeight}
+function hideTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+function showQuick(opts){const q=document.getElementById('cb-quick');q.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.textContent=o;b.onclick=()=>{sendMsg(o)};q.appendChild(b)})}
+
+function sendMsg(text){
+  const input=document.getElementById('cb-in');
+  const msg=text||input.value.trim();
+  if(!msg)return;
+  input.value='';
+  addUser(msg);
+  document.getElementById('cb-quick').innerHTML='';
+  showTyping();
+  setTimeout(()=>{hideTyping();const resp=getResponse(msg);addBot(resp.text);if(resp.quick)showQuick(resp.quick)},600+Math.random()*400);
 }
-function submitFeedback(){
-  const data={
-    rating:currentRating,
-    section:document.getElementById('fb-section').value,
-    comment:document.getElementById('fb-comment').value,
-    name:document.getElementById('fb-name').value,
-    email:document.getElementById('fb-email').value,
-    timestamp:new Date().toISOString(),
-    url:window.location.href
-  };
-  // Store in localStorage for collection
-  const existing=JSON.parse(localStorage.getItem('bp-feedback')||'[]');
-  existing.push(data);
-  localStorage.setItem('bp-feedback',JSON.stringify(existing));
-  // Also copy to clipboard as JSON for easy collection
-  const summary=`⭐ ${data.rating}/5 | ${data.section||'Overall'}\n${data.comment}\n— ${data.name||'Anonymous'}${data.email?' ('+data.email+')':''}`;
-  navigator.clipboard?.writeText(summary).catch(()=>{});
-  // Show success
-  document.getElementById('fb-form-area').innerHTML=`
-    <div class="fb-success">
-      <div class="fb-success-icon">✓</div>
-      <h4>Thank you!</h4>
-      <p>Your feedback has been recorded and copied to clipboard. It helps us make BrainPulse even better.</p>
-    </div>`;
+
+document.getElementById('cb-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg()});
+
+function getResponse(msg){
+  const m=msg.toLowerCase();
+  
+  if(m.match(/servic|what.*(do|offer)|help.*with/))
+    return{text:"We offer four core service pillars:<br><br><strong>1. Design for AI</strong> — dashboards, chatbot UX, explainability interfaces, trust calibration<br><strong>2. Design & Engineering</strong> — product design, UI/UX, design systems, React/Angular/Vue<br><strong>3. Research & Strategy</strong> — user research, cognitive task analysis, UX strategy, FMEA<br><strong>4. AI Governance & Compliance</strong> — NIST AI RMF, EU AI Act, ISO/IEC 42001, WCAG AAA<br><br>We also specialize in dashboard design, data visualization, digital twins, and accessibility remediation.",quick:["Tell me about pricing","How does your process work?","What's AI governance?"]};
+
+  if(m.match(/pric|cost|how much|budget|rate|fee|invest/))
+    return{text:"Our pricing is project-based and depends on scope:<br><br>• <strong>AI UX Audit</strong> — $1,500–$5,000 (1–2 weeks)<br>• <strong>UX Design Sprint</strong> — $8,000–$25,000 (2–4 weeks)<br>• <strong>Full Product Design</strong> — $25,000–$80,000+ (2–4 months)<br>• <strong>Accessibility Audit & Remediation</strong> — $5,000–$20,000<br>• <strong>AI Governance Assessment</strong> — $10,000–$30,000<br><br>We also offer retained partnerships for ongoing design support. Want to discuss your specific project?",quick:["Book a discovery call","What's included in an audit?","Tell me about your process"]};
+
+  if(m.match(/process|how.*work|methodology|approach|step/))
+    return{text:"Our process follows a disciplined engineering approach:<br><br><strong>01 — Discover</strong><br>Stakeholder interviews, user research, accessibility audit, competitive analysis<br><br><strong>02 — Define</strong><br>Information architecture, user flows, requirements traceability, design principles<br><br><strong>03 — Design</strong><br>Wireframes, prototypes, visual design, WCAG-compliant components, usability validation<br><br><strong>04 — Deliver</strong><br>Production code (React/Angular/Vue), design systems, developer handoff, ongoing support<br><br>Every decision is traceable to evidence — FMEA, URRA, or usability testing.",quick:["What makes you different?","Tell me about accessibility","What industries do you serve?"]};
+
+  if(m.match(/govern|nist|eu ai|compliance|regulat|iso.*42001|ai.*act/))
+    return{text:"AI Governance is our core differentiator — no other UX agency offers this depth:<br><br>• <strong>NIST AI RMF</strong> — full risk management framework implementation & dashboard design<br>• <strong>EU AI Act</strong> — classification, compliance design, and cross-border patterns<br>• <strong>ISO/IEC 42001</strong> — AI management system interfaces<br>• <strong>Algorithmic Impact Assessments</strong> — model cards, AI BoM documentation<br>• <strong>Human-in-the-Loop</strong> — oversight controls, audit trail UX<br>• <strong>AI Monitoring</strong> — drift detection, TEVV reporting, human-override dashboards<br><br>We design the governance layer, not just the interface.",quick:["What's your pricing?","Tell me about safety analysis","Book a call"]};
+
+  if(m.match(/access|wcag|508|a11y|disab|inclusive|remediat|vpat/))
+    return{text:"Accessibility is architecture — built in, not bolted on:<br><br>• <strong>WCAG 2.2 AAA</strong> — the highest compliance level (our own site meets this)<br>• <strong>Section 508</strong> — federal accessibility compliance<br>• <strong>SSA11y</strong> — CI/CD automated accessibility scanning<br>• <strong>VPAT Generation</strong> — automated audit documentation<br>• <strong>Remediation Roadmaps</strong> — prioritized by severity & user impact<br>• <strong>Screen Reader Testing</strong> — NVDA, JAWS, VoiceOver validation<br><br>We treat accessibility as a systems discipline with organizational policy, training, and design system integration.",quick:["What's your pricing?","Tell me about your process","What industries do you serve?"]};
+
+  if(m.match(/industr|sector|vertical|healthcare|gov|defense|finance|saa[s]/))
+    return{text:"We serve industries where human safety and system complexity intersect:<br><br>• <strong>Healthcare & Biotech</strong> — clinical tools, ISO 14971, IEC 62366<br>• <strong>Government & Federal</strong> — SSA, Section 508, FedRAMP-conscious design<br>• <strong>Defense</strong> — MIL-STD-1472H, DoDI 5000.95 HSI lifecycle<br>• <strong>AI & Machine Learning</strong> — governance dashboards, model monitoring<br>• <strong>Finance & FinTech</strong> — compliance interfaces, data visualization<br>• <strong>SaaS & Enterprise</strong> — design systems, dashboard & BI products<br>• <strong>Manufacturing & Cybersecurity</strong> — operator interfaces, monitoring UX<br><br>Our deepest experience is in safety-critical environments.",quick:["See case studies","What's your pricing?","Book a call"]};
+
+  if(m.match(/case.stud|portfolio|work|project|example|client/))
+    return{text:"Here are some of our key projects:<br><br><strong>SSA — Case Processing Modernization</strong><br>40% faster task completion, 100% Section 508 compliance, 12 modules shipped<br><br><strong>Leidos — Defense Human Factors</strong><br>3x usability improvement, 67% error reduction, MIL-STD-1472H compliant<br><br><strong>Best Buy — Inclusive Design Program</strong><br>23% user base increase, enterprise-wide a11y standards, 50+ components<br><br><strong>Federal Agency — AI Governance Dashboard</strong><br>NIST AI RMF compliant, 8 AI models governed, React production code<br><br>Scroll up to the <a href='#case-studies'>Case Studies section</a> for full details.",quick:["What's your pricing?","How does your process work?","Book a call"]};
+
+  if(m.match(/different|unique|why.*you|compet|vs|compared|advantage|stand.*out/))
+    return{text:"What sets us apart from every other UX agency:<br><br><strong>1. AI Governance</strong> — NIST AI RMF, EU AI Act compliance. No other design agency offers this.<br><strong>2. Human Factors Engineering</strong> — MIL-STD-1472H, cognitive task analysis, operator performance.<br><strong>3. WCAG 2.2 AAA</strong> — our own site meets the highest accessibility standard.<br><strong>4. Systems Engineering</strong> — MBSE/SysML with LLM-accelerated modeling.<br><strong>5. Evidence-Based</strong> — FMEA, URRA, and usability validation. Not guesswork.<br><strong>6. Full-Stack Delivery</strong> — we ship production code in React, Angular, and Vue.<br><br>Most agencies design screens. We design governance, safety, and systems.",quick:["Tell me about pricing","See case studies","Book a call"]};
+
+  if(m.match(/tech|stack|react|angular|vue|figma|tool/))
+    return{text:"Our modern tech stack:<br><br><strong>Frontend:</strong> React, Angular, Vue.js, Next.js, TypeScript, Storybook, Tailwind<br><strong>Design:</strong> Figma, Axure RP, Framer, ProtoPie, Miro<br><strong>Accessibility:</strong> axe-core, SSA11y, Pa11y CI, NVDA, JAWS, VoiceOver<br><strong>Standards:</strong> MIL-STD-1472H, ISO 14971, IEC 62366, WCAG 2.2<br><strong>AI Governance:</strong> NIST AI RMF, EU AI Act, ISO/IEC 42001, TEVV<br><strong>AI/LLM:</strong> LLM-powered SysML generation, FMEA automation, RTM building<br><br>We deliver production-ready code, not just Figma files.",quick:["What's your process?","Tell me about pricing","Book a call"]};
+
+  if(m.match(/senthil|founder|who|team|about|background|experience/))
+    return{text:"<strong>Senthil Nagappan</strong> — Founder & Principal UX Consultant<br><br>15+ years at the intersection of technology and human safety:<br><br>• <strong>Social Security Administration</strong> — Sr. UX & Accessibility Specialist<br>• <strong>Leidos</strong> — Senior UX Specialist (Defense)<br>• <strong>Best Buy</strong> — Senior Inclusive Designer & Accessibility SME<br>• <strong>Synectics</strong> — UX Consultant for Federal Agencies<br><br>Expertise in AI Safety, Human Systems Integration, MIL-STD-1472H, MBSE/SysML, and WCAG 2.2 AAA accessibility.",quick:["What services do you offer?","See case studies","Book a call"]};
+
+  if(m.match(/book|call|meet|consult|contact|email|reach|start|hire|engage|get.*touch/))
+    return{text:"I'd love to connect! Here's how to reach Senthil:<br><br>📧 <strong>Email:</strong> <a href='mailto:senthil@brainpulseinc.com'>senthil@brainpulseinc.com</a><br>💼 <strong>LinkedIn:</strong> <a href='https://www.linkedin.com/in/senthil-nagappan-58705016/' target='_blank'>Connect on LinkedIn</a><br><br>Or scroll down to our <a href='#contact'>contact section</a> and submit your email — we'll get back within 24 hours.<br><br>Typical first step: a free 30-minute discovery call to understand your project needs.",quick:["What's your pricing?","What services do you offer?","Tell me about your process"]};
+
+  if(m.match(/human.factor|hfe|mil.std|1472|cognitive|operator|ergonomic/))
+    return{text:"Human Factors Engineering is core to our practice:<br><br>• <strong>MIL-STD-1472H</strong> — human engineering design criteria for safety-critical interfaces<br>• <strong>Cognitive Task Analysis</strong> — mapping mental models and decision flows<br>• <strong>Workload Assessment</strong> — cognitive load reduction strategies<br>• <strong>Situational Awareness</strong> — decision support interface design<br>• <strong>Error Prevention</strong> — FMEA-based human error mitigation<br>• <strong>Operator Performance</strong> — design under stress, fatigue, and time pressure<br><br>We go beyond visual design into cognitive science and human performance.",quick:["Tell me about HSI","What's AI governance?","See case studies"]};
+
+  if(m.match(/hsi|human.*system.*int|dodi|5000|lifecycle/))
+    return{text:"Human Systems Integration (HSI) is the governing framework:<br><br>• <strong>DoDI 5000.95</strong> — full lifecycle integration<br>• <strong>7 HSI Domains:</strong> Manpower, Personnel, Training, Human Factors Engineering, Safety, Health Hazards, Survivability<br>• <strong>System-level integration</strong> across all stakeholders<br>• <strong>Human performance trade-off analysis</strong><br>• <strong>Operational scenario modeling</strong> & task analysis<br><br>We ensure the human is designed into the system from day one — not retrofitted at the end.",quick:["Tell me about human factors","What's your process?","Book a call"]};
+
+  if(m.match(/llm|sysml|mbse|model|automat/))
+    return{text:"We use LLMs to accelerate systems engineering:<br><br>• <strong>Auto-generate SysML</strong> diagrams from natural language requirements<br>• <strong>FMEA automation</strong> — generate failure mode tables from use case descriptions<br>• <strong>Requirements traceability</strong> — trace human performance across architecture layers<br>• <strong>VPAT acceleration</strong> — automate accessibility audit documentation<br>• <strong>Compliance packages</strong> — build EU AI Act evidence packages automatically<br><br>This turns weeks of manual engineering into hours of AI-assisted, human-verified work.",quick:["What's your pricing?","Tell me about AI governance","Book a call"]};
+
+  if(m.match(/dashboard|data.*viz|visualization|bi|analytics|chart/))
+    return{text:"We specialize in complex data interfaces:<br><br>• <strong>Dashboard & BI Products</strong> — for healthcare, government, defense, enterprise<br>• <strong>Data Visualization</strong> — charts, geospatial maps, real-time streams<br>• <strong>AI Model Monitoring</strong> — drift detection, confidence scoring, explainability<br>• <strong>Accessible Charts</strong> — colorblind-safe, screen reader compatible<br>• <strong>Operator Dashboards</strong> — designed for cognitive load and rapid decision-making<br><br>Every visualization is WCAG compliant and optimized for human performance.",quick:["See case studies","What's your pricing?","Book a call"]};
+
+  if(m.match(/hi|hello|hey|morning|afternoon|good/))
+    return{text:"Hello! Welcome to BrainPulse Inc. I'm here to help you learn about our UX engineering, AI governance, accessibility, and human factors services. What can I help you with today?",quick:["What services do you offer?","Tell me about AI governance","How does your process work?","What industries do you serve?"]};
+
+  if(m.match(/thank|thanks|great|awesome|perfect|helpful/))
+    return{text:"You're welcome! Is there anything else you'd like to know about BrainPulse Inc? I'm happy to help with any questions about our services, process, or how we can support your project.",quick:["Book a discovery call","What's your pricing?","Tell me about your team"]};
+
+  if(m.match(/bye|goodbye|see you|later|done/))
+    return{text:"Thanks for chatting! If you'd like to start a project or have more questions, reach out anytime at <a href='mailto:senthil@brainpulseinc.com'>senthil@brainpulseinc.com</a>. We look forward to hearing from you!",quick:["Book a call","What's your pricing?"]};
+
+  return{text:"Great question! While I may not have a specific answer for that, here's what I can help with:<br><br>• Our <strong>services</strong> (AI governance, UX design, accessibility, human factors)<br>• <strong>Pricing</strong> and engagement models<br>• Our <strong>process</strong> and methodology<br>• <strong>Case studies</strong> and past work<br>• <strong>Industry expertise</strong><br>• How to <strong>get in touch</strong><br><br>Or feel free to email <a href='mailto:senthil@brainpulseinc.com'>senthil@brainpulseinc.com</a> for a personalized response!",quick:["What services do you offer?","Tell me about pricing","Book a call"]};
 }
 </script>
 </body>
