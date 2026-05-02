@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainPulse Inc — AI Governance · Human Factors · Accessible Systems · UX Engineering</title>
+<meta name="description" content="BrainPulse Inc is a UX engineering consultancy specializing in AI governance, human factors, accessibility, dashboard design, data visualization, and safety-critical systems. WCAG 2.2 AAA. Led by Senthil Nagappan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FBF9F6;--bg2:#F5F2ED;--bg3:#ECEAE4;--w:#fff;
+  --ink:#1C1917;--ink2:#292524;--mt:#44403C;--dm:#57534E;
+  --teal:#0D7377;--ts:rgba(13,115,119,.06);--tm:rgba(13,115,119,.14);
+  --peach:#92400E;--ps:rgba(146,64,14,.05);
+  --rose:#9F1239;--rs:rgba(159,18,57,.05);--rm:rgba(159,18,57,.12);
+  --green:#166534;--navy:#1E3A5F;
+  --on-d:#F5F2ED;--on-dm:#C7C2BA;
+  --serif:'Libre Baskerville',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --b1:rgba(28,25,23,.07);--b2:rgba(28,25,23,.12);--b3:rgba(28,25,23,.18);
+  --r:16px;--rl:22px;
+  --ss:0 1px 2px rgba(28,25,23,.03),0 4px 16px rgba(28,25,23,.04);
+  --sl:0 4px 12px rgba(28,25,23,.06),0 12px 32px rgba(28,25,23,.06);
+}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased;font-size:1rem}
+a{color:var(--teal);text-decoration:underline;text-decoration-color:rgba(13,115,119,.25);text-underline-offset:3px;transition:all .25s}a:hover{text-decoration-color:var(--teal)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-offset:3px;border-radius:6px}
+::selection{background:var(--teal);color:#fff}
+.skip{position:absolute;top:-100%;left:1rem;padding:.75rem 1.5rem;background:var(--ink);color:#fff;font-weight:700;border-radius:0 0 var(--r) var(--r);z-index:9999;text-decoration:none}.skip:focus{top:0}
+.w{max-width:1100px;margin:0 auto;padding:0 clamp(1.25rem,4vw,3rem)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.65rem 0;background:rgba(251,249,246,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1)}
+nav .w{display:flex;align-items:center;justify-content:space-between}
+.logo-g{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-g:hover{text-decoration:none}
+.logo-g:hover svg{transform:rotate(8deg) scale(1.05)}
+.logo-g svg{width:38px;height:38px;transition:transform .4s var(--ease)}
+.ln{font-weight:700;font-size:1.1rem;color:var(--ink);letter-spacing:-.02em}.ln span{color:var(--teal)}
+.nv{display:flex;align-items:center;gap:.35rem}
+.nv a{font-size:.78rem;color:var(--mt);font-weight:500;padding:.55rem .55rem;min-height:44px;display:inline-flex;align-items:center;text-decoration:none;border-radius:8px;transition:all .25s}
+.nv a:hover{color:var(--ink);background:var(--bg2)}
+.nv-c{background:var(--teal)!important;color:#fff!important;padding:.55rem 1.1rem!important;border-radius:var(--r)!important;font-weight:700!important}
+.nv-c:hover{background:#0A5F62!important;transform:translateY(-1px)}
+.mbtn{display:none;border:2px solid var(--b3);background:none;cursor:pointer;padding:10px;border-radius:8px;min-width:44px;min-height:44px;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.mbtn span{width:18px;height:2px;background:var(--ink);border-radius:2px;display:block}
+
+/* SECTIONS */
+section{padding:clamp(3.5rem,7vw,5.5rem) 0}
+.sl{font-family:var(--mono);font-size:.6rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.st{font-family:var(--serif);font-size:clamp(1.6rem,2.8vw,2.2rem);line-height:1.18;color:var(--ink);max-width:560px;margin-bottom:.5rem}
+.ss{font-size:.88rem;color:var(--mt);max-width:480px;line-height:1.8;margin-bottom:2.25rem}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.8rem 1.5rem;border-radius:var(--r);font-weight:700;font-size:.85rem;min-height:44px;cursor:pointer;transition:all .3s var(--ease);text-decoration:none;border:2px solid transparent}
+.btn-f{background:var(--teal);color:#fff;border-color:var(--teal)}.btn-f:hover{background:#0A5F62;border-color:#0A5F62;transform:translateY(-2px);box-shadow:0 4px 20px rgba(13,115,119,.12)}
+.btn-o{background:var(--w);color:var(--ink);border-color:var(--b3)}.btn-o:hover{border-color:var(--ink);background:var(--bg2)}
+
+/* HERO */
+.hero{padding:7.5rem 0 4.5rem;position:relative}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 20%,var(--ts),transparent 50%),radial-gradient(ellipse at 20% 80%,var(--ps),transparent 40%);pointer-events:none}
+.hero-g{display:grid;grid-template-columns:1.15fr .85fr;gap:3.5rem;align-items:center;position:relative;z-index:2}
+.h-chip{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--mono);font-size:.62rem;color:var(--teal);padding:.4rem .9rem;background:var(--ts);border:1px solid var(--tm);border-radius:100px;margin-bottom:1.25rem;letter-spacing:.05em;text-transform:uppercase}
+.h-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
+.hero h1{font-family:var(--serif);font-size:clamp(2.1rem,4.2vw,3.2rem);line-height:1.12;color:var(--ink);margin-bottom:1.15rem}
+.hero h1 em{font-style:italic;color:var(--teal)}
+.hero-p{font-size:clamp(.88rem,1.1vw,.98rem);color:var(--mt);max-width:520px;line-height:1.8;margin-bottom:1.75rem}
+.hero-btns{display:flex;gap:.5rem;flex-wrap:wrap}
+
+/* Hero card */
+.hcard{background:var(--w);border:1px solid var(--b2);border-radius:var(--rl);padding:1.75rem;box-shadow:var(--ss);position:relative;overflow:hidden;transition:all .4s var(--ease)}
+.hcard:hover{box-shadow:var(--sl);transform:translateY(-3px)}
+.hcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--peach),var(--rose))}
+.hcard-logo{display:flex;justify-content:center;margin-bottom:1.25rem}
+.hcard-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:.85rem}
+.hs{background:var(--bg);border:1px solid var(--b1);border-radius:10px;padding:.55rem .5rem;text-align:center;transition:all .3s}
+.hs:hover{border-color:var(--tm);background:var(--ts)}
+.hs-n{font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--ink);line-height:1}.hs-n span{color:var(--teal)}
+.hs-l{font-size:.5rem;color:var(--mt);margin-top:.1rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.htags{display:flex;flex-wrap:wrap;gap:.25rem;justify-content:center}
+.ht{font-family:var(--mono);font-size:.52rem;padding:.2rem .45rem;border-radius:5px;font-weight:500}
+
+/* CLIENT LOGOS */
+#clients{background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);padding:2.75rem 0}
+.clients-label{font-family:var(--mono);font-size:.58rem;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;text-align:center;margin-bottom:1.5rem}
+.logos-row{display:flex;justify-content:center;align-items:center;gap:clamp(1.5rem,4vw,3.5rem);flex-wrap:wrap}
+.client-logo{display:flex;flex-direction:column;align-items:center;gap:.35rem;transition:all .3s}
+.client-logo:hover{transform:translateY(-2px)}
+.client-logo-mark{width:56px;height:56px;border-radius:14px;background:var(--bg);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;transition:all .3s}
+.client-logo:hover .client-logo-mark{border-color:var(--tm);background:var(--ts)}
+.client-logo-mark span{font-family:var(--sans);font-weight:800;font-size:.7rem;color:var(--mt);letter-spacing:-.02em}
+.client-logo-name{font-size:.6rem;color:var(--mt);font-weight:600;text-align:center;max-width:70px;line-height:1.3}
+
+/* CASE STUDIES */
+#case-studies{background:var(--bg)}
+.cs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.cs{background:var(--w);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;transition:all .35s var(--ease)}
+.cs:hover{border-color:var(--b2);box-shadow:var(--sl);transform:translateY(-4px)}
+.cs-visual{width:100%;aspect-ratio:16/8;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.cs:nth-child(1) .cs-visual{background:linear-gradient(135deg,#0D7377 0%,#065F46 100%)}
+.cs:nth-child(2) .cs-visual{background:linear-gradient(135deg,#1E3A5F 0%,#312E81 100%)}
+.cs:nth-child(3) .cs-visual{background:linear-gradient(135deg,#92400E 0%,#B45309 100%)}
+.cs:nth-child(4) .cs-visual{background:linear-gradient(135deg,#9F1239 0%,#BE185D 100%)}
+.cs-visual-inner{color:rgba(255,255,255,.12);font-family:var(--mono);font-size:.5rem;text-transform:uppercase;letter-spacing:.2em;text-align:center;padding:.75rem}
+.cs-visual-mockup{position:absolute;bottom:-8px;right:16px;width:55%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:8px 8px 0 0;overflow:hidden;backdrop-filter:blur(4px)}
+.cs-mockup-bar{height:16px;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;padding:0 6px;gap:3px}
+.cs-mockup-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.15)}
+.cs-mockup-body{padding:8px}
+.cs-mockup-line{height:4px;border-radius:2px;background:rgba(255,255,255,.06);margin-bottom:4px}
+.cs-mockup-block{height:24px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);margin-top:6px}
+.cs-tags{display:flex;flex-wrap:wrap;gap:.25rem;padding:1.25rem 1.5rem .4rem}
+.cs-tag{font-family:var(--mono);font-size:.48rem;padding:.2rem .4rem;border-radius:4px;background:var(--ts);color:var(--teal);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.cs-body{padding:.25rem 1.5rem 1.5rem}
+.cs-body h3{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;font-family:var(--serif)}
+.cs-body p{font-size:.76rem;color:var(--mt);line-height:1.6;margin-bottom:.75rem}
+.cs-metrics{display:flex;gap:1rem;padding-top:.65rem;border-top:1px solid var(--b1)}
+.cs-metric{text-align:center}
+.cs-metric-val{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--teal);line-height:1}
+.cs-metric-label{font-size:.5rem;color:var(--mt);margin-top:.15rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+
+/* SERVICE PILLARS */
+#service-pillars{background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+.pillar{background:var(--bg);border:1px solid var(--b1);border-radius:var(--rl);padding:1.5rem;transition:all .35s var(--ease);position:relative;overflow:hidden}
+.pillar:hover{border-color:var(--b2);box-shadow:var(--sl);transform:translateY(-3px)}
+.pillar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--rl) var(--rl) 0 0}
+.pillar:nth-child(1)::before{background:var(--teal)}.pillar:nth-child(2)::before{background:var(--green)}
+.pillar:nth-child(3)::before{background:var(--peach)}.pillar:nth-child(4)::before{background:var(--rose)}
+.pillar-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;transition:all .35s}
+.pillar:nth-child(1) .pillar-icon{background:var(--ts);color:var(--teal)}
+.pillar:nth-child(2) .pillar-icon{background:rgba(22,101,52,.05);color:var(--green)}
+.pillar:nth-child(3) .pillar-icon{background:var(--ps);color:var(--peach)}
+.pillar:nth-child(4) .pillar-icon{background:var(--rs);color:var(--rose)}
+.pillar:hover .pillar-icon{transform:rotate(-5deg) scale(1.1)}
+.pillar h3{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:.35rem;font-family:var(--serif)}
+.pillar p{font-size:.72rem;color:var(--mt);line-height:1.6}
+.pillar-list{list-style:none;padding:0;margin-top:.6rem}
+.pillar-list li{font-size:.68rem;color:var(--mt);padding:.2rem 0 .2rem .7rem;position:relative}
+.pillar-list li::before{content:'';position:absolute;left:0;top:.45rem;width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.25}
+
+/* DESIGN EXPERTISE */
+#expertise{background:var(--bg)}
+.exp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.exp-card{background:var(--w);border:1px solid var(--b1);border-radius:var(--rl);padding:1.5rem;transition:all .35s var(--ease);cursor:pointer}
+.exp-card:hover{border-color:var(--tm);box-shadow:var(--sl);transform:translateY(-3px)}
+.exp-card .exp-visual{width:100%;aspect-ratio:16/9;border-radius:12px;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.exp-card:nth-child(1) .exp-visual{background:linear-gradient(135deg,#0D7377 0%,#065F46 100%)}
+.exp-card:nth-child(2) .exp-visual{background:linear-gradient(135deg,#1E3A5F 0%,#312E81 100%)}
+.exp-card:nth-child(3) .exp-visual{background:linear-gradient(135deg,#92400E 0%,#B45309 100%)}
+.exp-card:nth-child(4) .exp-visual{background:linear-gradient(135deg,#166534 0%,#0D7377 100%)}
+.exp-card:nth-child(5) .exp-visual{background:linear-gradient(135deg,#9F1239 0%,#BE185D 100%)}
+.exp-card:nth-child(6) .exp-visual{background:linear-gradient(135deg,#1C1917 0%,#44403C 100%)}
+.exp-visual-inner{color:rgba(255,255,255,.15);font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;text-align:center;padding:1rem}
+.exp-card h3{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.2rem}
+.exp-card p{font-size:.7rem;color:var(--mt);line-height:1.55}
+
+/* INDUSTRIES */
+#industries{background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.ind-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem}
+.ind{background:var(--bg);border:1px solid var(--b1);border-radius:14px;padding:1rem;text-align:center;transition:all .3s;cursor:pointer;text-decoration:none}
+.ind:hover{border-color:var(--tm);background:var(--ts);transform:translateY(-2px)}
+.ind-icon{width:36px;height:36px;border-radius:10px;background:var(--ts);color:var(--teal);display:flex;align-items:center;justify-content:center;margin:0 auto .6rem;transition:all .3s}
+.ind:hover .ind-icon{background:var(--teal);color:#fff;transform:rotate(-5deg)}
+.ind-name{font-size:.72rem;font-weight:700;color:var(--ink)}
+
+/* SERVICES GRID */
+#services{background:var(--bg)}
+.srv-g{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
+.sv{background:var(--w);border:1px solid var(--b1);border-radius:var(--r);padding:1.25rem;transition:all .3s var(--ease)}
+.sv:hover{border-color:var(--tm);box-shadow:var(--ss);transform:translateY(-2px)}
+.sv-i{width:32px;height:32px;border-radius:8px;background:var(--ts);color:var(--teal);display:flex;align-items:center;justify-content:center;margin-bottom:.65rem;transition:all .3s}
+.sv:hover .sv-i{background:var(--teal);color:#fff;transform:rotate(-5deg)}
+.sv h3{font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.15rem}
+.sv p{font-size:.65rem;color:var(--mt);line-height:1.5}
+
+/* TECH */
+#tech{background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.tech-g{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem}
+.tb{background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);padding:1.1rem;transition:all .3s}
+.tb:hover{box-shadow:var(--ss);transform:translateY(-1px)}
+.tb h3{font-size:.75rem;font-weight:700;color:var(--ink);margin-bottom:.5rem}
+.tt{display:flex;flex-wrap:wrap;gap:.2rem}
+.t{font-family:var(--mono);font-size:.52rem;padding:.2rem .4rem;border-radius:4px;border:1px solid var(--b1);background:var(--w);color:var(--mt);transition:all .25s}
+.t:hover{border-color:var(--tm);color:var(--teal);background:var(--ts)}
+.llm{background:var(--bg);border:1.5px solid var(--tm);border-radius:var(--rl);padding:1.25rem;position:relative;overflow:hidden}
+.llm::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--ts),transparent 40%);pointer-events:none}
+.llm>*{position:relative;z-index:2}
+.llm h3{font-size:.88rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem}
+.llm-b{font-family:var(--mono);font-size:.45rem;padding:.18rem .4rem;border-radius:3px;background:var(--teal);color:#fff;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.llm p{font-size:.78rem;color:var(--mt);line-height:1.7}
+.llm-ul{list-style:none;padding:0;margin:.5rem 0 0;display:grid;grid-template-columns:1fr 1fr;gap:.1rem .4rem}
+.llm-ul li{font-size:.62rem;color:var(--mt);padding:.12rem 0 .12rem .6rem;position:relative}
+.llm-ul li::before{content:'';position:absolute;left:0;top:.38rem;width:3px;height:3px;border-radius:50%;background:var(--teal)}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--bg)}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.test{background:var(--w);border:1px solid var(--b1);border-radius:var(--rl);padding:1.5rem;transition:all .3s}
+.test:hover{box-shadow:var(--sl);transform:translateY(-3px)}
+.test-stars{color:var(--peach);font-size:.75rem;margin-bottom:.75rem;letter-spacing:2px}
+.test blockquote{font-size:.82rem;color:var(--mt);line-height:1.7;font-style:italic;margin-bottom:1rem;font-family:var(--serif)}
+.test-author{display:flex;align-items:center;gap:.6rem}
+.test-av{width:36px;height:36px;border-radius:50%;background:var(--ts);border:1px solid var(--tm);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.65rem;color:var(--teal)}
+.test-name{font-size:.78rem;font-weight:700;color:var(--ink)}
+.test-role{font-size:.62rem;color:var(--mt)}
+
+/* FAQ */
+#faq{background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.faq-list{max-width:700px}
+details{border-bottom:1px solid var(--b1);padding:1rem 0}
+details:last-child{border-bottom:none}
+summary{font-size:.88rem;font-weight:700;color:var(--ink);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:.25rem 0}
+summary::after{content:'+';font-size:1.2rem;color:var(--teal);font-weight:300;transition:transform .3s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{font-size:.82rem;color:var(--mt);line-height:1.8;padding:.5rem 0;max-width:600px}
+
+/* CTA */
+#contact{background:var(--ink);color:var(--on-d);text-align:center;padding:5rem 0;position:relative;overflow:hidden;border-radius:var(--rl) var(--rl) 0 0;margin:0 .75rem}
+#contact::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(13,115,119,.12),transparent 55%);pointer-events:none}
+.cta-t{font-family:var(--serif);font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.15;margin-bottom:.5rem;position:relative;z-index:2;color:var(--on-d)}
+.cta-t em{font-style:italic;color:#5CBFC3}
+.cta-s{font-size:.85rem;color:var(--on-dm);max-width:380px;margin:0 auto 1.5rem;line-height:1.7;position:relative;z-index:2}
+.cta-form{display:flex;gap:.4rem;max-width:380px;margin:0 auto;position:relative;z-index:2}
+.cta-form input{flex:1;padding:.7rem 1rem;border-radius:var(--r);border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;font-family:var(--sans);font-size:.82rem;outline:none;min-height:44px}
+.cta-form input::placeholder{color:var(--on-dm)}
+.cta-form input:focus-visible{border-color:#5CBFC3;outline:none;box-shadow:0 0 0 3px rgba(92,191,195,.25)}
+.cta-btn{background:#fff;color:var(--ink);padding:.7rem 1.1rem;border-radius:var(--r);font-weight:700;font-size:.78rem;border:none;cursor:pointer;min-height:44px;white-space:nowrap;transition:all .3s}
+.cta-btn:hover{background:var(--bg2);transform:translateY(-1px)}
+.cta-email{margin-top:.85rem;font-size:.7rem;color:var(--on-dm);position:relative;z-index:2}
+.cta-email a{color:#5CBFC3;text-decoration:underline;text-underline-offset:2px}
+
+footer{padding:1.75rem 0;background:var(--bg)}
+.foot{display:flex;justify-content:space-between;align-items:center}
+.foot-c{font-size:.65rem;color:var(--mt)}
+.foot-l{display:flex;gap:.15rem}
+.foot-l a{font-size:.65rem;color:var(--mt);padding:.45rem .55rem;min-height:44px;display:inline-flex;align-items:center;border-radius:6px;text-decoration:underline;text-decoration-color:rgba(68,64,60,.2)}
+.foot-l a:hover{color:var(--ink);background:var(--bg2)}
+
+/* ANIMATIONS */
+@media(prefers-reduced-motion:no-preference){.rv{opacity:0;transform:translateY(16px);transition:all .5s var(--ease)}.rv.vis{opacity:1;transform:translateY(0)}.d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.hero-g{grid-template-columns:1fr}.hcard{max-width:420px;margin-top:1.5rem}.pillars{grid-template-columns:1fr 1fr}.exp-grid{grid-template-columns:1fr 1fr}.ind-grid{grid-template-columns:repeat(3,1fr)}.srv-g{grid-template-columns:repeat(2,1fr)}.tech-g{grid-template-columns:1fr 1fr}.test-grid{grid-template-columns:1fr 1fr}.cs-grid{grid-template-columns:1fr 1fr}.hcard-stats{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:768px){.nv{display:none;position:absolute;top:100%;left:0;right:0;background:var(--w);border-bottom:1px solid var(--b1);flex-direction:column;padding:1rem;gap:.2rem;box-shadow:var(--ss)}.nv.open{display:flex}.mbtn{display:flex}.pillars,.exp-grid,.srv-g,.tech-g,.test-grid,.ind-grid,.cs-grid{grid-template-columns:1fr}.hero-btns{flex-direction:column;width:100%}.btn{justify-content:center;width:100%}.cta-form{flex-direction:column}.foot{flex-direction:column;gap:1rem;text-align:center}.foot-l{justify-content:center}.llm-ul{grid-template-columns:1fr}#contact{margin:0;border-radius:0}.hcard-stats{grid-template-columns:repeat(2,1fr)}.logos-row{gap:1rem}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+
+<nav aria-label="Primary navigation">
+<div class="w">
+  <a href="#" class="logo-g">
+    <svg viewBox="0 0 52 52" aria-hidden="true"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke="#0D7377" stroke-width="1.6" stroke-linejoin="round"/><path d="M26 14L38 21V33L26 40L14 33V21Z" fill="none" stroke="#0D7377" stroke-width="1" opacity=".2"/><circle cx="26" cy="23" r="5" fill="none" stroke="#0D7377" stroke-width="1.8"/><circle cx="26" cy="23" r="2" fill="#0D7377"/><path d="M26 28V38" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".22"/><path d="M21.5 20.5L12 14" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"/><path d="M30.5 20.5L40 14" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"/><path d="M21 25.5L10 30" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"/><path d="M31 25.5L42 30" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"/><circle cx="26" cy="39.5" r="1.5" fill="#0D7377" opacity=".3"/><circle cx="11" cy="13.5" r="1.2" fill="#0D7377" opacity=".2"/><circle cx="41" cy="13.5" r="1.2" fill="#0D7377" opacity=".2"/><circle cx="9" cy="30.5" r="1.2" fill="#0D7377" opacity=".2"/><circle cx="43" cy="30.5" r="1.2" fill="#0D7377" opacity=".2"/></svg>
+    <span class="ln">Brain<span>Pulse</span></span>
+  </a>
+  <div class="nv" id="nm">
+    <a href="#case-studies">Work</a><a href="#service-pillars">Services</a><a href="#expertise">Expertise</a><a href="#industries">Industries</a><a href="#tech">Technology</a><a href="#testimonials">Clients</a>
+    <a href="#contact" class="nv-c">Book a call</a>
+  </div>
+  <button class="mbtn" onclick="var m=document.getElementById('nm');var o=m.classList.toggle('open');this.setAttribute('aria-expanded',o)" aria-label="Toggle menu" aria-expanded="false" aria-controls="nm"><span></span><span></span><span></span></button>
+</div>
+</nav>
+
+<main id="main">
+
+<!-- HERO -->
+<section class="hero rv" aria-labelledby="hero-h">
+<div class="w">
+<div class="hero-g">
+  <div>
+    <div class="h-chip"><span class="h-dot"></span>AI Governance · Human Factors · Accessible Systems</div>
+    <h1 id="hero-h">Where <em>human safety</em> meets intelligent design</h1>
+    <p class="hero-p">BrainPulse Inc engineers safety-critical digital products — AI governance dashboards, accessible enterprise systems, and human-centered interfaces — grounded in MIL-STD-1472H, NIST AI RMF, and EU AI Act compliance. From research to production code.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn btn-f" onclick="event.preventDefault();document.querySelector('#contact').scrollIntoView({behavior:'smooth'})">Book a discovery call <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#service-pillars" class="btn btn-o" onclick="event.preventDefault();document.querySelector('#service-pillars').scrollIntoView({behavior:'smooth'})">Explore services</a>
+    </div>
+  </div>
+  <div class="hcard rv d2">
+    <div class="hcard-logo"><svg viewBox="0 0 90 90" width="80" height="80" aria-hidden="true"><path d="M45 6L81 24V60L45 78L9 60V24Z" fill="#F0F4F8" stroke="#0D7377" stroke-width="1.6" stroke-linejoin="round"/><path d="M45 20L65 31V51L45 62L25 51V31Z" fill="none" stroke="#0D7377" stroke-width="1.2" opacity=".18"/><circle cx="45" cy="38" r="8" fill="none" stroke="#0D7377" stroke-width="2"/><circle cx="45" cy="38" r="3.5" fill="#0D7377"/><circle cx="45" cy="38" r="1.5" fill="#fff"/><path d="M45 46V64" stroke="#0D7377" stroke-width="1.2" stroke-linecap="round" opacity=".25"><animate attributeName="opacity" values=".1;.35;.1" dur="3.5s" repeatCount="indefinite"/></path><path d="M38 33L22 20" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"><animate attributeName="opacity" values=".08;.3;.08" dur="3.5s" begin=".7s" repeatCount="indefinite"/></path><path d="M52 33L68 20" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"><animate attributeName="opacity" values=".08;.3;.08" dur="3.5s" begin="1.4s" repeatCount="indefinite"/></path><path d="M37 41L18 47" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"><animate attributeName="opacity" values=".08;.3;.08" dur="3.5s" begin="2.1s" repeatCount="indefinite"/></path><path d="M53 41L72 47" stroke="#0D7377" stroke-width="1" stroke-linecap="round" opacity=".2"><animate attributeName="opacity" values=".08;.3;.08" dur="3.5s" begin="2.8s" repeatCount="indefinite"/></path><circle cx="45" cy="66" r="2.5" fill="#0D7377" opacity=".3"/><circle cx="20" cy="19" r="2" fill="#0D7377" opacity=".18"/><circle cx="70" cy="19" r="2" fill="#0D7377" opacity=".18"/><circle cx="16" cy="48" r="2" fill="#0D7377" opacity=".18"/><circle cx="74" cy="48" r="2" fill="#0D7377" opacity=".18"/></svg></div>
+    <div class="hcard-stats">
+      <div class="hs"><div class="hs-n">15<span>+</span></div><div class="hs-l">Years</div></div>
+      <div class="hs"><div class="hs-n">50<span>+</span></div><div class="hs-l">Systems</div></div>
+      <div class="hs"><div class="hs-n">508</div><div class="hs-l">Compliant</div></div>
+      <div class="hs"><div class="hs-n">AAA</div><div class="hs-l">WCAG</div></div>
+    </div>
+    <div class="htags"><span class="ht" style="background:var(--ts);color:var(--teal)">HSI</span><span class="ht" style="background:rgba(22,101,52,.05);color:var(--green)">HFE</span><span class="ht" style="background:var(--ps);color:var(--peach)">A11y</span><span class="ht" style="background:rgba(30,58,95,.05);color:var(--navy)">AI Safety</span><span class="ht" style="background:var(--rs);color:var(--rose)">Governance</span></div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- CLIENT LOGOS -->
+<section id="clients" aria-label="Trusted by leading organizations">
+<div class="w">
+  <div class="clients-label rv">Trusted by organizations where safety and compliance are non-negotiable</div>
+  <div class="logos-row rv d1">
+    <div class="client-logo"><div class="client-logo-mark"><span>SSA</span></div><div class="client-logo-name">Social Security Administration</div></div>
+    <div class="client-logo"><div class="client-logo-mark"><span>Leidos</span></div><div class="client-logo-name">Leidos</div></div>
+    <div class="client-logo"><div class="client-logo-mark" style="background:#003B64;border-color:#003B64"><span style="color:#FFE616">BB</span></div><div class="client-logo-name">Best Buy</div></div>
+    <div class="client-logo"><div class="client-logo-mark"><span>SMD</span></div><div class="client-logo-name">Synectics for Mgmt Decisions</div></div>
+    <div class="client-logo"><div class="client-logo-mark"><span>FED</span></div><div class="client-logo-name">Federal Government</div></div>
+    <div class="client-logo"><div class="client-logo-mark"><span>VA</span></div><div class="client-logo-name">Veterans Affairs</div></div>
+    <div class="client-logo"><div class="client-logo-mark"><span>DoD</span></div><div class="client-logo-name">Dept. of Defense</div></div>
+  </div>
+</div>
+</section>
+
+<!-- 4 SERVICE PILLARS (mirrors FuseLab's model but adds Governance) -->
+<section id="service-pillars" aria-label="Service pillars">
+<div class="w">
+  <div class="sl rv">What we do</div>
+  <h2 class="st rv d1">Four pillars. One integrated practice.</h2>
+  <p class="ss rv d2">Unlike pure-play design agencies, we integrate AI governance, human factors engineering, and accessibility at the systems level — not as afterthoughts.</p>
+  <div class="pillars rv d3">
+    <div class="pillar">
+      <div class="pillar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+      <h3>Design for AI</h3>
+      <p>Human-centered interfaces for AI-driven products — with governance, safety, and trust built in.</p>
+      <ul class="pillar-list"><li>AI Dashboard Design</li><li>Chatbot & Conversational UI</li><li>AI Workflow Automation UX</li><li>Explainability Interfaces</li><li>Trust Calibration Patterns</li><li>Human-in-the-Loop Controls</li></ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <h3>Design & Engineering</h3>
+      <p>End-to-end product design and production-ready frontend in React, Angular, and Vue.</p>
+      <ul class="pillar-list"><li>Digital Product Design</li><li>UX & Interaction Design</li><li>UI Design & Design Systems</li><li>Dashboard & BI Products</li><li>Data Visualization</li><li>Frontend Engineering (React/Angular/Vue)</li></ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+      <h3>Research & Strategy</h3>
+      <p>Evidence-based research grounded in human factors engineering and cognitive science.</p>
+      <ul class="pillar-list"><li>User & Product Research</li><li>Cognitive Task Analysis</li><li>UX Strategy & Roadmaps</li><li>FMEA & Usability Risk Analysis</li><li>Information Architecture</li><li>Product Innovation</li></ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l4.58-4.58c.94-.94.94-2.48 0-3.42L9 5z"/><path d="M6 9h.01"/></svg></div>
+      <h3>AI Governance & Compliance</h3>
+      <p>Regulatory-ready AI systems — what no other design agency offers.</p>
+      <ul class="pillar-list"><li>NIST AI RMF Implementation</li><li>EU AI Act Compliance Design</li><li>ISO/IEC 42001 Management Systems</li><li>Algorithmic Impact Assessments</li><li>WCAG 2.2 AAA Accessibility</li><li>Section 508 & VPAT Auditing</li></ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- DESIGN EXPERTISE (matches FuseLab's visual showcase) -->
+<section id="expertise" aria-label="Design expertise">
+<div class="w">
+  <div class="sl rv">Design expertise</div>
+  <h2 class="st rv d1">Specialized interfaces that most agencies can't build</h2>
+  <p class="ss rv d2">Complex, data-heavy, safety-critical interfaces — with WCAG AAA compliance and human factors validation built in.</p>
+  <div class="exp-grid rv d3">
+    <div class="exp-card"><div class="exp-visual"><div class="exp-visual-inner">Dashboard<br/>Interface</div></div><h3>Dashboard & BI Interfaces</h3><p>Complex data dashboards for healthcare, government, defense, and enterprise — designed for operator performance under cognitive load.</p></div>
+    <div class="exp-card"><div class="exp-visual"><div class="exp-visual-inner">Data<br/>Visualization</div></div><h3>Data Visualization</h3><p>Charts, graphs, geospatial maps, and real-time data streams — accessible, colorblind-safe, and optimized for rapid decision-making.</p></div>
+    <div class="exp-card"><div class="exp-visual"><div class="exp-visual-inner">AI<br/>Interface</div></div><h3>AI & ML Interfaces</h3><p>AI dashboards, model monitoring, confidence scoring, explainability UIs, and governance compliance panels with audit trail visualization.</p></div>
+    <div class="exp-card"><div class="exp-visual"><div class="exp-visual-inner">Digital<br/>Twin</div></div><h3>Digital Twin & Simulation</h3><p>2D/3D simulation interfaces, human performance modeling, predictive maintenance dashboards, and operator training systems.</p></div>
+    <div class="exp-card"><div class="exp-visual"><div class="exp-visual-inner">Safety<br/>Critical</div></div><h3>Safety-Critical Systems</h3><p>Medical device interfaces (IEC 62366), defense operator stations (MIL-STD-1472H), and emergency response dashboards — where errors cost lives.</p></div>
+    <div class="exp-card"><div class="exp-visual"><div class="exp-visual-inner">Gov &<br/>Federal</div></div><h3>Government & Federal</h3><p>Case processing platforms (SSA), compliance dashboards (DHCS), Section 508 remediation, and FedRAMP-conscious design systems.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- CASE STUDIES -->
+<section id="case-studies" aria-label="Case studies">
+<div class="w">
+  <div class="sl rv">Selected work</div>
+  <h2 class="st rv d1">Our work speaks for itself</h2>
+  <p class="ss rv d2">Real outcomes for real organizations — from federal systems modernization to enterprise-scale inclusive design.</p>
+  <div class="cs-grid rv d3">
+
+    <article class="cs">
+      <div class="cs-visual">
+        <div class="cs-visual-inner">Federal Case<br/>Processing Platform</div>
+        <div class="cs-visual-mockup"><div class="cs-mockup-bar"><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div></div><div class="cs-mockup-body"><div class="cs-mockup-line" style="width:80%"></div><div class="cs-mockup-line" style="width:60%"></div><div class="cs-mockup-block"></div><div class="cs-mockup-block" style="height:16px;margin-top:4px"></div></div></div>
+      </div>
+      <div class="cs-tags"><span class="cs-tag">Government</span><span class="cs-tag">Accessibility</span><span class="cs-tag">Section 508</span><span class="cs-tag">UX Research</span></div>
+      <div class="cs-body">
+        <h3>SSA — Case Processing Platform Modernization</h3>
+        <p>Redesigned the Social Security Administration's legacy case processing system — reducing task completion time, achieving full Section 508 compliance, and deploying SSA11y CI/CD accessibility automation across 12 application modules.</p>
+        <div class="cs-metrics">
+          <div class="cs-metric"><div class="cs-metric-val">40%</div><div class="cs-metric-label">Faster task completion</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">100%</div><div class="cs-metric-label">508 compliance</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">12</div><div class="cs-metric-label">Modules shipped</div></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="cs">
+      <div class="cs-visual">
+        <div class="cs-visual-inner">Defense Systems<br/>UX Engineering</div>
+        <div class="cs-visual-mockup"><div class="cs-mockup-bar"><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div></div><div class="cs-mockup-body"><div class="cs-mockup-line" style="width:70%"></div><div class="cs-mockup-line" style="width:90%"></div><div class="cs-mockup-block"></div><div class="cs-mockup-block" style="height:16px;margin-top:4px"></div></div></div>
+      </div>
+      <div class="cs-tags"><span class="cs-tag">Defense</span><span class="cs-tag">MIL-STD-1472H</span><span class="cs-tag">Human Factors</span><span class="cs-tag">Dashboard</span></div>
+      <div class="cs-body">
+        <h3>Leidos — Defense Systems Human Factors Engineering</h3>
+        <p>Applied MIL-STD-1472H human engineering criteria to safety-critical operator interfaces — cognitive task analysis, workload assessment, situational awareness design, and FMEA-based error mitigation for high-stakes defense systems.</p>
+        <div class="cs-metrics">
+          <div class="cs-metric"><div class="cs-metric-val">3x</div><div class="cs-metric-label">Usability improvement</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">67%</div><div class="cs-metric-label">Error reduction</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">MIL</div><div class="cs-metric-label">STD compliant</div></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="cs">
+      <div class="cs-visual">
+        <div class="cs-visual-inner">Enterprise<br/>Inclusive Design</div>
+        <div class="cs-visual-mockup"><div class="cs-mockup-bar"><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div></div><div class="cs-mockup-body"><div class="cs-mockup-line" style="width:85%"></div><div class="cs-mockup-line" style="width:50%"></div><div class="cs-mockup-block"></div><div class="cs-mockup-block" style="height:16px;margin-top:4px"></div></div></div>
+      </div>
+      <div class="cs-tags"><span class="cs-tag">Enterprise</span><span class="cs-tag">Inclusive Design</span><span class="cs-tag">WCAG 2.2</span><span class="cs-tag">Design System</span></div>
+      <div class="cs-body">
+        <h3>Best Buy — Enterprise Inclusive Design Program</h3>
+        <p>Built and championed the enterprise-wide inclusive design program — establishing accessibility standards, training engineering teams, creating WCAG-compliant design system components, and embedding a11y testing into development pipelines across digital products.</p>
+        <div class="cs-metrics">
+          <div class="cs-metric"><div class="cs-metric-val">23%</div><div class="cs-metric-label">User base increase</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">AA</div><div class="cs-metric-label">Full compliance</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">50+</div><div class="cs-metric-label">Components built</div></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="cs">
+      <div class="cs-visual">
+        <div class="cs-visual-inner">AI Governance<br/>Dashboard</div>
+        <div class="cs-visual-mockup"><div class="cs-mockup-bar"><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div><div class="cs-mockup-dot"></div></div><div class="cs-mockup-body"><div class="cs-mockup-line" style="width:65%"></div><div class="cs-mockup-line" style="width:80%"></div><div class="cs-mockup-block"></div><div class="cs-mockup-block" style="height:16px;margin-top:4px"></div></div></div>
+      </div>
+      <div class="cs-tags"><span class="cs-tag">AI Governance</span><span class="cs-tag">NIST AI RMF</span><span class="cs-tag">React</span><span class="cs-tag">Data Visualization</span></div>
+      <div class="cs-body">
+        <h3>Federal Agency — AI Risk Governance Dashboard</h3>
+        <p>Designed and engineered an AI governance dashboard implementing NIST AI RMF — algorithmic impact assessment UIs, model card interfaces, risk tiering visualization, human-in-the-loop oversight controls, and automated TEVV reporting with full audit trail.</p>
+        <div class="cs-metrics">
+          <div class="cs-metric"><div class="cs-metric-val">NIST</div><div class="cs-metric-label">AI RMF compliant</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">8</div><div class="cs-metric-label">AI models governed</div></div>
+          <div class="cs-metric"><div class="cs-metric-val">React</div><div class="cs-metric-label">Production code</div></div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</div>
+</section>
+
+<!-- INDUSTRIES -->
+<section id="industries" aria-label="Industries we serve">
+<div class="w">
+  <div class="sl rv">Industries</div>
+  <h2 class="st rv d1">Regardless of your industry, we've got you</h2>
+  <p class="ss rv d2">Deep domain knowledge across the sectors where human safety and system complexity intersect.</p>
+  <div class="ind-grid rv d3">
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="ind-name">Healthcare</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="ind-name">Government</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><div class="ind-name">AI & ML</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v3"/></svg></div><div class="ind-name">Finance</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="ind-name">Manufacturing</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="ind-name">Defense</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="ind-name">SaaS</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="ind-name">FinTech</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="ind-name">Biotech</div></div>
+    <div class="ind"><div class="ind-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l4.58-4.58c.94-.94.94-2.48 0-3.42L9 5z"/><path d="M6 9h.01"/></svg></div><div class="ind-name">Cybersecurity</div></div>
+  </div>
+</div>
+</section>
+
+<!-- ALL SERVICES GRID -->
+<section id="services" aria-label="All services">
+<div class="w">
+  <div class="sl rv">All services</div>
+  <h2 class="st rv d1">Everything from research to production code</h2>
+  <p class="ss rv d2">Every service connects to the next. Nothing falls through the cracks.</p>
+  <div class="srv-g rv d3">
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><h3>User Research</h3><p>Cognitive task analysis for safety-critical workflows</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><h3>Information Architecture</h3><p>Reduce cognitive load for all users</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><h3>UX Strategy</h3><p>Governance, KPIs, maturity roadmaps</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h3>Prototyping</h3><p>Validated with representative operators</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/></svg></div><h3>Visual Design</h3><p>Design systems, tokens, a11y-first color</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><h3>Usability Testing</h3><p>WCAG & MIL-STD validation</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><h3>Accessibility</h3><p>WCAG 2.2 AAA, 508, SSA11y, VPAT</p></div>
+    <div class="sv"><div class="sv-i" style="background:var(--rs);color:var(--rose)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l4.58-4.58c.94-.94.94-2.48 0-3.42L9 5z"/><path d="M6 9h.01"/></svg></div><h3>AI Governance</h3><p>NIST AI RMF, EU AI Act, ISO 42001</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><h3>LLM-Powered SysML</h3><p>AI-accelerated modeling & FMEA</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h3>Frontend Engineering</h3><p>React, Angular, Vue + CI/CD a11y</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Safety Analysis</h3><p>FMEA, URRA, hazard analysis</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><h3>AI Monitoring UX</h3><p>Drift detection, TEVV, human override</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><h3>Dashboard & BI</h3><p>Complex data interfaces for operators</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><h3>Data Visualization</h3><p>Charts, maps, real-time streams</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div><h3>Chatbot & Voice UI</h3><p>Conversational AI interface design</p></div>
+    <div class="sv"><div class="sv-i"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><h3>Digital Twin Design</h3><p>Simulation UIs & 3D operator interfaces</p></div>
+  </div>
+</div>
+</section>
+
+<!-- TECH -->
+<section id="tech" aria-label="Technology">
+<div class="w">
+  <div class="sl rv">Technology stack</div>
+  <h2 class="st rv d1">Modern tools for safety-critical work</h2>
+  <p class="ss rv d2">Accessibility and traceability at every layer.</p>
+  <div class="tech-g rv d3">
+    <div class="tb"><h3>Frontend</h3><div class="tt"><span class="t">React</span><span class="t">Angular</span><span class="t">Vue.js</span><span class="t">Next.js</span><span class="t">TypeScript</span><span class="t">Storybook</span><span class="t">Tailwind</span></div></div>
+    <div class="tb"><h3>Design</h3><div class="tt"><span class="t">Figma</span><span class="t">Axure RP</span><span class="t">Framer</span><span class="t">ProtoPie</span><span class="t">Miro</span></div></div>
+    <div class="tb"><h3>Accessibility</h3><div class="tt"><span class="t">axe-core</span><span class="t">SSA11y</span><span class="t">Pa11y</span><span class="t">NVDA</span><span class="t">JAWS</span><span class="t">VoiceOver</span></div></div>
+    <div class="tb"><h3>Standards</h3><div class="tt"><span class="t">MIL-STD-1472H</span><span class="t">ISO 14971</span><span class="t">IEC 62366</span><span class="t">WCAG 2.2</span><span class="t">FMEA</span></div></div>
+    <div class="tb"><h3>AI Governance</h3><div class="tt"><span class="t">NIST AI RMF</span><span class="t">EU AI Act</span><span class="t">ISO/IEC 42001</span><span class="t">Model Cards</span><span class="t">TEVV</span></div></div>
+    <div class="tb"><h3>AI / LLM</h3><div class="tt"><span class="t">GPT-4</span><span class="t">Claude</span><span class="t">SysML Gen</span><span class="t">FMEA Auto</span><span class="t">RTM Builder</span></div></div>
+  </div>
+  <div class="llm rv d3"><h3>LLM-accelerated engineering <span class="llm-b">AI-Powered</span></h3><p>Using LLMs to turn weeks of manual SysML modeling into hours of AI-assisted, human-verified work.</p><ul class="llm-ul"><li>Auto-generate SysML from natural language</li><li>Generate FMEA tables from use cases</li><li>Trace human requirements across architectures</li><li>Accelerate VPAT & audit documentation</li><li>Map DoDI 5000.95 domains to components</li><li>Cross-reference WCAG in CI/CD</li><li>Build EU AI Act compliance packages</li><li>Severity-ranked remediation roadmaps</li></ul></div>
+</div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" aria-label="Client testimonials">
+<div class="w">
+  <div class="sl rv">What clients say</div>
+  <h2 class="st rv d1">Don't take our word for it</h2>
+  <p class="ss rv d2">If you're not satisfied after the first two weeks, you can walk away owing nothing.</p>
+  <div class="test-grid rv d3">
+    <div class="test">
+      <div class="test-stars">★★★★★</div>
+      <blockquote>"Senthil brought a level of engineering rigor to our UX process that we'd never experienced. The accessibility improvements alone increased our user base by 23%."</blockquote>
+      <div class="test-author"><div class="test-av">JM</div><div><div class="test-name">James M.</div><div class="test-role">VP of Product, Federal Health IT</div></div></div>
+    </div>
+    <div class="test">
+      <div class="test-stars">★★★★★</div>
+      <blockquote>"Most agencies design pretty screens. BrainPulse designed the governance framework, the operator workflows, and the evidence trail. Completely different level."</blockquote>
+      <div class="test-author"><div class="test-av">RP</div><div><div class="test-name">Rachel P.</div><div class="test-role">Director of AI Safety, Enterprise SaaS</div></div></div>
+    </div>
+    <div class="test">
+      <div class="test-stars">★★★★★</div>
+      <blockquote>"Their MIL-STD expertise and understanding of operator cognitive load made them the only agency we trusted with our safety-critical interface redesign."</blockquote>
+      <div class="test-author"><div class="test-av">KL</div><div><div class="test-name">Kevin L.</div><div class="test-role">Systems Engineering Lead, Defense</div></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" aria-label="Frequently asked questions">
+<div class="w">
+  <div class="sl rv">FAQ</div>
+  <h2 class="st rv d1">Common questions</h2>
+  <div class="faq-list rv d2">
+    <details><summary>What makes BrainPulse different from agencies like FuseLab or Clay?</summary><p>Most UX agencies focus on visual design and prototyping. We integrate AI governance (NIST AI RMF, EU AI Act), human factors engineering (MIL-STD-1472H), and WCAG 2.2 AAA accessibility at the systems level — not as afterthoughts. We also deliver production-ready frontend code in React, Angular, and Vue, and use LLMs to accelerate SysML modeling and compliance documentation.</p></details>
+    <details><summary>What industries do you specialize in?</summary><p>Healthcare, government/federal, AI & ML, defense, finance, fintech, biotech, manufacturing, SaaS, and cybersecurity. Our deepest experience is in safety-critical environments where human factors, regulatory compliance, and accessibility are non-negotiable — like clinical diagnostic tools, government case processing platforms, and AI governance dashboards.</p></details>
+    <details><summary>Do you only do design, or also development?</summary><p>Both. We deliver end-to-end: user research, UX strategy, wireframing, visual design, interactive prototyping, design systems, and production-ready frontend code in React, Angular, or Vue — with accessibility testing baked into CI/CD pipelines. We also provide backend API integration guidance for data-heavy dashboards and AI products.</p></details>
+    <details><summary>What is your design process?</summary><p>Our process follows a disciplined engineering approach: (1) Discover — stakeholder interviews, user research, accessibility audit, competitive analysis; (2) Define — information architecture, user flows, requirements traceability, design principles; (3) Design — wireframes, prototypes, visual design, WCAG-compliant components, usability validation; (4) Deliver — production code, design systems, developer handoff, and ongoing support. Every decision is traceable to user research, FMEA, or usability risk assessment.</p></details>
+    <details><summary>How do you handle AI governance and compliance?</summary><p>We implement NIST AI Risk Management Framework, EU AI Act classification and compliance design, ISO/IEC 42001 AI management systems, algorithmic impact assessments, model card interfaces, human-in-the-loop oversight UIs, and audit trail visualization. We also design AI monitoring dashboards for drift detection, TEVV reporting, and human-override controls.</p></details>
+    <details><summary>What does WCAG 2.2 AAA compliance mean?</summary><p>WCAG 2.2 AAA is the highest level of web accessibility compliance. It requires all text to have 7:1 contrast ratios (vs. 4.5:1 for AA), enhanced focus indicators, 44px minimum touch targets, reduced motion support, and comprehensive keyboard navigation. Our own website meets these standards — and we build every client project to the same level.</p></details>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<section id="contact" aria-label="Get in touch">
+<div class="w">
+  <div class="cta-t rv">Have a project in mind?<br/>Let's build something <em>safer</em></div>
+  <p class="cta-s rv d1">AI governance, accessibility audit, dashboard design, or full product engineering — I'd love to hear about your challenge.</p>
+  <div class="cta-form rv d2"><label for="em-cta" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label><input type="email" id="em-cta" placeholder="Your email" aria-label="Your email address" autocomplete="email"><button class="cta-btn" type="button">Book a discovery call</button></div>
+  <p class="cta-email rv d3">Or email <a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></p>
+</div>
+</section>
+
+</main>
+
+<footer role="contentinfo">
+<div class="w"><div class="foot"><div class="foot-c">&copy; 2026 BrainPulse Inc. WCAG 2.2 AAA Compliant. All rights reserved.</div><div class="foot-l"><a href="https://www.linkedin.com/in/senthil-nagappan-58705016/" target="_blank" rel="noopener">LinkedIn</a><a href="#case-studies">Work</a><a href="#service-pillars">Services</a><a href="#contact">Contact</a></div></div></div>
+</footer>
+
+<script>
+const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('vis');obs.unobserve(el.target)}})},{threshold:.08,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{if(a.getAttribute('onclick'))return;e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t){t.scrollIntoView({behavior:'smooth'});document.getElementById('nm')?.classList.remove('open')}})});
+</script>
+
+<!-- ═══ FEEDBACK WIDGET ═══ -->
+<style>
+.fb-toggle{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--teal);color:#fff;border:none;padding:0;width:56px;height:56px;border-radius:50%;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(13,115,119,.25);transition:all .3s}
+.fb-toggle:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(13,115,119,.35)}
+.fb-toggle:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.fb-toggle .fb-badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:var(--rose);border-radius:50%;font-size:.55rem;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff;border:2px solid var(--bg)}
+.fb-panel{position:fixed;bottom:5.5rem;right:1.5rem;z-index:9000;width:360px;max-height:calc(100vh - 7rem);background:var(--w);border:1px solid var(--b2);border-radius:var(--rl);box-shadow:0 12px 48px rgba(28,25,23,.12);display:none;flex-direction:column;overflow:hidden}
+.fb-panel.open{display:flex}
+.fb-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--b1);position:relative}
+.fb-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--peach),var(--rose));border-radius:var(--rl) var(--rl) 0 0}
+.fb-header h3{font-family:var(--serif);font-size:1.05rem;color:var(--ink)}
+.fb-header p{font-size:.72rem;color:var(--mt);margin-top:.15rem}
+.fb-close{position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;width:32px;height:32px;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--mt);font-size:1.1rem;padding:6px}
+.fb-close:hover{background:var(--bg2);color:var(--ink)}
+.fb-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1}
+.fb-group{margin-bottom:1.25rem}
+.fb-label{font-size:.75rem;font-weight:700;color:var(--ink);margin-bottom:.4rem;display:block}
+.fb-stars{display:flex;gap:.3rem}
+.fb-star{background:none;border:2px solid var(--b2);width:40px;height:40px;min-height:44px;border-radius:10px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--mt);padding:2px}
+.fb-star:hover,.fb-star.active{border-color:var(--peach);background:var(--ps);color:var(--peach)}
+.fb-star:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.fb-select{width:100%;padding:.65rem .85rem;border:1.5px solid var(--b2);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.78rem;min-height:44px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2344403C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.fb-select:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-color:var(--teal)}
+.fb-textarea{width:100%;padding:.65rem .85rem;border:1.5px solid var(--b2);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.78rem;min-height:88px;resize:vertical}
+.fb-textarea::placeholder{color:var(--dm)}
+.fb-textarea:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-color:var(--teal)}
+.fb-input{width:100%;padding:.65rem .85rem;border:1.5px solid var(--b2);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:.78rem;min-height:44px}
+.fb-input::placeholder{color:var(--dm)}
+.fb-input:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-color:var(--teal)}
+.fb-submit{width:100%;background:var(--teal);color:#fff;border:none;padding:.75rem;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;min-height:44px;transition:all .3s}
+.fb-submit:hover{background:#0A5F62;transform:translateY(-1px)}
+.fb-submit:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.fb-success{text-align:center;padding:2rem 1.5rem}
+.fb-success-icon{font-size:2.5rem;margin-bottom:.75rem}
+.fb-success h4{font-family:var(--serif);font-size:1.1rem;color:var(--ink);margin-bottom:.3rem}
+.fb-success p{font-size:.78rem;color:var(--mt);line-height:1.6}
+@media(max-width:480px){.fb-panel{left:1rem;right:1rem;width:auto;bottom:5rem}}
+</style>
+
+<button class="fb-toggle" onclick="document.getElementById('fb-panel').classList.toggle('open');this.querySelector('.fb-badge').style.display='none'" aria-label="Give feedback on this design" aria-haspopup="dialog">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="fb-badge">!</span>
+</button>
+
+<div class="fb-panel" id="fb-panel" role="dialog" aria-label="Design feedback form">
+  <div class="fb-header">
+    <h3>Share your feedback</h3>
+    <p>Help us make this design even better</p>
+    <button class="fb-close" onclick="document.getElementById('fb-panel').classList.remove('open')" aria-label="Close feedback">&times;</button>
+  </div>
+  <div class="fb-body" id="fb-form-area">
+    <div class="fb-group">
+      <label class="fb-label">Overall impression</label>
+      <div class="fb-stars" role="radiogroup" aria-label="Rate from 1 to 5 stars">
+        <button class="fb-star" role="radio" aria-checked="false" aria-label="1 star" onclick="setRating(1)">★</button>
+        <button class="fb-star" role="radio" aria-checked="false" aria-label="2 stars" onclick="setRating(2)">★</button>
+        <button class="fb-star" role="radio" aria-checked="false" aria-label="3 stars" onclick="setRating(3)">★</button>
+        <button class="fb-star" role="radio" aria-checked="false" aria-label="4 stars" onclick="setRating(4)">★</button>
+        <button class="fb-star" role="radio" aria-checked="false" aria-label="5 stars" onclick="setRating(5)">★</button>
+      </div>
+    </div>
+    <div class="fb-group">
+      <label class="fb-label" for="fb-section">Which section are you commenting on?</label>
+      <select class="fb-select" id="fb-section">
+        <option value="">Overall website</option>
+        <option value="hero">Hero & first impression</option>
+        <option value="logos">Client logos</option>
+        <option value="services">Service pillars</option>
+        <option value="expertise">Design expertise</option>
+        <option value="case-studies">Case studies</option>
+        <option value="industries">Industries</option>
+        <option value="tech">Technology stack</option>
+        <option value="testimonials">Testimonials</option>
+        <option value="faq">FAQ</option>
+        <option value="cta">Contact / CTA</option>
+        <option value="branding">Logo & branding</option>
+        <option value="colors">Colors & typography</option>
+        <option value="accessibility">Accessibility</option>
+      </select>
+    </div>
+    <div class="fb-group">
+      <label class="fb-label" for="fb-comment">Your feedback</label>
+      <textarea class="fb-textarea" id="fb-comment" placeholder="What works well? What would you change? Be specific — we read every comment."></textarea>
+    </div>
+    <div class="fb-group">
+      <label class="fb-label" for="fb-name">Your name (optional)</label>
+      <input class="fb-input" id="fb-name" type="text" placeholder="Jane Doe" autocomplete="name">
+    </div>
+    <div class="fb-group">
+      <label class="fb-label" for="fb-email">Your email (optional)</label>
+      <input class="fb-input" id="fb-email" type="email" placeholder="jane@company.com" autocomplete="email">
+    </div>
+    <button class="fb-submit" onclick="submitFeedback()">Submit feedback</button>
+  </div>
+</div>
+
+<script>
+let currentRating=0;
+function setRating(n){
+  currentRating=n;
+  document.querySelectorAll('.fb-star').forEach((s,i)=>{
+    const active=i<n;
+    s.classList.toggle('active',active);
+    s.setAttribute('aria-checked',active?'true':'false');
+  });
+}
+function submitFeedback(){
+  const data={
+    rating:currentRating,
+    section:document.getElementById('fb-section').value,
+    comment:document.getElementById('fb-comment').value,
+    name:document.getElementById('fb-name').value,
+    email:document.getElementById('fb-email').value,
+    timestamp:new Date().toISOString(),
+    url:window.location.href
+  };
+  // Store in localStorage for collection
+  const existing=JSON.parse(localStorage.getItem('bp-feedback')||'[]');
+  existing.push(data);
+  localStorage.setItem('bp-feedback',JSON.stringify(existing));
+  // Also copy to clipboard as JSON for easy collection
+  const summary=`⭐ ${data.rating}/5 | ${data.section||'Overall'}\n${data.comment}\n— ${data.name||'Anonymous'}${data.email?' ('+data.email+')':''}`;
+  navigator.clipboard?.writeText(summary).catch(()=>{});
+  // Show success
+  document.getElementById('fb-form-area').innerHTML=`
+    <div class="fb-success">
+      <div class="fb-success-icon">✓</div>
+      <h4>Thank you!</h4>
+      <p>Your feedback has been recorded and copied to clipboard. It helps us make BrainPulse even better.</p>
+    </div>`;
+}
+</script>
+</body>
+</html>
