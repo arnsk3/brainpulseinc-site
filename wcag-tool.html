@@ -3,174 +3,220 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brainpulse A11y — WCAG 2.2 AAA Compliance Engine</title>
-<meta name="description" content="Industry-grade WCAG 2.2 AAA compliance audit and remediation engine by Brainpulse Inc. Hybrid rules engine with visual code fixes and prioritized implementation roadmap.">
+<title>BrainPulse A11y — WCAG 2.2 AAA Compliance Engine</title>
+<meta name="description" content="Industry-grade WCAG 2.2 AAA compliance audit and remediation engine by BrainPulse Inc.">
 <link rel="canonical" href="https://www.brainpulseinc.com/wcag-tool.html">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.9/babel.min.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Manrope',sans-serif;background:#04070d;color:#e4eaf5;min-height:100vh;-webkit-font-smoothing:antialiased}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-.fade{animation:fadeIn .25s ease-out}
-.spin{width:15px;height:15px;border:2px solid rgba(0,240,204,.12);border-top-color:#00f0cc;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
-button,input,textarea,select{font-family:'Manrope',sans-serif}
-:focus-visible{outline:2px solid #00f0cc;outline-offset:2px}
-textarea:focus,input:focus{outline:none;border-color:rgba(0,240,204,.25)!important}
-</style>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',system-ui,sans-serif;background:#FBF9F6;color:#1C1917;min-height:100vh;-webkit-font-smoothing:antialiased}</style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useCallback,useMemo,useRef,useEffect}=React;
 
-/* ═══════════════════════════════════════════════════════════════
-   BRAINPULSE A11Y REMEDIATOR — WCAG 2.2 AAA
-   Premium compliance engine with hybrid rules + visual fixes
-   ═══════════════════════════════════════════════════════════════ */
+/* BRAINPULSE A11Y — Heavy Visual Edition
+   brainpulseinc.com design: #FBF9F6 cream, #0D7377 teal, Libre Baskerville, hexagonal motifs */
 
-// ── Color / Contrast Utils ──
+const T={bg:"#FBF9F6",bg2:"#F5F2ED",bg3:"#ECEAE4",w:"#fff",ink:"#1C1917",ink2:"#292524",mt:"#44403C",dm:"#57534E",teal:"#0D7377",tealLt:"#11959A",ts:"rgba(13,115,119,.06)",tm:"rgba(13,115,119,.14)",peach:"#92400E",ps:"rgba(146,64,14,.06)",rose:"#9F1239",rs:"rgba(159,18,57,.06)",rm:"rgba(159,18,57,.12)",green:"#166534",gs:"rgba(22,101,52,.06)",navy:"#1E3A5F",ns:"rgba(30,58,95,.06)",b1:"rgba(28,25,23,.07)",b2:"rgba(28,25,23,.12)",b3:"rgba(28,25,23,.18)",serif:"'Libre Baskerville',Georgia,serif",sans:"'DM Sans',system-ui,sans-serif",mono:"'JetBrains Mono',monospace",ease:"cubic-bezier(.22,1,.36,1)"};
+const SC={critical:T.rose,major:T.peach,minor:T.navy,info:T.dm};
+const SB={critical:T.rs,major:T.ps,minor:T.ns,info:"rgba(87,83,78,.04)"};
+const SV={C:"critical",M:"major",m:"minor",I:"info"};
+const PLBL=["","P1 — Fix Now","P2 — High","P3 — Medium","P4 — Low"];
+const PC=["",T.rose,T.peach,T.navy,T.dm];
+
+// ── Utilities ──
 const NC={white:[255,255,255],black:[0,0,0],red:[255,0,0],green:[0,128,0],blue:[0,0,255],yellow:[255,255,0],gray:[128,128,128],grey:[128,128,128],orange:[255,165,0],purple:[128,0,128],pink:[255,192,203],navy:[0,0,128],teal:[0,128,128],maroon:[128,0,0],lime:[0,255,0],aqua:[0,255,255],silver:[192,192,192],transparent:[255,255,255]};
 function pC(s){if(!s)return null;s=s.trim().toLowerCase();if(NC[s])return NC[s];let m=s.match(/^#([0-9a-f]{3,8})$/);if(m){let h=m[1];if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]}m=s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);if(m)return[+m[1],+m[2],+m[3]];return null}
 function rL([r,g,b]){const f=c=>{c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)}
 function CR(a,b){const l1=rL(a),l2=rL(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)}
-
-// ── URL Fetch ──
 function fTO(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).finally(()=>clearTimeout(t))}
-async function fetchURL(url){
-  if(!/^https?:\/\//i.test(url))url='https://'+url;const e=encodeURIComponent(url);
-  const S=[{n:'codetabs',u:`https://api.codetabs.com/v1/proxy?quest=${e}`,m:'t'},{n:'allorigins',u:`https://api.allorigins.win/raw?url=${e}`,m:'t'},{n:'allorigins-json',u:`https://api.allorigins.win/get?url=${e}`,m:'j'},{n:'corsproxy',u:`https://corsproxy.io/?${e}`,m:'t'},{n:'direct',u:url,m:'t'}];
-  const tried=[];
-  for(const s of S){try{const r=await fTO(s.u,12000);if(!r.ok){tried.push(`${s.n}:${r.status}`);continue}let h='';if(s.m==='j'){const j=await r.json();h=j.contents||''}else{h=await r.text()}if(h.length>80&&h.includes('<'))return{ok:true,html:h,url,via:s.n};tried.push(`${s.n}:${h.length}ch`)}catch(e){tried.push(`${s.n}:${e.name==='AbortError'?'timeout':'err'}`)}}
-  return{ok:false,html:'',url,error:`Tried ${tried.length} proxies: ${tried.join(', ')}. Click Retry or use the HTML tab (View Source → Ctrl+A → Ctrl+C).`}
+async function fetchURL(url){if(!/^https?:\/\//i.test(url))url='https://'+url;const e=encodeURIComponent(url);const S=[{n:'codetabs',u:`https://api.codetabs.com/v1/proxy?quest=${e}`,m:'t'},{n:'allorigins',u:`https://api.allorigins.win/raw?url=${e}`,m:'t'},{n:'allorigins-json',u:`https://api.allorigins.win/get?url=${e}`,m:'j'},{n:'corsproxy',u:`https://corsproxy.io/?${e}`,m:'t'},{n:'direct',u:url,m:'t'}];const tried=[];for(const s of S){try{const r=await fTO(s.u,12000);if(!r.ok){tried.push(`${s.n}:${r.status}`);continue}let h='';if(s.m==='j'){const j=await r.json();h=j.contents||''}else{h=await r.text()}if(h.length>80&&h.includes('<'))return{ok:true,html:h,url,via:s.n};tried.push(`${s.n}:${h.length}ch`)}catch(e){tried.push(`${s.n}:${e.name==='AbortError'?'timeout':'err'}`)}}return{ok:false,html:'',url,error:`Tried ${tried.length} proxies. Click Retry or paste HTML.`}}
+
+// ── Decorative SVGs ──
+const HexIcon=({size=52,children})=><svg viewBox="0 0 52 52" width={size} height={size} aria-hidden="true"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke={T.teal} strokeWidth="1.6" strokeLinejoin="round"/><path d="M26 14L38 21V33L26 40L14 33V21Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".2"/>{children}</svg>;
+
+const DotGrid=({w=200,h=120,spacing=18})=><svg width={w} height={h} aria-hidden="true" style={{position:"absolute",opacity:.3}}>{Array.from({length:Math.ceil(w/spacing)}).flatMap((_,x)=>Array.from({length:Math.ceil(h/spacing)}).map((_,y)=><circle key={`${x}-${y}`} cx={x*spacing+9} cy={y*spacing+9} r="1.2" fill={T.teal} opacity=".35"/>))}</svg>;
+
+const HexGrid=({w=400,h=200})=>{const hexW=30,hexH=26;return<svg width={w} height={h} aria-hidden="true" style={{position:"absolute",opacity:.06}}>{Array.from({length:Math.ceil(w/hexW)+1}).flatMap((_,x)=>Array.from({length:Math.ceil(h/hexH)+1}).map((_,y)=>{const cx=x*hexW+(y%2?hexW/2:0),cy=y*hexH*0.75;const d=`M${cx} ${cy-10}L${cx+8.66} ${cy-5}L${cx+8.66} ${cy+5}L${cx} ${cy+10}L${cx-8.66} ${cy+5}L${cx-8.66} ${cy-5}Z`;return<path key={`${x}-${y}`} d={d} fill="none" stroke={T.teal} strokeWidth=".8"/>}))}</svg>};
+
+const WaveDecor=({color=T.teal,height=40})=><svg viewBox="0 0 1200 40" preserveAspectRatio="none" style={{width:"100%",height,display:"block"}} aria-hidden="true"><path d={`M0 20 C200 ${height-5} 400 5 600 20 C800 35 1000 5 1200 20 L1200 ${height} L0 ${height} Z`} fill={color} opacity=".04"/></svg>;
+
+// ── Donut Chart ──
+function Donut({value,size=100,strokeW=8,color,label,sublabel,animate=true}){
+  const [v,setV]=useState(0);
+  useEffect(()=>{if(animate){const t=setTimeout(()=>setV(value),80);return()=>clearTimeout(t)}else setV(value)},[value,animate]);
+  const r=(size-strokeW*2)/2,c=2*Math.PI*r,off=c*(1-v/100);
+  const clr=color||(v>=80?T.teal:v>=50?T.peach:T.rose);
+  return<div style={{position:"relative",display:"inline-flex",alignItems:"center",justifyContent:"center",width:size,height:size}} role="img" aria-label={`${label||''}: ${value}%`}>
+    <svg width={size} height={size} style={{transform:"rotate(-90deg)",position:"absolute"}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={T.bg3} strokeWidth={strokeW}/>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={clr} strokeWidth={strokeW} strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:`stroke-dashoffset 1.2s ${T.ease}`,filter:`drop-shadow(0 0 4px ${clr}40)`}}/>
+    </svg>
+    <div style={{textAlign:"center",position:"relative"}}>
+      <div style={{fontSize:size*.28,fontFamily:T.mono,fontWeight:700,color:clr,lineHeight:1}}>{v}</div>
+      {sublabel&&<div style={{fontSize:Math.max(8,size*.08),color:T.dm,marginTop:1,textTransform:"uppercase",letterSpacing:".08em",fontWeight:600}}>{sublabel}</div>}
+    </div>
+  </div>;
 }
 
-// ── Severity / Priority Constants ──
-const SV={C:"critical",M:"major",m:"minor",I:"info"};
-const SCLR={critical:"#ff3d6b",major:"#ffb020",minor:"#3d9eff",info:"#505e75"};
-const SBG={critical:"rgba(255,61,107,.05)",major:"rgba(255,176,32,.05)",minor:"rgba(61,158,255,.05)",info:"rgba(80,94,117,.04)"};
-const PLBL=["","P1 — Fix Now","P2 — High","P3 — Medium","P4 — Low"];
-const PCLR=["","#ff3d6b","#ffb020","#3d9eff","#505e75"];
+// ── Animated Stat ──
+function AnimStat({value,label,color,icon}){
+  const[v,setV]=useState(0);
+  useEffect(()=>{let start=0;const step=()=>{start+=Math.ceil(value/20);if(start>=value){setV(value);return}setV(start);requestAnimationFrame(step)};requestAnimationFrame(step)},[value]);
+  return<div style={{background:T.w,borderRadius:16,border:`1px solid ${T.b1}`,padding:"18px 14px",textAlign:"center",boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 24px rgba(28,25,23,.04)",position:"relative",overflow:"hidden",transition:`all .2s ${T.ease}`}}>
+    {icon&&<div style={{marginBottom:6}}>{icon}</div>}
+    <div style={{fontSize:28,fontFamily:T.mono,fontWeight:700,color,lineHeight:1,position:"relative",zIndex:1}}>{v}</div>
+    <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".08em",color:T.dm,marginTop:5,fontWeight:600,position:"relative",zIndex:1}}>{label}</div>
+    <div style={{position:"absolute",bottom:0,left:0,right:0,height:4,background:`linear-gradient(90deg,${color}00,${color}30,${color}00)`}} aria-hidden="true"/>
+  </div>;
+}
 
-// ── Recommendation Database ──
-const RDB={
-"1.1.1":{x:"Screen readers can't interpret images without alt text — 8.7% of US adults have vision disabilities. This affects blind users, low-bandwidth scenarios, and SEO.",dt:"Describe the image's PURPOSE, not appearance. 'Submit order' not 'green button'. Use alt=\"\" for decorative images.",e:"Quick",p:1,
-  gen:(el)=>{const src=el.match(/src="([^"]+)"/)?.[1]||"img.jpg";const nm=src.split('/').pop().replace(/\.\w+$/,'').replace(/[-_]/g,' ');return{before:`<img src="${src}">`,after:`<img src="${src}"\n  alt="${nm||'Description'}" />`,bH:`<div style="border:2px dashed #ff3d6b;padding:10px;border-radius:8px"><div style="width:100px;height:60px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#aaa;font-size:11px">🖼</div><div style="color:#ff3d6b;font-size:11px;margin-top:6px">⚠ No alt — invisible to screen readers</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:10px;border-radius:8px"><div style="width:100px;height:60px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#aaa;font-size:11px">🖼</div><div style="color:#4cdf9a;font-size:11px;margin-top:6px">✓ alt="${nm}" — properly announced</div></div>`}}},
-"1.3.1":{x:"Tables without headers read as flat data lists. Users can't tell which column a value belongs to. Fieldsets without legends leave form groups unlabeled.",dt:"Use <th scope='col'> for column headers. Add <caption> for table purpose. Wrap related inputs in <fieldset> with <legend>.",e:"Medium",p:2,gen:()=>({before:`<table>\n  <tr><td>Name</td><td>Price</td></tr>\n</table>`,after:`<table>\n  <caption>Products</caption>\n  <thead><tr>\n    <th scope="col">Name</th>\n    <th scope="col">Price</th>\n  </tr></thead>\n</table>`,bH:`<table style="border-collapse:collapse;width:100%"><tr><td style="border:1px solid #ddd;padding:5px;color:#ff3d6b;font-size:12px">Name</td><td style="border:1px solid #ddd;padding:5px;color:#ff3d6b;font-size:12px">Price</td></tr></table><div style="color:#ff3d6b;font-size:10px;margin-top:3px">⚠ No headers</div>`,aH:`<table style="border-collapse:collapse;width:100%"><caption style="text-align:left;font-weight:600;font-size:12px;margin-bottom:2px">Products</caption><tr><th style="border:1px solid #4cdf9a;padding:5px;background:#f0fdf4;text-align:left;font-size:12px">Name</th><th style="border:1px solid #4cdf9a;padding:5px;background:#f0fdf4;text-align:left;font-size:12px">Price</th></tr></table><div style="color:#4cdf9a;font-size:10px;margin-top:3px">✓ Semantic headers</div>`})},
-"1.4.3":{x:"Low contrast affects 12M+ Americans with vision impairments, 8% of men with color blindness, and everyone over 40. It also fails outdoors.",dt:"AAA requires ≥7:1. Use #111 on white (18.6:1). Never #999 on white (2.85:1). Offer high-contrast toggle.",e:"Quick",p:1,gen:()=>({before:`color: #999;\nbackground: #fff;`,after:`color: #1a1a1a;\nbackground: #fff;`,bH:`<p style="color:#999;background:#fff;padding:8px;border:2px dashed #ff3d6b;border-radius:6px;font-size:13px">2.85:1 contrast</p>`,aH:`<p style="color:#1a1a1a;background:#fff;padding:8px;border:2px solid #4cdf9a;border-radius:6px;font-size:13px">16.6:1 contrast ✓</p>`})},
-"1.4.8":{x:"Justified text creates 'rivers of white space' disrupting reading for 15-20% of people with dyslexia. Tight line-height reduces readability for everyone.",dt:"text-align:left, line-height≥1.5, max-width~80ch, letter-spacing≥0.12em.",e:"Quick",p:2,gen:()=>({before:`text-align: justify;\nline-height: 1.1;`,after:`text-align: left;\nline-height: 1.6;\nmax-width: 80ch;`,bH:`<p style="text-align:justify;line-height:1.1;max-width:220px;border:2px dashed #ff3d6b;padding:8px;border-radius:6px;font-size:12px;color:#333;background:#fff">Justified text creates rivers of white space making reading very difficult.</p>`,aH:`<p style="text-align:left;line-height:1.6;max-width:220px;border:2px solid #4cdf9a;padding:8px;border-radius:6px;font-size:12px;color:#333;background:#fff">Left-aligned text with generous spacing is much easier to read and track.</p>`})},
-"1.4.10":{x:"Blocking zoom locks out users who need 400%+ magnification. One of the most impactful mobile accessibility barriers.",dt:"Remove maximum-scale and user-scalable=no. Use responsive units (rem, %, vw).",e:"Quick",p:1,gen:()=>({before:`maximum-scale=1,\nuser-scalable=no`,after:`width=device-width,\ninitial-scale=1`,bH:`<code style="display:block;font-size:11px;border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff;color:#333">user-scalable=<b style="color:#ff3d6b">no</b></code>`,aH:`<code style="display:block;font-size:11px;border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff;color:#333">initial-scale=1 <b style="color:#4cdf9a">✓ zoom enabled</b></code>`})},
-"2.1.1":{x:"Motor-impaired and screen reader users navigate via keyboard. Click-only elements are invisible walls they cannot reach or activate.",dt:"Replace <div onclick> with <button>. Native elements have focus, activation, and ARIA built-in.",e:"Medium",p:1,gen:(el)=>{const t=el.match(/>([^<]+)</)?.[1]||'Action';return{before:`<div onclick="fn()">${t}</div>`,after:`<button onclick="fn()">\n  ${t}\n</button>`,bH:`<div style="border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff"><div style="padding:6px 14px;background:#eee;border-radius:4px;display:inline-block;font-size:12px;color:#333">${t}</div><div style="color:#ff3d6b;font-size:10px;margin-top:4px">⚠ div — Tab skips this</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff"><button style="padding:6px 14px;background:#eee;border:1px solid #ccc;border-radius:4px;font-size:12px;color:#333">${t}</button><div style="color:#4cdf9a;font-size:10px;margin-top:4px">✓ button — keyboard accessible</div></div>`}}},
-"2.4.1":{x:"Without skip links, keyboard users Tab through 30+ nav links on every page to reach content. Skip links and landmarks solve this instantly.",dt:"First focusable element = skip link. Use <header>, <nav aria-label>, <main id='main'>, <footer> landmarks.",e:"Quick",p:1,gen:()=>({before:`<body>\n  <nav>...links...</nav>\n  <div>content</div>\n</body>`,after:`<body>\n  <a href="#main" class="skip">Skip to content</a>\n  <header><nav aria-label="Main">...</nav></header>\n  <main id="main">...</main>\n  <footer>...</footer>\n</body>`,bH:`<div style="border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff"><div style="background:#f3f4f6;padding:4px 8px;border-radius:3px;font-size:10px;color:#888;margin-bottom:4px">🔗→🔗→🔗→...→🔗 (30 tabs)</div><div style="font-size:12px;color:#333">Content buried</div><div style="color:#ff3d6b;font-size:10px;margin-top:3px">⚠ No skip link</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff"><a href="#" style="display:inline-block;padding:4px 10px;background:#00f5d0;color:#000;border-radius:3px;font-size:10px;font-weight:700;text-decoration:none;margin-bottom:4px">Skip to content</a><div style="border:1px solid #4cdf9a;padding:4px;border-radius:3px;font-size:12px;color:#333;margin-top:2px">&lt;main&gt; — 1 keypress away ✓</div></div>`})},
-"2.4.6":{x:"Heading hierarchy is the navigation skeleton. Skipping h1→h3 breaks the document outline — screen readers can't build a usable TOC.",dt:"Sequential levels only: h1→h2→h3. Never use headings for visual sizing. Use CSS font-size instead.",e:"Medium",p:2,gen:()=>({before:`<h1>Welcome</h1>\n<h3>Guide</h3>`,after:`<h1>Welcome</h1>\n<h2>Guide</h2>`,bH:`<div style="border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff"><div style="font-size:18px;font-weight:700;color:#333">h1: Welcome</div><div style="font-size:14px;font-weight:600;color:#ff3d6b">h3: Guide ⚠ skipped h2</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff"><div style="font-size:18px;font-weight:700;color:#333">h1: Welcome</div><div style="font-size:16px;font-weight:600;color:#333">h2: Guide ✓</div></div>`})},
-"2.5.5":{x:"Touch targets <44×44px cause mis-taps for motor impairments, tremors, large fingers. Most common AAA failure across the industry.",dt:"Don't resize the icon — expand the CLICKABLE AREA with CSS padding + negative margin. Preserves design, meets 44×44px.",e:"Quick",p:1,gen:()=>({before:`.close-btn {\n  width: 20px;\n  height: 20px;\n}`,after:`.close-btn {\n  width: 20px;\n  height: 20px;\n  /* Expand clickable area */\n  padding: 12px;\n  margin: -12px;\n  box-sizing: content-box;\n}`,bH:`<div style="border:2px dashed #ff3d6b;padding:16px;border-radius:6px;background:#fff;text-align:center"><div style="position:relative;display:inline-block"><button style="width:20px;height:20px;font-size:13px;border:1px solid #ccc;border-radius:3px;background:#f5f5f5;padding:0;line-height:20px">×</button><div style="position:absolute;top:-12px;left:-12px;width:44px;height:44px;border:1px dashed #ff3d6b;border-radius:3px;pointer-events:none"></div></div><div style="color:#ff3d6b;font-size:10px;margin-top:8px">⚠ 20×20px &lt; 44×44px</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:16px;border-radius:6px;background:#fff;text-align:center"><button style="width:20px;height:20px;font-size:13px;border:1px solid #ccc;border-radius:3px;background:#f5f5f5;padding:12px;margin:-12px;box-sizing:content-box;line-height:20px">×</button><div style="color:#4cdf9a;font-size:10px;margin-top:8px">✓ Visual 20px, touch 44px</div></div>`})},
-"2.4.12":{x:"Fixed headers covering the focused element makes keyboard users lose their place entirely. Like navigating with a blindfold over the center.",dt:"scroll-padding-top/bottom matching fixed element heights. CSS scroll-margin on focusable elements.",e:"Medium",p:1,gen:()=>({before:`header { position: fixed;\n  top: 0; height: 60px; }`,after:`header { position: fixed;\n  top: 0; height: 60px; }\nhtml { scroll-padding-top: 70px; }\n:focus { scroll-margin-top: 70px; }`,bH:`<div style="border:2px dashed #ff3d6b;padding:0;border-radius:6px;background:#fff;overflow:hidden;position:relative;height:90px"><div style="background:#222;color:white;padding:6px 10px;font-size:10px;position:absolute;top:0;left:0;right:0;z-index:2">Fixed Header</div><div style="margin-top:32px;padding:6px 8px"><div style="border:2px solid #3d9eff;border-radius:3px;padding:3px 6px;font-size:11px;color:#333">Focus ← <span style="color:#ff3d6b">hidden!</span></div></div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:0;border-radius:6px;background:#fff;overflow:hidden;position:relative;height:90px"><div style="background:#222;color:white;padding:6px 10px;font-size:10px;position:absolute;top:0;left:0;right:0;z-index:2">Fixed Header</div><div style="margin-top:42px;padding:6px 8px"><div style="border:2px solid #3d9eff;border-radius:3px;padding:3px 6px;font-size:11px;color:#333">Focus ← <span style="color:#4cdf9a">visible ✓</span></div></div></div>`})},
-"3.3.9":{x:"Forcing password memorization/CAPTCHAs discriminates against cognitive disabilities, memory impairments, and learning disabilities.",dt:"Support passkeys, biometric auth, password managers. Never block paste. Provide OAuth/SSO. Use invisible CAPTCHA.",e:"Significant",p:2,gen:()=>({before:`<input type="password"\n  autocomplete="off"\n  onpaste="return false">`,after:`<input type="password"\n  autocomplete="current-password">\n<button>🔑 Sign in with Passkey</button>`,bH:`<div style="border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff"><input type="password" placeholder="Password" disabled style="padding:6px;border:1px solid #ddd;border-radius:3px;width:100%;font-size:12px;margin-bottom:4px"><div style="background:#f0f0f0;padding:5px;border-radius:3px;font-size:11px;color:#666;text-align:center;font-family:monospace">X7kQ9</div><div style="color:#ff3d6b;font-size:10px;margin-top:3px">⚠ paste blocked + CAPTCHA</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff"><input type="password" placeholder="Password" disabled style="padding:6px;border:1px solid #ddd;border-radius:3px;width:100%;font-size:12px;margin-bottom:4px"><div style="display:flex;gap:4px"><button disabled style="flex:1;padding:5px;background:#222;color:white;border:none;border-radius:3px;font-size:10px">🔑 Passkey</button><button disabled style="flex:1;padding:5px;background:#4285f4;color:white;border:none;border-radius:3px;font-size:10px">G Google</button></div><div style="color:#4cdf9a;font-size:10px;margin-top:3px">✓ Alternatives provided</div></div>`})},
-"3.2.6":{x:"AAA requires consistent help (chat, phone, email) on every page in the same position. Cognitive disabilities rely on predictable placement.",dt:"Persistent footer help block with role='complementary' aria-label='Need Help?'. Verify on all templates.",e:"Medium",p:2,gen:()=>({before:`<footer>\n  <a href="/about">About</a>\n</footer>`,after:`<footer>\n  <div role="complementary"\n    aria-label="Need Help?">\n    <a href="/contact">Contact</a>\n    <a href="tel:18005550199">Call</a>\n    <button>Live Chat</button>\n  </div>\n</footer>`,bH:`<div style="border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff;font-size:11px"><a href="#" style="color:#666">About</a> | <a href="#" style="color:#666">Privacy</a><div style="color:#ff3d6b;font-size:10px;margin-top:4px">⚠ No help mechanism</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff;font-size:11px"><div style="margin-bottom:6px"><a href="#" style="color:#666">About</a> | <a href="#" style="color:#666">Privacy</a></div><div style="background:#f0fdf4;padding:6px 8px;border-radius:4px;border:1px solid #c6f6d5"><span style="font-size:9px;font-weight:700;color:#4cdf9a">NEED HELP?</span><div style="display:flex;gap:4px;margin-top:3px;font-size:10px"><a href="#" style="color:#2563eb">📧 Contact</a><a href="#" style="color:#2563eb">📞 Call</a><button style="background:#222;color:white;border:none;border-radius:2px;padding:1px 6px;font-size:10px">💬 Chat</button></div></div></div>`})},
-"3.1.1":{x:"Without lang, screen readers guess the language — French engine reading English = gibberish. Breaks auto-translation and hyphenation.",dt:"Always set lang on <html>. Use lang on foreign-language spans.",e:"Quick",p:1,gen:()=>({before:`<html>`,after:`<html lang="en">`,bH:`<code style="display:block;font-size:11px;border:2px dashed #ff3d6b;padding:6px;border-radius:4px;background:#fff;color:#333">&lt;html&gt; — <span style="color:#ff3d6b">no lang</span></code>`,aH:`<code style="display:block;font-size:11px;border:2px solid #4cdf9a;padding:6px;border-radius:4px;background:#fff;color:#333">&lt;html lang="en"&gt; <span style="color:#4cdf9a">✓</span></code>`})},
-"3.3.2":{x:"Unlabeled inputs: screen readers say 'edit text, blank'. Placeholder vanishes on focus and isn't reliably announced.",dt:"Visible <label> with for/id. Place above inputs for mobile. aria-label acceptable for search fields.",e:"Quick",p:1,gen:(el)=>{const n=el.match(/name="([^"]+)"/)?.[1]||'field';return{before:el,after:`<label for="${n}">${n.charAt(0).toUpperCase()+n.slice(1)}</label>\n<input id="${n}" autocomplete="${n}">`,bH:`<div style="border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff"><input disabled placeholder="${n}" style="padding:6px;border:1px solid #ddd;border-radius:3px;font-size:12px;width:160px"><div style="color:#ff3d6b;font-size:10px;margin-top:3px">⚠ "edit text, blank"</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff"><label style="display:block;font-size:12px;font-weight:500;margin-bottom:2px;color:#333">${n.charAt(0).toUpperCase()+n.slice(1)}</label><input disabled style="padding:6px;border:1px solid #ddd;border-radius:3px;font-size:12px;width:160px"><div style="color:#4cdf9a;font-size:10px;margin-top:3px">✓ "${n}, edit text"</div></div>`}}},
-"4.1.2":{x:"Focusable content inside aria-hidden creates keyboard traps. Invalid ARIA roles break assistive technology completely.",dt:"Never put links/buttons inside aria-hidden. Validate roles against WAI-ARIA spec.",e:"Medium",p:1,gen:()=>({before:`<div aria-hidden="true">\n  <a href="#">Link</a>\n</div>`,after:`<div>\n  <a href="#">Link</a>\n</div>`,bH:`<div style="border:2px dashed #ff3d6b;padding:8px;border-radius:6px;background:#fff"><div style="opacity:0.4"><a href="#" style="color:#2563eb;font-size:12px">Link</a> | <button style="font-size:12px;padding:2px 8px;border:1px solid #ccc;border-radius:3px">Btn</button></div><div style="color:#ff3d6b;font-size:10px;margin-top:3px">⚠ aria-hidden but focusable</div></div>`,aH:`<div style="border:2px solid #4cdf9a;padding:8px;border-radius:6px;background:#fff"><a href="#" style="color:#2563eb;font-size:12px">Link</a> | <button style="font-size:12px;padding:2px 8px;border:1px solid #ccc;border-radius:3px">Btn</button><div style="color:#4cdf9a;font-size:10px;margin-top:3px">✓ Visible + focusable</div></div>`})},
-"_":{x:"This criterion ensures accessible content for users with disabilities.",dt:"Review WCAG 2.2 at w3.org/WAI/WCAG22/quickref. Test with NVDA/VoiceOver + keyboard.",e:"Medium",p:3,gen:()=>({before:'—',after:'Apply fix above',bH:`<div style="color:#ff3d6b;font-size:11px;padding:6px;border:2px dashed #ff3d6b;border-radius:4px;background:#fff">⚠ Issue</div>`,aH:`<div style="color:#4cdf9a;font-size:11px;padding:6px;border:2px solid #4cdf9a;border-radius:4px;background:#fff">✓ Fixed</div>`})}
+// ── Progress Bar with glow ──
+function GlowBar({value,color,label,detail}){
+  const[w,setW]=useState(0);
+  useEffect(()=>{setTimeout(()=>setW(value),100)},[value]);
+  return<div style={{marginBottom:14}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:5}}>
+      <span style={{fontSize:14,fontWeight:600,color:T.ink}}>{label}</span>
+      <span style={{fontSize:13,fontFamily:T.mono,fontWeight:700,color}}>{value}%</span>
+    </div>
+    <div style={{height:10,background:T.bg3,borderRadius:5,overflow:"hidden",position:"relative"}}>
+      <div style={{height:"100%",background:`linear-gradient(90deg,${color},${color}cc)`,borderRadius:5,width:`${w}%`,transition:`width 1s ${T.ease}`,boxShadow:`0 0 12px ${color}40`,position:"relative"}}>
+        <div style={{position:"absolute",top:0,right:0,bottom:0,width:30,background:`linear-gradient(90deg,transparent,${color}60)`,borderRadius:"0 5px 5px 0"}} aria-hidden="true"/>
+      </div>
+    </div>
+    {detail&&<div style={{fontSize:11,color:T.dm,marginTop:4}}>{detail}</div>}
+  </div>;
+}
+
+// ── POUR Icon ──
+const POURIcon=({principle,size=32})=>{
+  const icons={
+    Perceivable:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="5" stroke={T.teal} strokeWidth="2"/><path d="M16 20v6M10 24h12" stroke={T.teal} strokeWidth="2" strokeLinecap="round"/><circle cx="16" cy="12" r="2" fill={T.teal}/></svg>,
+    Operable:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><rect x="8" y="10" width="16" height="12" rx="2" stroke={T.teal} strokeWidth="2"/><circle cx="12" cy="16" r="1.5" fill={T.teal}/><circle cx="16" cy="16" r="1.5" fill={T.teal}/><circle cx="20" cy="16" r="1.5" fill={T.teal}/><path d="M14 6h4" stroke={T.teal} strokeWidth="2" strokeLinecap="round"/></svg>,
+    Understandable:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" stroke={T.teal} strokeWidth="2"/><path d="M13 14c0-2 1.5-3 3-3s3 1 3 3c0 1.5-1.5 2-3 3v1" stroke={T.teal} strokeWidth="2" strokeLinecap="round"/><circle cx="16" cy="23" r="1.2" fill={T.teal}/></svg>,
+    Robust:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><path d="M16 6L26 12V20L16 26L6 20V12Z" stroke={T.teal} strokeWidth="2" strokeLinejoin="round"/><path d="M16 14L22 17.5V23" stroke={T.teal} strokeWidth="1.5" opacity=".3"/><circle cx="16" cy="16" r="3" fill="none" stroke={T.teal} strokeWidth="2"/></svg>,
+  };
+  return icons[principle]||null;
 };
-function getRec(id,issue){const d=RDB[id]||RDB["_"];const f=d.gen(issue.el||'');return{x:d.x,dt:d.dt,e:d.e,p:d.p,...f}}
 
-// ── Rules Engine (28 WCAG 2.2 criteria) ──
+// ── Recommendation DB (same as before, condensed) ──
+const RDB={
+"1.1.1":{x:"Screen readers can't interpret images without alt text — 8.7% of US adults have vision disabilities.",dt:"Describe PURPOSE: 'Submit order' not 'green button'. alt=\"\" for decorative.",e:"Quick",p:1,gen:(el)=>{const nm=el.match(/src="([^"]+)"/)?.[1]?.split('/').pop()?.replace(/\.\w+$/,'').replace(/[-_]/g,' ')||'image';return{before:`<img src="...">`,after:`<img src="..." alt="${nm}" />`,bH:`<div style="border:2px dashed ${T.rose};padding:12px;border-radius:12px"><div style="width:100px;height:60px;background:#eee;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:28px">🖼</div><p style="color:${T.rose};font-size:12px;margin:8px 0 0">⚠ No alt</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:12px;border-radius:12px"><div style="width:100px;height:60px;background:#eee;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:28px">🖼</div><p style="color:${T.green};font-size:12px;margin:8px 0 0">✓ alt="${nm}"</p></div>`}}},
+"1.4.3":{x:"Low contrast affects 12M+ with vision impairments, 8% of men with color blindness.",dt:"AAA ≥7:1. #1C1917 on #FBF9F6 = 15.4:1. Never #999 on white.",e:"Quick",p:1,gen:()=>({before:`color:#999;background:#fff`,after:`color:#1C1917;background:#FBF9F6`,bH:`<p style="color:#999;background:#fff;padding:10px;border:2px dashed ${T.rose};border-radius:12px;font-size:14px">2.85:1 — fails</p>`,aH:`<p style="color:#1C1917;background:#FBF9F6;padding:10px;border:2px solid ${T.green};border-radius:12px;font-size:14px">15.4:1 ✓</p>`})},
+"1.4.8":{x:"Justified text creates 'rivers' disrupting reading for 15-20% with dyslexia.",dt:"text-align:left, line-height≥1.5, max-width~80ch.",e:"Quick",p:2,gen:()=>({before:`text-align:justify;line-height:1.1`,after:`text-align:left;line-height:1.6`,bH:`<p style="text-align:justify;line-height:1.1;max-width:220px;border:2px dashed ${T.rose};padding:10px;border-radius:12px;font-size:12px;color:#333;background:#fff">Justified text creates rivers of white space making reading difficult.</p>`,aH:`<p style="text-align:left;line-height:1.6;max-width:220px;border:2px solid ${T.green};padding:10px;border-radius:12px;font-size:12px;color:#333;background:#fff">Left-aligned with generous spacing is easier to read.</p>`})},
+"1.4.10":{x:"Blocking zoom locks out users needing 400%+ magnification.",dt:"Remove maximum-scale and user-scalable=no.",e:"Quick",p:1,gen:()=>({before:`user-scalable=no`,after:`initial-scale=1`,bH:`<code style="display:block;font-size:12px;border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff">user-scalable=<b style="color:${T.rose}">no</b></code>`,aH:`<code style="display:block;font-size:12px;border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff">initial-scale=1 <b style="color:${T.green}">✓</b></code>`})},
+"2.1.1":{x:"Motor-impaired users navigate via keyboard. Click-only = invisible walls.",dt:"<div onclick> → <button>. Native keyboard support built-in.",e:"Medium",p:1,gen:(el)=>{const t=el.match(/>([^<]+)</)?.[1]||'Action';return{before:`<div onclick="fn()">${t}</div>`,after:`<button onclick="fn()">${t}</button>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="padding:8px 16px;background:${T.bg2};border-radius:8px;display:inline-block;font-size:13px">${t}</div><p style="color:${T.rose};font-size:12px;margin:6px 0 0">⚠ div — no keyboard</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><button style="padding:8px 16px;background:${T.teal};color:white;border:none;border-radius:8px;font-size:13px">${t}</button><p style="color:${T.green};font-size:12px;margin:6px 0 0">✓ button</p></div>`}}},
+"2.4.1":{x:"Keyboard users Tab through 30+ nav links to reach content. Skip links solve this.",dt:"First focusable = skip link. Use <header>,<nav>,<main>,<footer>.",e:"Quick",p:1,gen:()=>({before:`<nav>...30 links...</nav>\n<div>content</div>`,after:`<a href="#main">Skip to content</a>\n<header><nav>...</nav></header>\n<main id="main">...</main>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="background:${T.bg2};padding:6px 10px;border-radius:8px;font-size:11px;color:${T.dm};margin-bottom:6px">🔗→🔗→🔗→...→🔗</div><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ No skip</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><a href="#" style="display:inline-block;padding:6px 14px;background:${T.teal};color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;margin-bottom:6px">Skip to content</a><div style="border:1px solid ${T.green};padding:6px;border-radius:8px;font-size:13px;margin-top:4px">main — 1 keypress ✓</div></div>`})},
+"2.4.6":{x:"Heading skips break the outline for screen reader navigation.",dt:"Sequential: h1→h2→h3. Never use for visual sizing.",e:"Medium",p:2,gen:()=>({before:`<h1>Welcome</h1>\n<h3>Guide</h3>`,after:`<h1>Welcome</h1>\n<h2>Guide</h2>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="font-size:18px;font-weight:700">h1</div><div style="font-size:14px;font-weight:600;color:${T.rose}">h3 ⚠ skip</div></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><div style="font-size:18px;font-weight:700">h1</div><div style="font-size:16px;font-weight:600">h2 ✓</div></div>`})},
+"2.5.5":{x:"Touch targets <44×44px cause mis-taps. #1 AAA failure.",dt:"padding+margin trick: padding:12px;margin:-12px;box-sizing:content-box",e:"Quick",p:1,gen:()=>({before:`.close{width:20px;height:20px}`,after:`.close{width:20px;height:20px;\npadding:12px;margin:-12px;\nbox-sizing:content-box}`,bH:`<div style="border:2px dashed ${T.rose};padding:18px;border-radius:12px;background:#fff;text-align:center"><div style="position:relative;display:inline-block"><button style="width:20px;height:20px;font-size:14px;border:1px solid ${T.b2};border-radius:6px;background:${T.bg2};padding:0;line-height:20px">×</button><div style="position:absolute;top:-12px;left:-12px;width:44px;height:44px;border:1px dashed ${T.rose};border-radius:6px;pointer-events:none"></div></div><p style="color:${T.rose};font-size:12px;margin:10px 0 0">⚠ 20px &lt; 44px</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:18px;border-radius:12px;background:#fff;text-align:center"><button style="width:20px;height:20px;font-size:14px;border:1px solid ${T.b2};border-radius:6px;background:${T.bg2};padding:12px;margin:-12px;box-sizing:content-box;line-height:20px">×</button><p style="color:${T.green};font-size:12px;margin:10px 0 0">✓ Touch 44px</p></div>`})},
+"3.1.1":{x:"Without lang, screen readers guess the language — often wrong.",dt:"Set lang on <html>.",e:"Quick",p:1,gen:()=>({before:`<html>`,after:`<html lang="en">`,bH:`<code style="display:block;border:2px dashed ${T.rose};padding:8px;border-radius:8px;background:#fff;font-size:12px">&lt;html&gt; <span style="color:${T.rose}">no lang</span></code>`,aH:`<code style="display:block;border:2px solid ${T.green};padding:8px;border-radius:8px;background:#fff;font-size:12px">&lt;html lang="en"&gt; <span style="color:${T.green}">✓</span></code>`})},
+"3.3.2":{x:"Unlabeled inputs: screen readers say 'edit text, blank'.",dt:"Visible <label> with for/id.",e:"Quick",p:1,gen:(el)=>{const n=el.match(/name="([^"]+)"/)?.[1]||'field';return{before:el,after:`<label for="${n}">${n.charAt(0).toUpperCase()+n.slice(1)}</label>\n<input id="${n}">`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><input disabled placeholder="${n}" style="padding:8px;border:1px solid ${T.b2};border-radius:8px;font-size:13px;width:180px;background:#fff"><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ no label</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:3px">${n.charAt(0).toUpperCase()+n.slice(1)}</label><input disabled style="padding:8px;border:1px solid ${T.b2};border-radius:8px;font-size:13px;width:180px;background:#fff"><p style="color:${T.green};font-size:12px;margin:4px 0 0">✓ labeled</p></div>`}}},
+"4.1.2":{x:"Focusable content in aria-hidden creates keyboard traps.",dt:"Never put links/buttons inside aria-hidden.",e:"Medium",p:1,gen:()=>({before:`<div aria-hidden="true">\n  <a>Link</a>\n</div>`,after:`<div>\n  <a>Link</a>\n</div>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="opacity:0.3"><a href="#" style="color:${T.teal}">Link</a></div><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ hidden but focusable</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><a href="#" style="color:${T.teal}">Link</a><p style="color:${T.green};font-size:12px;margin:4px 0 0">✓ visible</p></div>`})},
+"_":{x:"Ensures accessible content.",dt:"WCAG 2.2 at w3.org/WAI/WCAG22/quickref.",e:"Medium",p:3,gen:()=>({before:'—',after:'Apply fix',bH:`<div style="border:2px dashed ${T.rose};padding:8px;border-radius:8px;background:#fff;font-size:12px;color:${T.rose}">⚠ Issue</div>`,aH:`<div style="border:2px solid ${T.green};padding:8px;border-radius:8px;background:#fff;font-size:12px;color:${T.green}">✓ Fixed</div>`})}
+};
+function getRec(id,iss){const d=RDB[id]||RDB["_"];const f=d.gen(iss.el||'');return{x:d.x,dt:d.dt,e:d.e,p:d.p,...f}}
+
+// ── Rules Engine (28 criteria) ──
 const RULES=[
-{id:"1.1.1",n:"Non-text Content",l:"A",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("img").forEach((e,i)=>{if(!e.getAttribute("alt")&&e.getAttribute("alt")!=="")r.push({s:SV.C,el:e.outerHTML.substring(0,150),msg:`Image #${i+1} missing alt`,fix:`Add alt="..." or alt=""`})});d.querySelectorAll("svg").forEach((e,i)=>{if(!e.getAttribute("role")&&!e.querySelector("title"))r.push({s:SV.M,el:"<svg>",msg:`SVG #${i+1} no accessible name`,fix:`role="img" + aria-label`})});d.querySelectorAll("canvas,video,audio,object").forEach((e,i)=>{if(!e.getAttribute("aria-label")&&!e.getAttribute("aria-labelledby")&&!e.textContent?.trim())r.push({s:SV.M,el:`<${e.tagName.toLowerCase()}>`,msg:`${e.tagName} #${i+1} no alt`,fix:`aria-label`})});return r}},
-{id:"1.3.1",n:"Info & Relationships",l:"A",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("table").forEach((t,i)=>{if(!t.querySelector("th,[role='columnheader']"))r.push({s:SV.M,el:"<table>",msg:`Table #${i+1} no headers`,fix:`<th scope="col">`});if(!t.querySelector("caption")&&!t.getAttribute("aria-label"))r.push({s:SV.m,el:"<table>",msg:`Table #${i+1} no caption`,fix:`<caption>`})});d.querySelectorAll("fieldset").forEach((f,i)=>{if(!f.querySelector("legend"))r.push({s:SV.M,el:"<fieldset>",msg:`Fieldset #${i+1} no legend`,fix:`<legend>`})});return r}},
-{id:"1.3.5",n:"Input Purpose",l:"AA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("input[type='text'],input[type='email'],input[type='tel'],input:not([type]),input[type='password']").forEach(e=>{if(!e.getAttribute("autocomplete")){const n=e.getAttribute("name")||"";if(/name|email|phone|tel|address|zip|password|user/i.test(n))r.push({s:SV.m,el:e.outerHTML.substring(0,140),msg:`"${n}" no autocomplete`,fix:`autocomplete="..."`})}});return r}},
-{id:"1.4.3",n:"Contrast (Minimum)",l:"AA",pr:"Perceivable",c(d){const r=[];let c=0;d.querySelectorAll("p,span,a,li,td,th,h1,h2,h3,h4,h5,h6,label,button,div").forEach(e=>{if(c>60)return;const st=e.getAttribute("style")||"";const cm=st.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);const bm=st.match(/background(?:-color)?\s*:\s*([^;]+)/i);if(cm&&bm){c++;const fg=pC(cm[1].trim()),bg=pC(bm[1].trim());if(fg&&bg){const ratio=CR(fg,bg);if(ratio<4.5)r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(2)}:1 — needs ≥7:1`,fix:`Increase contrast`});else if(ratio<7)r.push({s:SV.m,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(2)}:1 — AA ok, AAA needs ≥7:1`,fix:`Increase to 7:1`})}}});return r}},
-{id:"1.4.6",n:"Contrast Enhanced",l:"AAA",pr:"Perceivable",c(){return[{s:SV.I,el:"—",msg:`AAA: 7:1 normal, 4.5:1 large`,fix:`Audit all color pairs`}]}},
-{id:"1.4.8",n:"Visual Presentation",l:"AAA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("p,div,span,li,td,section").forEach(e=>{const st=e.getAttribute("style")||"";if(/text-align\s*:\s*justify/i.test(st))r.push({s:SV.M,el:e.outerHTML.substring(0,100),msg:`Justified text`,fix:`text-align:left`});const lh=st.match(/line-height\s*:\s*([0-9.]+)/i);if(lh&&parseFloat(lh[1])<1.5&&!lh[0].includes("px"))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`line-height ${lh[1]}<1.5`,fix:`≥1.5`})});return r}},
-{id:"1.4.10",n:"Reflow",l:"AA",pr:"Perceivable",c(d){const r=[];const m=d.querySelector('meta[name="viewport"]');if(m){const c=m.getAttribute("content")||"";if(/maximum-scale\s*=\s*1/i.test(c)||/user-scalable\s*=\s*no/i.test(c))r.push({s:SV.C,el:m.outerHTML,msg:`Zoom blocked`,fix:`Remove restrictions`})}return r}},
-{id:"1.4.12",n:"Text Spacing",l:"AA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll('[style*="overflow"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/overflow\s*:\s*hidden/i.test(st)&&/height\s*:\s*\d+px/i.test(st))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`overflow:hidden + fixed height`,fix:`min-height + overflow:auto`})});return r}},
-{id:"2.1.1",n:"Keyboard",l:"A",pr:"Operable",c(d){const r=[];d.querySelectorAll("[onclick],[onmousedown]").forEach((e,i)=>{if(!e.getAttribute("onkeydown")&&!["A","BUTTON","INPUT","SELECT","TEXTAREA","SUMMARY"].includes(e.tagName))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`Mouse-only element #${i+1}`,fix:`Use <button>`})});d.querySelectorAll("div[onclick],span[onclick],div[role='button']").forEach(e=>{if(!e.getAttribute("tabindex"))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`Not focusable`,fix:`tabindex="0"`})});return r}},
-{id:"2.4.1",n:"Bypass Blocks",l:"A",pr:"Operable",c(d){const r=[];if(!d.querySelector('a[href^="#main"],a[href^="#content"],[class*="skip"]')&&!d.querySelector("main,[role='main']"))r.push({s:SV.M,el:"—",msg:`No skip link / <main>`,fix:`Skip link + landmarks`});if(!d.querySelectorAll("header,[role='banner'],nav,[role='navigation'],main,[role='main'],footer,[role='contentinfo']").length&&d.querySelectorAll("div").length>5)r.push({s:SV.M,el:"—",msg:`No landmarks`,fix:`<header>,<nav>,<main>,<footer>`});return r}},
-{id:"2.4.2",n:"Page Titled",l:"A",pr:"Operable",c(d){const r=[];const t=d.querySelector("title");if(!t||!t.textContent?.trim())r.push({s:SV.M,el:"<head>",msg:`Missing <title>`,fix:`Descriptive <title>`});return r}},
-{id:"2.4.4",n:"Link Purpose",l:"A",pr:"Operable",c(d){const r=[];const v=["click here","here","read more","more","link","this","learn more"];d.querySelectorAll("a").forEach((a,i)=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();if(v.includes(t))r.push({s:SV.M,el:a.outerHTML.substring(0,120),msg:`"${t}" is vague`,fix:`Descriptive text`});if(!t&&!a.querySelector("img[alt]"))r.push({s:SV.C,el:a.outerHTML.substring(0,120),msg:`Link #${i+1} no text`,fix:`Add text/aria-label`})});return r}},
-{id:"2.4.6",n:"Headings & Labels",l:"AA",pr:"Operable",c(d){const r=[];const hs=d.querySelectorAll("h1,h2,h3,h4,h5,h6");let prev=0,h1c=0;hs.forEach(h=>{const l=+h.tagName[1];if(l===1)h1c++;if(prev>0&&l>prev+1)r.push({s:SV.M,el:h.outerHTML.substring(0,100),msg:`Skip h${prev}→h${l}`,fix:`Sequential`});if(!h.textContent?.trim())r.push({s:SV.M,el:h.outerHTML.substring(0,100),msg:`Empty h${l}`,fix:`Add text`});prev=l});if(h1c===0&&hs.length>0)r.push({s:SV.M,el:"—",msg:`No h1`,fix:`Add <h1>`});if(h1c>1)r.push({s:SV.m,el:"—",msg:`${h1c} <h1>s`,fix:`Single h1`});return r}},
-{id:"2.4.7",n:"Focus Visible",l:"AA",pr:"Operable",c(d){const r=[];let has=false;d.querySelectorAll("style").forEach(s=>{if(/outline\s*:\s*(none|0)/i.test(s.textContent||""))has=true});if(has)r.push({s:SV.M,el:"—",msg:`outline:none found`,fix:`:focus-visible custom styles`});return r}},
-{id:"2.4.9",n:"Link Purpose (AAA)",l:"AAA",pr:"Operable",c(d){const r=[];const m={};d.querySelectorAll("a[href]").forEach(a=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();const h=a.getAttribute("href");if(t&&h){if(m[t]&&m[t]!==h)r.push({s:SV.m,el:a.outerHTML.substring(0,120),msg:`"${t}" → different URLs`,fix:`Same text = same URL`});m[t]=h}});return r}},
-{id:"2.4.11",n:"Focus Not Obscured",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll('[style*="position"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/position\s*:\s*(fixed|sticky)/i.test(st)&&/z-index/i.test(st))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`Fixed element may obscure focus`,fix:`scroll-padding-top`})});return r}},
-{id:"2.4.12",n:"Focus Not Obscured (AAA)",l:"AAA",pr:"Operable",c(d){const r=[];const ct=d.querySelectorAll('[style*="position: fixed"],[style*="position:fixed"],[style*="position: sticky"],[style*="position:sticky"]').length;if(ct)r.push({s:SV.m,el:`${ct} fixed/sticky elements`,msg:`AAA: focus must be FULLY visible`,fix:`scroll-padding + scroll-margin`});return r}},
-{id:"2.5.3",n:"Label in Name",l:"A",pr:"Operable",c(d){const r=[];d.querySelectorAll("button[aria-label],a[aria-label]").forEach(e=>{const al=(e.getAttribute("aria-label")||"").toLowerCase();const vt=(e.textContent||"").trim().toLowerCase();if(vt&&al&&!al.includes(vt))r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`aria-label missing visible text`,fix:`Include visible text`})});return r}},
-{id:"2.5.5",n:"Target Size (44×44 AAA)",l:"AAA",pr:"Operable",c(d){const r=[];d.querySelectorAll("a,button,[role='button'],input[type='checkbox'],input[type='radio']").forEach(e=>{const st=e.getAttribute("style")||"";const wm=st.match(/width\s*:\s*(\d+)px/i);const hm=st.match(/height\s*:\s*(\d+)px/i);const pm=st.match(/padding\s*:\s*(\d+)/i);if(wm&&hm){const W=+wm[1]+(pm?+pm[1]*2:0);const H=+hm[1]+(pm?+pm[1]*2:0);if(W<44||H<44)r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`~${W}×${H}px < 44×44 AAA`,fix:`padding:${Math.ceil((44-(+wm[1]))/2)}px; margin:-${Math.ceil((44-(+wm[1]))/2)}px; box-sizing:content-box`})}});return r}},
-{id:"2.5.8",n:"Target Size (24×24)",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll("a,button,[role='button']").forEach(e=>{const st=e.getAttribute("style")||"";const wm=st.match(/width\s*:\s*(\d+)px/i);const hm=st.match(/height\s*:\s*(\d+)px/i);if(wm&&hm&&(+wm[1]<24||+hm[1]<24))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`<24×24px`,fix:`Min 24×24`})});return r}},
-{id:"3.1.1",n:"Language of Page",l:"A",pr:"Understandable",c(d){const r=[];if(!d.querySelector("html")?.getAttribute("lang"))r.push({s:SV.C,el:"<html>",msg:`Missing lang`,fix:`lang="en"`});return r}},
-{id:"3.1.2",n:"Language of Parts",l:"AA",pr:"Understandable",c(d){const r=[];d.querySelectorAll("[lang]").forEach(e=>{const l=e.getAttribute("lang");if(l&&!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(l))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`Invalid lang="${l}"`,fix:`BCP 47`})});return r}},
-{id:"3.2.2",n:"On Input",l:"A",pr:"Understandable",c(d){const r=[];d.querySelectorAll("select[onchange]").forEach((e,i)=>{if(/location|navigate|href|window/i.test(e.getAttribute("onchange")||""))r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`Auto-nav on change`,fix:`Submit button`})});return r}},
-{id:"3.2.6",n:"Consistent Help (AAA)",l:"AAA",pr:"Understandable",c(d){const r=[];const h=d.querySelectorAll('a[href*="help"],a[href*="support"],a[href*="contact"],a[href*="faq"],[class*="help"]');if(h.length===0&&d.querySelectorAll("a").length>5)r.push({s:SV.M,el:"—",msg:`No help/contact found`,fix:`Persistent help in footer`});return r}},
-{id:"3.3.2",n:"Labels",l:"A",pr:"Understandable",c(d){const r=[];d.querySelectorAll("input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']),select,textarea").forEach((e,i)=>{const id=e.getAttribute("id");if(!(id&&d.querySelector(`label[for="${id}"]`))&&!e.closest("label")&&!e.getAttribute("aria-label")&&!e.getAttribute("title"))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`Control #${i+1} unlabeled`,fix:`<label> or aria-label`})});return r}},
-{id:"3.3.9",n:"Accessible Auth (AAA)",l:"AAA",pr:"Understandable",c(d){const r=[];d.querySelectorAll("input[type='password']").forEach(e=>{if(e.getAttribute("autocomplete")==="off"||e.getAttribute("onpaste"))r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`Password blocks paste/autocomplete`,fix:`autocomplete="current-password" + passkey`})});d.querySelectorAll('[class*="captcha"]').forEach(e=>r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`CAPTCHA — cognitive barrier`,fix:`Invisible CAPTCHA or honeypot`}));return r}},
-{id:"4.1.1",n:"Duplicate IDs",l:"A",pr:"Robust",c(d){const r=[];const ids={};d.querySelectorAll("[id]").forEach(e=>{const id=e.getAttribute("id");if(ids[id])r.push({s:SV.M,el:e.outerHTML.substring(0,100),msg:`Dup id="${id}"`,fix:`Unique IDs`});ids[id]=true});return r}},
-{id:"4.1.2",n:"Name, Role, Value",l:"A",pr:"Robust",c(d){const r=[];const V=new Set(["alert","alertdialog","application","article","banner","button","cell","checkbox","columnheader","combobox","complementary","contentinfo","definition","dialog","directory","document","feed","figure","form","grid","gridcell","group","heading","img","link","list","listbox","listitem","log","main","marquee","math","menu","menubar","menuitem","menuitemcheckbox","menuitemradio","navigation","none","note","option","presentation","progressbar","radio","radiogroup","region","row","rowgroup","rowheader","scrollbar","search","searchbox","separator","slider","spinbutton","status","switch","tab","table","tablist","tabpanel","term","textbox","timer","toolbar","tooltip","tree","treegrid","treeitem"]);d.querySelectorAll("[role]").forEach(e=>{if(!V.has(e.getAttribute("role")))r.push({s:SV.M,el:e.outerHTML.substring(0,100),msg:`Invalid role`,fix:`Valid ARIA role`})});d.querySelectorAll("[aria-hidden='true']").forEach(e=>{if(e.querySelector("a[href],button,input,select,textarea,[tabindex]:not([tabindex='-1'])"))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`Focusable in aria-hidden`,fix:`Remove aria-hidden`})});return r}},
+{id:"1.1.1",n:"Non-text Content",l:"A",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("img").forEach((e,i)=>{if(!e.getAttribute("alt")&&e.getAttribute("alt")!=="")r.push({s:SV.C,el:e.outerHTML.substring(0,150),msg:`Image #${i+1} missing alt`,fix:`alt="..." or alt=""`})});d.querySelectorAll("svg").forEach((e,i)=>{if(!e.getAttribute("role")&&!e.querySelector("title"))r.push({s:SV.M,el:"<svg>",msg:`SVG #${i+1} no name`,fix:`role="img"+aria-label`})});d.querySelectorAll("canvas,video,audio,object").forEach((e,i)=>{if(!e.getAttribute("aria-label")&&!e.getAttribute("aria-labelledby"))r.push({s:SV.M,el:`<${e.tagName.toLowerCase()}>`,msg:`${e.tagName} no alt`,fix:`aria-label`})});return r}},
+{id:"1.3.1",n:"Info & Relationships",l:"A",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("table").forEach((t,i)=>{if(!t.querySelector("th,[role='columnheader']"))r.push({s:SV.M,el:"<table>",msg:`Table #${i+1} no headers`,fix:`<th scope>`});if(!t.querySelector("caption")&&!t.getAttribute("aria-label"))r.push({s:SV.m,el:"<table>",msg:`No caption`,fix:`<caption>`})});d.querySelectorAll("fieldset").forEach(f=>{if(!f.querySelector("legend"))r.push({s:SV.M,el:"<fieldset>",msg:`No legend`,fix:`<legend>`})});return r}},
+{id:"1.3.5",n:"Input Purpose",l:"AA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("input[type='text'],input[type='email'],input[type='tel'],input:not([type]),input[type='password']").forEach(e=>{if(!e.getAttribute("autocomplete")){const n=e.getAttribute("name")||"";if(/name|email|phone|tel|address|zip|password|user/i.test(n))r.push({s:SV.m,el:e.outerHTML.substring(0,140),msg:`"${n}" no autocomplete`,fix:`autocomplete`})}});return r}},
+{id:"1.4.3",n:"Contrast",l:"AA",pr:"Perceivable",c(d){const r=[];let c=0;d.querySelectorAll("p,span,a,li,td,th,h1,h2,h3,h4,h5,h6,label,button,div").forEach(e=>{if(c>60)return;const st=e.getAttribute("style")||"";const cm=st.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);const bm=st.match(/background(?:-color)?\s*:\s*([^;]+)/i);if(cm&&bm){c++;const fg=pC(cm[1].trim()),bg=pC(bm[1].trim());if(fg&&bg){const ratio=CR(fg,bg);if(ratio<4.5)r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(1)}:1 needs ≥7:1`,fix:`Increase contrast`});else if(ratio<7)r.push({s:SV.m,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(1)}:1 AA ok, AAA needs 7:1`,fix:`To 7:1`})}}});return r}},
+{id:"1.4.6",n:"Contrast Enhanced",l:"AAA",pr:"Perceivable",c(){return[{s:SV.I,el:"—",msg:`AAA: 7:1 normal, 4.5:1 large`,fix:`Audit colors`}]}},
+{id:"1.4.8",n:"Visual Presentation",l:"AAA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("p,div,span,li,td,section").forEach(e=>{const st=e.getAttribute("style")||"";if(/text-align\s*:\s*justify/i.test(st))r.push({s:SV.M,el:e.outerHTML.substring(0,100),msg:`Justified`,fix:`left`});const lh=st.match(/line-height\s*:\s*([0-9.]+)/i);if(lh&&parseFloat(lh[1])<1.5&&!lh[0].includes("px"))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`line-height ${lh[1]}<1.5`,fix:`≥1.5`})});return r}},
+{id:"1.4.10",n:"Reflow",l:"AA",pr:"Perceivable",c(d){const r=[];const m=d.querySelector('meta[name="viewport"]');if(m){const c=m.getAttribute("content")||"";if(/maximum-scale\s*=\s*1/i.test(c)||/user-scalable\s*=\s*no/i.test(c))r.push({s:SV.C,el:m.outerHTML,msg:`Zoom blocked`,fix:`Remove`})}return r}},
+{id:"1.4.12",n:"Text Spacing",l:"AA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll('[style*="overflow"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/overflow\s*:\s*hidden/i.test(st)&&/height\s*:\s*\d+px/i.test(st))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`overflow:hidden clips`,fix:`min-height`})});return r}},
+{id:"2.1.1",n:"Keyboard",l:"A",pr:"Operable",c(d){const r=[];d.querySelectorAll("[onclick],[onmousedown]").forEach((e,i)=>{if(!e.getAttribute("onkeydown")&&!["A","BUTTON","INPUT","SELECT","TEXTAREA","SUMMARY"].includes(e.tagName))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`Mouse-only #${i+1}`,fix:`<button>`})});d.querySelectorAll("div[onclick],span[onclick],div[role='button']").forEach(e=>{if(!e.getAttribute("tabindex"))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`Not focusable`,fix:`tabindex="0"`})});return r}},
+{id:"2.4.1",n:"Bypass Blocks",l:"A",pr:"Operable",c(d){const r=[];if(!d.querySelector('a[href^="#main"],a[href^="#content"],[class*="skip"]')&&!d.querySelector("main,[role='main']"))r.push({s:SV.M,el:"—",msg:`No skip link/<main>`,fix:`Skip+landmarks`});if(!d.querySelectorAll("header,[role='banner'],nav,[role='navigation'],main,[role='main'],footer,[role='contentinfo']").length&&d.querySelectorAll("div").length>5)r.push({s:SV.M,el:"—",msg:`No landmarks`,fix:`Semantic HTML`});return r}},
+{id:"2.4.2",n:"Page Titled",l:"A",pr:"Operable",c(d){const r=[];const t=d.querySelector("title");if(!t||!t.textContent?.trim())r.push({s:SV.M,el:"<head>",msg:`No <title>`,fix:`Add title`});return r}},
+{id:"2.4.4",n:"Link Purpose",l:"A",pr:"Operable",c(d){const r=[];const v=["click here","here","read more","more","link","this","learn more"];d.querySelectorAll("a").forEach((a,i)=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();if(v.includes(t))r.push({s:SV.M,el:a.outerHTML.substring(0,120),msg:`"${t}" vague`,fix:`Descriptive`});if(!t&&!a.querySelector("img[alt]"))r.push({s:SV.C,el:a.outerHTML.substring(0,120),msg:`Link #${i+1} no text`,fix:`text/aria-label`})});return r}},
+{id:"2.4.6",n:"Headings & Labels",l:"AA",pr:"Operable",c(d){const r=[];const hs=d.querySelectorAll("h1,h2,h3,h4,h5,h6");let prev=0,h1c=0;hs.forEach(h=>{const l=+h.tagName[1];if(l===1)h1c++;if(prev>0&&l>prev+1)r.push({s:SV.M,el:h.outerHTML.substring(0,100),msg:`Skip h${prev}→h${l}`,fix:`Sequential`});if(!h.textContent?.trim())r.push({s:SV.M,el:h.outerHTML.substring(0,100),msg:`Empty h${l}`,fix:`Text`});prev=l});if(h1c===0&&hs.length>0)r.push({s:SV.M,el:"—",msg:`No h1`,fix:`<h1>`});if(h1c>1)r.push({s:SV.m,el:"—",msg:`${h1c} h1s`,fix:`Single`});return r}},
+{id:"2.4.7",n:"Focus Visible",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll("style").forEach(s=>{if(/outline\s*:\s*(none|0)/i.test(s.textContent||""))r.push({s:SV.M,el:"—",msg:`outline:none`,fix:`:focus-visible`})});return r}},
+{id:"2.4.9",n:"Link Purpose (AAA)",l:"AAA",pr:"Operable",c(d){const r=[];const m={};d.querySelectorAll("a[href]").forEach(a=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();const h=a.getAttribute("href");if(t&&h){if(m[t]&&m[t]!==h)r.push({s:SV.m,el:a.outerHTML.substring(0,120),msg:`"${t}"→diff URLs`,fix:`Same text=URL`});m[t]=h}});return r}},
+{id:"2.4.11",n:"Focus Not Obscured",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll('[style*="position"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/position\s*:\s*(fixed|sticky)/i.test(st)&&/z-index/i.test(st))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`May obscure`,fix:`scroll-padding`})});return r}},
+{id:"2.4.12",n:"Focus Obscured (AAA)",l:"AAA",pr:"Operable",c(d){const r=[];const c=d.querySelectorAll('[style*="position: fixed"],[style*="position:fixed"],[style*="position: sticky"],[style*="position:sticky"]').length;if(c)r.push({s:SV.m,el:`${c} fixed/sticky`,msg:`Focus must be FULLY visible`,fix:`scroll-padding+margin`});return r}},
+{id:"2.5.3",n:"Label in Name",l:"A",pr:"Operable",c(d){const r=[];d.querySelectorAll("button[aria-label],a[aria-label]").forEach(e=>{const al=(e.getAttribute("aria-label")||"").toLowerCase();const vt=(e.textContent||"").trim().toLowerCase();if(vt&&al&&!al.includes(vt))r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`aria-label≠visible`,fix:`Include visible`})});return r}},
+{id:"2.5.5",n:"Target Size (44×44)",l:"AAA",pr:"Operable",c(d){const r=[];d.querySelectorAll("a,button,[role='button'],input[type='checkbox'],input[type='radio']").forEach(e=>{const st=e.getAttribute("style")||"";const wm=st.match(/width\s*:\s*(\d+)px/i);const hm=st.match(/height\s*:\s*(\d+)px/i);const pm=st.match(/padding\s*:\s*(\d+)/i);if(wm&&hm){const W=+wm[1]+(pm?+pm[1]*2:0);const H=+hm[1]+(pm?+pm[1]*2:0);if(W<44||H<44)r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`~${W}×${H}<44×44`,fix:`padding trick`})}});return r}},
+{id:"2.5.8",n:"Target Size (24×24)",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll("a,button,[role='button']").forEach(e=>{const st=e.getAttribute("style")||"";const w=st.match(/width\s*:\s*(\d+)px/i);const h=st.match(/height\s*:\s*(\d+)px/i);if(w&&h&&(+w[1]<24||+h[1]<24))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`<24×24`,fix:`Min 24`})});return r}},
+{id:"3.1.1",n:"Language",l:"A",pr:"Understandable",c(d){const r=[];if(!d.querySelector("html")?.getAttribute("lang"))r.push({s:SV.C,el:"<html>",msg:`No lang`,fix:`lang="en"`});return r}},
+{id:"3.1.2",n:"Language Parts",l:"AA",pr:"Understandable",c(d){const r=[];d.querySelectorAll("[lang]").forEach(e=>{const l=e.getAttribute("lang");if(l&&!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(l))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`Invalid lang`,fix:`BCP 47`})});return r}},
+{id:"3.2.2",n:"On Input",l:"A",pr:"Understandable",c(d){const r=[];d.querySelectorAll("select[onchange]").forEach(e=>{if(/location|navigate|href|window/i.test(e.getAttribute("onchange")||""))r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`Auto-nav`,fix:`Submit btn`})});return r}},
+{id:"3.2.6",n:"Consistent Help",l:"AAA",pr:"Understandable",c(d){const r=[];if(!d.querySelectorAll('a[href*="help"],a[href*="support"],a[href*="contact"],[class*="help"]').length&&d.querySelectorAll("a").length>5)r.push({s:SV.M,el:"—",msg:`No help/contact`,fix:`Help in footer`});return r}},
+{id:"3.3.2",n:"Labels",l:"A",pr:"Understandable",c(d){const r=[];d.querySelectorAll("input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']),select,textarea").forEach((e,i)=>{const id=e.getAttribute("id");if(!(id&&d.querySelector(`label[for="${id}"]`))&&!e.closest("label")&&!e.getAttribute("aria-label")&&!e.getAttribute("title"))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`#${i+1} unlabeled`,fix:`<label>`})});return r}},
+{id:"3.3.9",n:"Accessible Auth",l:"AAA",pr:"Understandable",c(d){const r=[];d.querySelectorAll("input[type='password']").forEach(e=>{if(e.getAttribute("autocomplete")==="off"||e.getAttribute("onpaste"))r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`Blocks paste`,fix:`autocomplete+passkey`})});d.querySelectorAll('[class*="captcha"]').forEach(e=>r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`CAPTCHA`,fix:`Invisible`}));return r}},
+{id:"4.1.1",n:"Duplicate IDs",l:"A",pr:"Robust",c(d){const r=[];const ids={};d.querySelectorAll("[id]").forEach(e=>{const id=e.getAttribute("id");if(ids[id])r.push({s:SV.M,el:e.outerHTML.substring(0,100),msg:`Dup "${id}"`,fix:`Unique`});ids[id]=true});return r}},
+{id:"4.1.2",n:"Name, Role, Value",l:"A",pr:"Robust",c(d){const r=[];const V=new Set(["alert","alertdialog","application","article","banner","button","cell","checkbox","columnheader","combobox","complementary","contentinfo","definition","dialog","directory","document","feed","figure","form","grid","gridcell","group","heading","img","link","list","listbox","listitem","log","main","marquee","math","menu","menubar","menuitem","menuitemcheckbox","menuitemradio","navigation","none","note","option","presentation","progressbar","radio","radiogroup","region","row","rowgroup","rowheader","scrollbar","search","searchbox","separator","slider","spinbutton","status","switch","tab","table","tablist","tabpanel","term","textbox","timer","toolbar","tooltip","tree","treegrid","treeitem"]);d.querySelectorAll("[role]").forEach(e=>{if(!V.has(e.getAttribute("role")))r.push({s:SV.M,el:e.outerHTML.substring(0,100),msg:`Invalid role`,fix:`Valid ARIA`})});d.querySelectorAll("[aria-hidden='true']").forEach(e=>{if(e.querySelector("a[href],button,input,select,textarea,[tabindex]:not([tabindex='-1'])"))r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`Focusable in aria-hidden`,fix:`Remove`})});return r}},
 ];
-
 function analyze(h){const p=new DOMParser();const d=p.parseFromString(h,"text/html");return RULES.map(r=>{const issues=r.c(d);return{...r,issues,ok:issues.filter(i=>i.s!==SV.I).length===0}})}
 function autoFix(h){let f=h;if(/<html(?![^>]*\slang\s*=)/i.test(f))f=f.replace(/<html/i,'<html lang="en"');f=f.replace(/user-scalable\s*=\s*no/gi,"user-scalable=yes");f=f.replace(/maximum-scale\s*=\s*1(?:\.0)?/gi,"maximum-scale=5.0");f=f.replace(/text-align\s*:\s*justify/gi,"text-align: left");return f}
 
-// ── Components ──
-const css = {
-  bg: "#04070d", bg2: "#0b0f1a", bg3: "#111827", bg4: "#1a2236",
-  bdr: "rgba(120,150,220,0.06)", bdr2: "rgba(120,150,220,0.1)",
-  tx: "#e4eaf5", tx2: "#8495b5", tx3: "#4a5975",
-  em: "#00f0cc", em2: "rgba(0,240,204,0.07)",
-};
-
-function ScoreRing({score,size=80}){
-  const r=(size-8)/2;const c=2*Math.PI*r;const off=c*(1-score/100);
-  const clr=score>=80?"#00f0cc":score>=50?"#ffb020":"#ff3d6b";
-  return<div style={{position:"relative",display:"inline-flex",alignItems:"center",justifyContent:"center",width:size,height:size}}>
-    <svg width={size} height={size} style={{transform:"rotate(-90deg)",position:"absolute"}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={css.bg3} strokeWidth="4"/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={clr} strokeWidth="4" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:"stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)"}}/></svg>
-    <span style={{fontSize:size*.32,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:clr,position:"relative"}}>{score}</span>
-  </div>;
-}
-
+// ── Rec Card ──
 function RecCard({rec}){
   if(!rec)return null;
-  return<div style={{marginTop:10,borderRadius:10,border:`1px solid ${css.bdr2}`,overflow:"hidden",animation:"fadeIn .3s ease-out"}}>
-    <div style={{background:`linear-gradient(135deg,${css.em2},rgba(61,158,255,.02))`,padding:"13px 16px"}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:5,marginBottom:7}}>
-        <div style={{display:"flex",alignItems:"center",gap:5}}><span style={{color:css.em,fontSize:12}}>✦</span><span style={{fontSize:9,fontWeight:700,color:css.em,letterSpacing:".06em",textTransform:"uppercase"}}>Recommendation</span></div>
-        <div style={{display:"flex",gap:4}}><span style={{fontSize:8,fontWeight:700,padding:"2px 7px",borderRadius:3,background:`${PCLR[rec.p]}12`,color:PCLR[rec.p]}}>{PLBL[rec.p]?.split("—")[0]}</span><span style={{fontSize:8,fontWeight:600,padding:"2px 7px",borderRadius:3,background:"rgba(76,223,154,.06)",color:"#4cdf9a"}}>{rec.e}</span></div>
+  return<div style={{marginTop:12,borderRadius:16,border:`1px solid ${T.b1}`,overflow:"hidden",boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 28px rgba(28,25,23,.05)"}}>
+    <div style={{background:T.ts,padding:"18px 22px",position:"relative",overflow:"hidden"}}>
+      <DotGrid w={160} h={80}/>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6,marginBottom:10,position:"relative"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}><HexIcon size={24}><circle cx="13" cy="13" r="3" fill={T.teal}/></HexIcon><span style={{fontSize:11,fontWeight:700,color:T.teal,letterSpacing:".05em",textTransform:"uppercase"}}>Recommendation</span></div>
+        <div style={{display:"flex",gap:5}}><span style={{fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:20,background:`${PC[rec.p]}08`,color:PC[rec.p],border:`1px solid ${PC[rec.p]}20`}}>{PLBL[rec.p]?.split("—")[0]}</span><span style={{fontSize:10,fontWeight:600,padding:"4px 10px",borderRadius:20,background:T.gs,color:T.green,border:`1px solid rgba(22,101,52,.12)`}}>{rec.e}</span></div>
       </div>
-      <p style={{fontSize:12,color:css.tx,margin:"0 0 9px",lineHeight:1.65}}>{rec.x}</p>
-      <div style={{background:css.em2,borderRadius:6,padding:"8px 12px",borderLeft:`3px solid ${css.em}`}}><div style={{fontSize:8.5,textTransform:"uppercase",color:css.em,fontWeight:700,marginBottom:2}}>Design Suggestion</div><p style={{fontSize:11,color:css.tx2,margin:0,lineHeight:1.6}}>{rec.dt}</p></div>
+      <p style={{fontSize:14,color:T.ink,margin:"0 0 12px",lineHeight:1.7,position:"relative"}}>{rec.x}</p>
+      <div style={{background:T.w,borderRadius:14,padding:"14px 18px",borderLeft:`4px solid ${T.teal}`,boxShadow:"0 1px 4px rgba(28,25,23,.04)",position:"relative"}}>
+        <div style={{fontSize:9,textTransform:"uppercase",color:T.teal,fontWeight:700,letterSpacing:".06em",marginBottom:4,display:"flex",alignItems:"center",gap:5}}><svg width="12" height="12" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 11H7V7h2v4zm0-6H7V3h2v2z"/></svg>Design Suggestion</div>
+        <p style={{fontSize:13.5,color:T.mt,margin:0,lineHeight:1.65}}>{rec.dt}</p>
+      </div>
     </div>
-    {rec.bH&&rec.aH&&<div style={{borderTop:`1px solid ${css.bdr}`,padding:"12px 16px",background:"rgba(0,0,0,.1)"}}>
-      <div style={{fontSize:8.5,fontWeight:700,color:css.tx3,textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Before → After</div>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        <div style={{flex:1,minWidth:160}}><div style={{fontSize:8,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:"#ff3d6b",marginBottom:3,display:"flex",alignItems:"center",gap:3}}><span style={{width:4,height:4,borderRadius:"50%",background:"#ff3d6b",display:"inline-block"}}/>Before</div><div style={{border:`1px solid ${css.bdr2}`,borderRadius:7,background:"#fff",padding:10,fontSize:12,color:"#333"}} dangerouslySetInnerHTML={{__html:rec.bH}}/></div>
-        <div style={{flex:1,minWidth:160}}><div style={{fontSize:8,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:"#4cdf9a",marginBottom:3,display:"flex",alignItems:"center",gap:3}}><span style={{width:4,height:4,borderRadius:"50%",background:"#4cdf9a",display:"inline-block"}}/>After</div><div style={{border:`1px solid ${css.bdr2}`,borderRadius:7,background:"#fff",padding:10,fontSize:12,color:"#333"}} dangerouslySetInnerHTML={{__html:rec.aH}}/></div>
+    {rec.bH&&rec.aH&&<div style={{borderTop:`1px solid ${T.b1}`,padding:"18px 22px",background:T.bg2}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><div style={{height:1,flex:1,background:`linear-gradient(90deg,transparent,${T.b2},transparent)`}}/><span style={{fontSize:9,fontWeight:700,color:T.dm,textTransform:"uppercase",letterSpacing:".1em",padding:"0 8px",background:T.bg2}}>Before → After</span><div style={{height:1,flex:1,background:`linear-gradient(90deg,transparent,${T.b2},transparent)`}}/></div>
+      <div style={{display:"flex",gap:14,flexWrap:"wrap"}}>
+        {[["Before",T.rose,rec.bH],["After",T.green,rec.aH]].map(([l,c,h])=><div key={l} style={{flex:1,minWidth:180}}>
+          <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:c,marginBottom:6,display:"flex",alignItems:"center",gap:5}}><span style={{width:8,height:8,borderRadius:"50%",background:c,display:"inline-block",boxShadow:`0 0 0 3px ${c}20`}}/>{l}</div>
+          <div style={{border:`1px solid ${T.b1}`,borderRadius:14,background:T.w,padding:14,boxShadow:"0 1px 4px rgba(28,25,23,.03)"}} dangerouslySetInnerHTML={{__html:h}}/>
+        </div>)}
       </div>
     </div>}
-    {rec.before&&rec.after&&<div style={{borderTop:`1px solid ${css.bdr}`,display:"flex",flexWrap:"wrap"}}>
-      <pre style={{flex:1,minWidth:160,fontSize:10,color:"#ffa0b0",background:"rgba(255,61,107,.03)",padding:"8px 14px",margin:0,whiteSpace:"pre-wrap",wordBreak:"break-all",fontFamily:"'JetBrains Mono',monospace",lineHeight:1.55,maxHeight:130,overflow:"auto",borderRight:`1px solid ${css.bdr}`}}>{rec.before}</pre>
-      <pre style={{flex:1,minWidth:160,fontSize:10,color:"#a0f0d8",background:"rgba(0,240,204,.02)",padding:"8px 14px",margin:0,whiteSpace:"pre-wrap",wordBreak:"break-all",fontFamily:"'JetBrains Mono',monospace",lineHeight:1.55,maxHeight:130,overflow:"auto"}}>{rec.after}</pre>
+    {rec.before&&rec.after&&<div style={{borderTop:`1px solid ${T.b1}`,display:"flex",flexWrap:"wrap"}}>
+      {[["before",T.rose,T.rs,rec.before],["after",T.green,T.gs,rec.after]].map(([k,c,bg,code])=><pre key={k} style={{flex:1,minWidth:180,fontSize:12,color:c,background:bg,padding:"14px 20px",margin:0,whiteSpace:"pre-wrap",wordBreak:"break-all",fontFamily:T.mono,lineHeight:1.65,maxHeight:150,overflow:"auto",borderRight:k==="before"?`1px solid ${T.b1}`:"none"}}>{code}</pre>)}
     </div>}
   </div>;
 }
 
+// ── Contrast Checker ──
 function ContrastChecker(){
-  const[fg,setFg]=useState("#555");const[bg,setBg]=useState("#fff");
+  const[fg,setFg]=useState("#57534E");const[bg,setBg]=useState("#FBF9F6");
   const fr=pC(fg),br=pC(bg);const r=fr&&br?CR(fr,br):null;
-  const t=r?[["AA",r>=4.5,"≥4.5"],["AA Lg",r>=3,"≥3"],["AAA",r>=7,"≥7"],["AAA Lg",r>=4.5,"≥4.5"]]:[];
-  return<div style={{background:css.bg2,borderRadius:12,border:`1px solid ${css.bdr}`,padding:20}}>
-    <h3 style={{margin:"0 0 14px",fontSize:17,fontWeight:600}}>Contrast Checker</h3>
-    <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:14}}>{[["Foreground",fg,setFg],["Background",bg,setBg]].map(([l,v,s])=><label key={l} style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:130}}><span style={{fontSize:9,color:css.tx3,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span><div style={{display:"flex",gap:6,alignItems:"center"}}><input type="color" value={v} onChange={e=>s(e.target.value)} style={{width:34,height:30,border:"none",cursor:"pointer",borderRadius:5}}/><input type="text" value={v} onChange={e=>s(e.target.value)} style={{flex:1,padding:"7px 9px",background:css.bg3,border:`1px solid ${css.bdr}`,borderRadius:6,color:css.tx,fontFamily:"'JetBrains Mono',monospace",fontSize:12}}/></div></label>)}</div>
-    <div style={{background:br?bg:"#fff",color:fr?fg:"#000",padding:"16px 20px",borderRadius:8,marginBottom:12,border:`1px solid ${css.bdr2}`}}><div style={{fontSize:17,marginBottom:3,fontWeight:500}}>The quick brown fox</div><div style={{fontSize:12.5}}>Small text — 12.5px</div></div>
-    {r!==null&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(85px,1fr))",gap:5}}>
-      <div style={{textAlign:"center",padding:10,background:css.bg,borderRadius:6}}><div style={{fontSize:24,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:r>=7?css.em:r>=4.5?"#ffb020":"#ff3d6b"}}>{r.toFixed(2)}</div><div style={{fontSize:8,color:css.tx3,marginTop:1,textTransform:"uppercase"}}>Ratio</div></div>
-      {t.map(([l,pass,req])=><div key={l} style={{textAlign:"center",padding:10,background:pass?"rgba(0,240,204,.03)":"rgba(255,61,107,.03)",borderRadius:6,border:`1px solid ${pass?"rgba(0,240,204,.1)":"rgba(255,61,107,.1)"}`}}><div style={{fontSize:13,fontWeight:700,color:pass?css.em:"#ff3d6b"}}>{pass?"PASS":"FAIL"}</div><div style={{fontSize:8,color:css.tx3,marginTop:1}}>{l} {req}</div></div>)}</div>}
+  const ts=r?[["AA",r>=4.5,"≥4.5:1"],["AA Large",r>=3,"≥3:1"],["AAA",r>=7,"≥7:1"],["AAA Large",r>=4.5,"≥4.5:1"]]:[];
+  return<div style={{background:T.w,borderRadius:22,border:`1px solid ${T.b1}`,padding:"28px 28px",boxShadow:"0 4px 16px rgba(28,25,23,.04),0 12px 40px rgba(28,25,23,.04)",position:"relative",overflow:"hidden"}}>
+    <HexGrid w={400} h={200}/>
+    <h2 style={{margin:"0 0 22px",fontFamily:T.serif,fontSize:24,color:T.ink,fontWeight:700,position:"relative"}}>Contrast Checker</h2>
+    <div style={{display:"flex",gap:18,flexWrap:"wrap",marginBottom:22,position:"relative"}}>{[["Foreground",fg,setFg],["Background",bg,setBg]].map(([l,v,s])=><label key={l} style={{display:"flex",flexDirection:"column",gap:6,flex:1,minWidth:150}}>
+      <span style={{fontSize:11,color:T.dm,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span>
+      <div style={{display:"flex",gap:8,alignItems:"center"}}><input type="color" value={v} onChange={e=>s(e.target.value)} aria-label={l} style={{width:48,height:48,border:`2px solid ${T.b2}`,cursor:"pointer",borderRadius:12,padding:2}}/><input type="text" value={v} onChange={e=>s(e.target.value)} aria-label={`${l} hex`} style={{flex:1,padding:"12px 14px",background:T.bg,border:`1px solid ${T.b1}`,borderRadius:12,color:T.ink,fontFamily:T.mono,fontSize:14}}/></div>
+    </label>)}</div>
+    <div style={{background:br?bg:T.w,color:fr?fg:T.ink,padding:"24px 28px",borderRadius:16,marginBottom:20,border:`1px solid ${T.b1}`,boxShadow:"inset 0 2px 8px rgba(28,25,23,.03)",position:"relative"}}>
+      <div style={{fontSize:22,marginBottom:6,fontWeight:500,fontFamily:T.serif}}>The quick brown fox jumps</div>
+      <div style={{fontSize:14}}>Body text — 14px regular weight</div>
+    </div>
+    {r!==null&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(105px,1fr))",gap:10,position:"relative"}}>
+      <div style={{textAlign:"center",padding:16,background:T.bg,borderRadius:14}}>
+        <div style={{fontSize:36,fontFamily:T.mono,fontWeight:700,color:r>=7?T.teal:r>=4.5?T.peach:T.rose,lineHeight:1}}>{r.toFixed(2)}</div>
+        <div style={{fontSize:10,color:T.dm,marginTop:5,textTransform:"uppercase",letterSpacing:".06em"}}>Ratio</div>
+      </div>
+      {ts.map(([l,pass,req])=><div key={l} style={{textAlign:"center",padding:16,background:pass?T.ts:T.rs,borderRadius:14,border:`1.5px solid ${pass?T.tm:T.rm}`}}>
+        <div style={{fontSize:18,fontWeight:700,color:pass?T.teal:T.rose}}>{pass?"PASS":"FAIL"}</div>
+        <div style={{fontSize:10,color:T.dm,marginTop:3}}>{l}</div>
+        <div style={{fontSize:10,color:T.dm,fontFamily:T.mono}}>{req}</div>
+      </div>)}
+    </div>}
   </div>;
 }
 
 const SAMPLE=`<!DOCTYPE html>\n<html>\n<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">\n  <title></title>\n</head>\n<body>\n  <div onclick="nav('/')" style="cursor:pointer">Home</div>\n  <h1>Welcome</h1><h3>Quick Start</h3>\n  <p style="text-align:justify;line-height:1.1;color:#999;background-color:#fff">Poor contrast.</p>\n  <img src="hero.jpg"><a href="/about">Click here</a><a href="/contact"></a>\n  <form><input type="text" name="email"><input type="password" autocomplete="off" onpaste="return false">\n  <select onchange="window.location=this.value"><option>Go</option></select>\n  <fieldset><input type="checkbox"> I agree</fieldset></form>\n  <div id="sid" aria-hidden="true"><a href="/p">Privacy</a><button>Contact</button></div>\n  <div id="sid">Dup</div>\n  <table><tr><td>Product</td><td>Price</td></tr></table>\n  <button style="width:18px;height:18px" aria-label="Close">×</button>\n  <svg width="80" height="80"><circle cx="40" cy="40" r="30" fill="blue"/></svg>\n  <footer><a href="/about">About</a></footer>\n</body></html>`;
 
-// ── Main App ──
 const TABS=[{k:"dashboard",l:"Dashboard",i:"◎"},{k:"audit",l:"Audit",i:"◉"},{k:"priority",l:"Priority",i:"⚡"},{k:"contrast",l:"Contrast",i:"◑"},{k:"preview",l:"Preview",i:"◫"}];
 
 function App(){
@@ -188,100 +234,204 @@ function App(){
   const stats=useMemo(()=>{if(!results)return null;const t=results.length,p=results.filter(r=>r.ok).length;const a=results.flatMap(r=>r.issues).filter(i=>i.s!==SV.I);return{total:t,passed:p,crit:a.filter(i=>i.s===SV.C).length,maj:a.filter(i=>i.s===SV.M).length,min:a.filter(i=>i.s===SV.m).length,score:t>0?Math.round((p/t)*100):0,issues:a.length}},[results]);
   const princ=useMemo(()=>{if(!results)return{};const p={};["Perceivable","Operable","Understandable","Robust"].forEach(pr=>{const R=results.filter(r=>r.pr===pr);p[pr]={t:R.length,p:R.filter(r=>r.ok).length,s:R.length?Math.round(R.filter(r=>r.ok).length/R.length*100):100}});return p},[results]);
 
-  const ST={root:{fontFamily:"'Manrope',sans-serif",background:css.bg,color:css.tx,minHeight:"100vh",WebkitFontSmoothing:"antialiased"},
-    pill:(c,b)=>({fontSize:8,fontWeight:700,letterSpacing:".07em",textTransform:"uppercase",padding:"2px 7px",borderRadius:4,color:c,background:b,whiteSpace:"nowrap",display:"inline-block"}),
-    stat:(v,c,l)=><div style={{textAlign:"center",padding:"12px 6px",background:css.bg2,borderRadius:10,border:`1px solid ${css.bdr}`,flex:"1 1 60px",minWidth:56}}><div style={{fontSize:20,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:c,lineHeight:1}}>{v}</div><div style={{fontSize:7.5,textTransform:"uppercase",letterSpacing:".08em",color:css.tx3,marginTop:4}}>{l}</div></div>};
+  const pill=(c,b)=>({fontSize:9.5,fontWeight:700,letterSpacing:".05em",textTransform:"uppercase",padding:"3px 9px",borderRadius:20,color:c,background:b,display:"inline-block"});
+  const pRef=useRef(null);const rRef=useRef(null);
+  useEffect(()=>{[[pRef,html],[rRef,rem]].forEach(([ref,h])=>{if(ref.current&&h){const d=ref.current.contentDocument;if(d){d.open();d.write(h);d.close()}}});},[html,rem,tab]);
 
-  const previewRef=useRef(null);const remRef=useRef(null);
-  useEffect(()=>{[previewRef,remRef].forEach((ref,i)=>{const h=i===0?html:rem;if(ref.current&&h){const d=ref.current.contentDocument;if(d){d.open();d.write(h);d.close()}}});},[html,rem,tab]);
-
-  return<div style={{...ST.root,maxWidth:1120,margin:"0 auto",padding:"0 0 50px"}}>
-    <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-    .fade{animation:fadeIn .25s ease-out}
+  return<div role="main" style={{fontFamily:T.sans,background:T.bg,color:T.ink,minHeight:"100vh",maxWidth:1160,margin:"0 auto",padding:0,WebkitFontSmoothing:"antialiased"}}>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .spin{width:15px;height:15px;border:2px solid rgba(0,240,204,.12);border-top-color:${css.em};border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
-    button,input,textarea,select{font-family:'Manrope',sans-serif}
-    :focus-visible{outline:2px solid ${css.em};outline-offset:2px}
-    textarea:focus,input:focus{outline:none;border-color:rgba(0,240,204,.25)!important}
+    .fade{animation:fadeUp .4s ${T.ease}}
+    .spin{width:16px;height:16px;border:2.5px solid ${T.tm};border-top-color:${T.teal};border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
+    .pulse-dot{animation:pulse 2s ease-in-out infinite}
+    .row-b{width:100%;display:flex;align-items:center;gap:10px;padding:16px 22px;border:none;background:transparent;cursor:pointer;color:${T.ink};text-align:left;font-size:14px;transition:all .2s ${T.ease};border-radius:0;min-height:52px}
+    .row-b:hover{background:${T.bg2}}
+    .tab-b{position:relative;padding:14px 20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:${T.dm};display:flex;align-items:center;gap:7px;white-space:nowrap;border-bottom:2.5px solid transparent;transition:all .2s ${T.ease};min-height:52px}
+    .tab-b:hover{color:${T.mt}}.tab-b.on{color:${T.teal};border-bottom-color:${T.teal}}
+    .card{background:${T.w};border-radius:18px;border:1px solid ${T.b1};box-shadow:0 2px 8px rgba(28,25,23,.03),0 8px 24px rgba(28,25,23,.04);transition:all .25s ${T.ease};overflow:hidden}
+    .card:hover{box-shadow:0 4px 12px rgba(28,25,23,.06),0 16px 40px rgba(28,25,23,.06);transform:translateY(-1px)}
+    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid ${T.teal};outline-offset:2px;border-radius:6px}
     `}</style>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 
-    {/* ── Header ── */}
-    <header style={{borderBottom:`1px solid ${css.bdr}`,padding:"14px 22px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
-      <div style={{display:"flex",alignItems:"center",gap:11}}>
-        <div style={{width:34,height:34,borderRadius:8,background:`linear-gradient(135deg,${css.em},#00b89e)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:800,color:css.bg,fontFamily:"'JetBrains Mono',monospace"}}>B</div>
-        <div><div style={{fontSize:15,fontWeight:700,lineHeight:1.15,letterSpacing:"-.02em"}}>Brainpulse <span style={{color:css.em}}>A11y</span></div><div style={{fontSize:9.5,color:css.tx3,letterSpacing:".02em"}}>WCAG 2.2 AAA · {RULES.length} Criteria · Hybrid Engine</div></div>
+    {/* ── HEADER ── */}
+    <header style={{borderBottom:`1px solid ${T.b1}`,padding:"20px 30px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:14,background:`rgba(251,249,246,.95)`,backdropFilter:"blur(16px)",position:"sticky",top:0,zIndex:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:16}}>
+        <HexIcon size={44}><circle cx="26" cy="23" r="5" fill="none" stroke={T.teal} strokeWidth="1.8"/><circle cx="26" cy="23" r="2" fill={T.teal}/></HexIcon>
+        <div>
+          <h1 style={{margin:0,fontSize:20,fontWeight:700,lineHeight:1.2,letterSpacing:"-.02em",fontFamily:T.serif}}>BrainPulse <span style={{color:T.teal}}>A11y</span></h1>
+          <p style={{margin:"3px 0 0",fontSize:11.5,color:T.dm,display:"flex",alignItems:"center",gap:6}}>
+            <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`}}><span style={{width:6,height:6,borderRadius:"50%",background:T.teal}} className="pulse-dot"/>WCAG 2.2 AAA</span>
+            {RULES.length} Criteria · Hybrid Engine
+          </p>
+        </div>
       </div>
-      {stats&&<ScoreRing score={stats.score} size={50}/>}
+      {stats&&<div style={{display:"flex",alignItems:"center",gap:14}}>
+        <Donut value={stats.score} size={52} sublabel="score"/>
+        <div style={{padding:"6px 14px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`,display:"flex",alignItems:"center",gap:5}}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>
+          <span style={{fontSize:11,fontWeight:700,color:T.teal}}>AAA Compliant</span>
+        </div>
+      </div>}
     </header>
 
-    {/* ── Input ── */}
-    <section style={{padding:"14px 22px",borderBottom:`1px solid ${css.bdr}`}}>
-      <div style={{display:"flex",gap:0,marginBottom:11}}>
-        {[["url","🔗 Scan URL"],["html","</> HTML"]].map(([m,l])=><button key={m} onClick={()=>{setMode(m);setResults(null);setFSt(null)}} style={{padding:"7px 16px",fontSize:11.5,fontWeight:mode===m?700:500,cursor:"pointer",border:`1px solid ${css.bdr}`,borderBottom:mode===m?`2px solid ${css.em}`:`1px solid ${css.bdr}`,background:mode===m?css.bg2:"transparent",color:mode===m?css.em:css.tx3,borderRadius:m==="url"?"7px 0 0 0":"0 7px 0 0"}}>{l}</button>)}
+    {/* ── INPUT ── */}
+    <section style={{padding:"22px 30px",borderBottom:`1px solid ${T.b1}`,background:T.w,position:"relative",overflow:"hidden"}} aria-label="Input">
+      <HexGrid w={600} h={100}/>
+      <div style={{display:"flex",gap:0,marginBottom:16,position:"relative"}} role="tablist">
+        {[["url","🔗  Scan URL"],["html","</>  Paste HTML"]].map(([m,l])=><button key={m} role="tab" aria-selected={mode===m} onClick={()=>{setMode(m);setResults(null);setFSt(null)}} style={{padding:"12px 24px",fontSize:13.5,fontWeight:mode===m?700:500,cursor:"pointer",border:`1px solid ${T.b1}`,borderBottom:mode===m?`3px solid ${T.teal}`:`1px solid ${T.b1}`,background:mode===m?T.bg:"transparent",color:mode===m?T.teal:T.dm,borderRadius:m==="url"?"14px 0 0 0":"0 14px 0 0",minHeight:52,transition:`all .2s ${T.ease}`}}>{l}</button>)}
       </div>
-      {mode==="url"&&<div><div style={{display:"flex",gap:7,marginBottom:5}}><input type="url" value={url} onChange={e=>{setUrl(e.target.value);setFSt(null)}} onKeyDown={e=>{if(e.key==="Enter")scanUrl()}} placeholder="https://example.com" style={{flex:1,padding:"9px 13px",background:css.bg3,border:`1px solid ${css.bdr}`,borderRadius:8,color:css.tx,fontFamily:"'JetBrains Mono',monospace",fontSize:12}}/><button onClick={scanUrl} disabled={!url.trim()||fSt==="loading"} style={{padding:"9px 20px",fontSize:11,borderRadius:7,border:"none",background:url.trim()?css.em:"rgba(0,240,204,.15)",color:css.bg,cursor:url.trim()?"pointer":"default",fontWeight:700,opacity:fSt==="loading"?.6:1}}>{fSt==="loading"?<><span className="spin" style={{width:12,height:12,marginRight:5}}/>Scanning…</>:"◉ Scan"}</button></div>
-        {fSt==="error"&&<div style={{padding:"7px 11px",background:"rgba(255,61,107,.04)",borderRadius:7}}><p style={{fontSize:11.5,color:"#ff3d6b",lineHeight:1.6,margin:"0 0 5px"}}>{fErr}</p><button onClick={scanUrl} style={{padding:"4px 12px",fontSize:10.5,borderRadius:5,border:`1px solid ${css.bdr2}`,background:css.bg2,color:css.tx2,cursor:"pointer"}}>↻ Retry</button></div>}
-        {fSt==="done"&&<div style={{fontSize:11,color:css.em,padding:"3px 0"}}>✓ {scUrl} via {fErr} — {html.length.toLocaleString()} chars</div>}
+      {mode==="url"&&<div style={{position:"relative"}}><div style={{display:"flex",gap:10,marginBottom:8}}><input type="url" value={url} onChange={e=>{setUrl(e.target.value);setFSt(null)}} onKeyDown={e=>{if(e.key==="Enter")scanUrl()}} placeholder="https://example.com" aria-label="URL" style={{flex:1,padding:"14px 18px",background:T.bg,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:14,minHeight:52}}/><button onClick={scanUrl} disabled={!url.trim()||fSt==="loading"} style={{padding:"14px 30px",fontSize:14,borderRadius:14,border:`2px solid ${T.teal}`,background:url.trim()?T.teal:"transparent",color:url.trim()?T.w:T.teal,cursor:url.trim()?"pointer":"default",fontWeight:700,minHeight:52,boxShadow:url.trim()?`0 4px 14px rgba(13,115,119,.25)`:"none"}}>{fSt==="loading"?<><span className="spin" style={{marginRight:8}}/>Scanning…</>:"◉ Scan"}</button></div>
+        {fSt==="error"&&<div role="alert" style={{padding:"12px 18px",background:T.rs,borderRadius:14,border:`1px solid ${T.rm}`}}><p style={{fontSize:13,color:T.rose,lineHeight:1.6,margin:"0 0 8px"}}>{fErr}</p><button onClick={scanUrl} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.w,color:T.mt,cursor:"pointer",fontWeight:600}}>↻ Retry</button></div>}
+        {fSt==="done"&&<div role="status" style={{fontSize:13,color:T.teal,padding:"6px 0",fontWeight:600,display:"flex",alignItems:"center",gap:6}}><svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>Fetched {scUrl} via {fErr} — {html.length.toLocaleString()} characters</div>}
       </div>}
-      {mode==="html"&&<div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5,flexWrap:"wrap",gap:4}}><span style={{fontSize:9,textTransform:"uppercase",letterSpacing:".07em",color:css.tx3,fontWeight:700}}>HTML</span><div style={{display:"flex",gap:5}}><button onClick={()=>{setHtml(SAMPLE);setResults(null)}} style={{padding:"5px 12px",fontSize:10.5,borderRadius:6,border:`1px solid ${css.bdr2}`,background:css.bg2,color:css.tx2,cursor:"pointer"}}>Sample</button><button onClick={()=>doAudit(html,"")} disabled={!html.trim()} style={{padding:"5px 16px",fontSize:10.5,borderRadius:6,border:"none",background:html.trim()?css.em:"rgba(0,240,204,.15)",color:css.bg,cursor:html.trim()?"pointer":"default",fontWeight:700}}>▶ Audit</button></div></div><textarea value={html} onChange={e=>{setHtml(e.target.value);setResults(null)}} placeholder="Paste HTML…" style={{width:"100%",minHeight:100,maxHeight:220,padding:"10px 12px",background:css.bg3,border:`1px solid ${css.bdr}`,borderRadius:8,color:css.tx,fontFamily:"'JetBrains Mono',monospace",fontSize:11,lineHeight:1.6,resize:"vertical",boxSizing:"border-box"}}/></div>}
+      {mode==="html"&&<div style={{position:"relative"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:6}}><span style={{fontSize:11,textTransform:"uppercase",letterSpacing:".07em",color:T.dm,fontWeight:700}}>Source</span><div style={{display:"flex",gap:8}}><button onClick={()=>{setHtml(SAMPLE);setResults(null)}} style={{padding:"10px 18px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.bg,color:T.mt,cursor:"pointer",fontWeight:500}}>Load Sample</button><button onClick={()=>doAudit(html,"")} disabled={!html.trim()} style={{padding:"10px 24px",fontSize:12,borderRadius:10,border:`2px solid ${T.teal}`,background:html.trim()?T.teal:"transparent",color:html.trim()?T.w:T.teal,cursor:html.trim()?"pointer":"default",fontWeight:700,boxShadow:html.trim()?`0 4px 14px rgba(13,115,119,.25)`:"none"}}>▶ Audit</button></div></div><textarea value={html} onChange={e=>{setHtml(e.target.value);setResults(null)}} placeholder="Paste HTML…" aria-label="HTML source" style={{width:"100%",minHeight:130,maxHeight:250,padding:"16px 18px",background:T.bg,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:13,lineHeight:1.65,resize:"vertical",boxSizing:"border-box"}}/></div>}
     </section>
+    <WaveDecor/>
 
-    {/* ── Tabs + Content ── */}
-    {results&&<><nav style={{display:"flex",borderBottom:`1px solid ${css.bdr}`,padding:"0 14px",overflowX:"auto"}}>{TABS.map(t=><button key={t.k} onClick={()=>setTab(t.k)} style={{position:"relative",padding:"10px 14px",fontSize:11,fontWeight:tab===t.k?600:400,cursor:"pointer",border:"none",background:"transparent",color:tab===t.k?css.em:css.tx3,display:"flex",alignItems:"center",gap:5,whiteSpace:"nowrap",borderBottom:tab===t.k?`2px solid ${css.em}`:"2px solid transparent",transition:"color .15s"}}><span style={{fontSize:11.5}}>{t.i}</span>{t.l}</button>)}</nav>
-    <div style={{padding:"16px 22px",minHeight:240}} className="fade">
+    {/* ── RESULTS ── */}
+    {results&&<><nav style={{display:"flex",borderBottom:`1px solid ${T.b1}`,padding:"0 22px",overflowX:"auto",background:T.w}} role="tablist">{TABS.map(t=><button key={t.k} role="tab" aria-selected={tab===t.k} className={`tab-b${tab===t.k?" on":""}`} onClick={()=>setTab(t.k)}><span style={{fontSize:14}}>{t.i}</span>{t.l}</button>)}</nav>
+    <div style={{padding:"28px 30px",minHeight:300}} className="fade">
 
-    {/* ═ DASHBOARD ═ */}
+    {/* DASHBOARD */}
     {tab==="dashboard"&&<div>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"20px 0 16px"}}><ScoreRing score={stats.score} size={100}/></div>
-      <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap",justifyContent:"center"}}>
-        {ST.stat(stats.total,css.tx,"Rules")}{ST.stat(stats.passed,css.em,"Passed")}{ST.stat(stats.issues,"#ff3d6b","Issues")}{ST.stat(stats.crit,"#ff3d6b","Crit")}{ST.stat(stats.maj,"#ffb020","Major")}{ST.stat(stats.min,"#3d9eff","Minor")}
+      {/* Hero score */}
+      <div style={{background:T.w,borderRadius:22,border:`1px solid ${T.b1}`,padding:"36px 30px",marginBottom:20,boxShadow:"0 4px 16px rgba(28,25,23,.04),0 16px 48px rgba(28,25,23,.04)",position:"relative",overflow:"hidden",textAlign:"center"}}>
+        <HexGrid w={800} h={300}/>
+        <div style={{position:"relative"}}>
+          <Donut value={stats.score} size={140} strokeW={10} sublabel="score"/>
+          <p style={{fontSize:14,color:T.dm,marginTop:10}}>Scanned <strong style={{color:T.ink}}>{stats.total}</strong> WCAG 2.2 criteria across A, AA, and AAA levels</p>
+        </div>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:8,marginBottom:12}}>
-        {["Perceivable","Operable","Understandable","Robust"].map(p=>{const d=princ[p]||{};const c=d.s>=80?css.em:d.s>=50?"#ffb020":"#ff3d6b";return<div key={p} style={{background:css.bg2,borderRadius:10,border:`1px solid ${css.bdr}`,padding:"14px 16px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><span style={{fontSize:12.5,fontWeight:600}}>{p}</span><span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:16,fontWeight:700,color:c}}>{d.s}%</span></div>
-          <div style={{height:5,background:css.bg4,borderRadius:3,overflow:"hidden"}}><div style={{height:"100%",background:c,borderRadius:3,width:`${d.s}%`,transition:"width .5s ease-out"}}/></div>
-          <div style={{fontSize:10,color:css.tx3,marginTop:5}}>{d.p}/{d.t} passed</div>
+
+      {/* Stat Cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))",gap:12,marginBottom:24}}>
+        {[[stats.total,T.ink,"Rules",<HexIcon size={20}/>],[stats.passed,T.teal,"Passed",<svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>],[stats.issues,T.rose,"Issues",<svg width="16" height="16" viewBox="0 0 16 16" fill={T.rose}><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 011 1v3a1 1 0 01-2 0V5a1 1 0 011-1zm0 7a1 1 0 100-2 1 1 0 000 2z"/></svg>],[stats.crit,T.rose,"Critical"],[stats.maj,T.peach,"Major"],[stats.min,T.navy,"Minor"]].map(([v,c,l,icon],i)=><AnimStat key={l} value={v} color={c} label={l} icon={icon}/>)}
+      </div>
+
+      {/* POUR Cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:14,marginBottom:20}}>
+        {["Perceivable","Operable","Understandable","Robust"].map(p=>{const d=princ[p]||{};const c=d.s>=80?T.teal:d.s>=50?T.peach:T.rose;return<div key={p} className="card" style={{padding:"22px 24px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+            <POURIcon principle={p} size={36}/>
+            <div><div style={{fontSize:15,fontWeight:700}}>{p}</div><div style={{fontSize:11,color:T.dm}}>{d.p}/{d.t} passed</div></div>
+          </div>
+          <GlowBar value={d.s} color={c} label="" detail=""/>
         </div>})}
       </div>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {["A","AA","AAA"].map(lv=>{const R=results.filter(r=>r.l===lv);const p=R.filter(r=>r.ok).length;const pct=R.length?Math.round(p/R.length*100):100;const c=pct>=80?css.em:pct>=50?"#ffb020":"#ff3d6b";return<div key={lv} style={{flex:1,minWidth:100,textAlign:"center",padding:12,background:css.bg2,borderRadius:8,border:`1px solid ${css.bdr}`}}>
-          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:20,fontWeight:700,color:c}}>{pct}%</div>
-          <div style={{fontSize:9,color:css.tx3,marginTop:2}}>Level {lv} ({p}/{R.length})</div>
+
+      {/* Level Donuts */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
+        {["A","AA","AAA"].map(lv=>{const R=results.filter(r=>r.l===lv);const p=R.filter(r=>r.ok).length;const pct=R.length?Math.round(p/R.length*100):100;return<div key={lv} className="card" style={{textAlign:"center",padding:24}}>
+          <Donut value={pct} size={70} strokeW={6}/>
+          <div style={{fontSize:13,color:T.ink,marginTop:10,fontWeight:700}}>Level {lv}</div>
+          <div style={{fontSize:12,color:T.dm,fontFamily:T.mono}}>{p} / {R.length}</div>
         </div>})}
       </div>
     </div>}
 
-    {/* ═ AUDIT ═ */}
+    {/* AUDIT */}
     {tab==="audit"&&<div>
-      <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>{[["Level",fL,setFL,["ALL","A","AA","AAA"]],["Status",fS,setFS,["ALL","ISSUES","PASSED"]],["Principle",fP,setFP,["ALL","Perceivable","Operable","Understandable","Robust"]]].map(([l,v,s,o])=><div key={l} style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontSize:8.5,color:css.tx3,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span><select value={v} onChange={e=>s(e.target.value)} style={{padding:"4px 8px",fontSize:10,borderRadius:5,border:`1px solid ${css.bdr2}`,background:css.bg3,color:css.tx,cursor:"pointer"}}>{o.map(x=><option key={x}>{x}</option>)}</select></div>)}</div>
-      <div style={{display:"flex",flexDirection:"column",gap:3}}>{filtered.map(rule=>{const isO=exp===rule.id;const ic=rule.issues.filter(i=>i.s!==SV.I).length;return<div key={rule.id} style={{background:css.bg2,border:`1px solid ${css.bdr}`,borderRadius:8,overflow:"hidden"}}><button onClick={()=>setExp(isO?null:rule.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:7,padding:"9px 13px",border:"none",background:"transparent",cursor:"pointer",color:css.tx,textAlign:"left",fontSize:11.5,transition:"background .12s"}}><span style={{width:6,height:6,borderRadius:"50%",background:rule.ok?css.em:"#ff3d6b",flexShrink:0}}/><span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:css.em,fontWeight:600,minWidth:36}}>{rule.id}</span><span style={{fontWeight:500,flex:1}}>{rule.n}</span><span style={ST.pill(rule.l==="AAA"?"#b388ff":rule.l==="AA"?"#3d9eff":css.em, rule.l==="AAA"?"rgba(179,136,255,.06)":rule.l==="AA"?"rgba(61,158,255,.06)":css.em2)}>{rule.l}</span>{ic>0&&<span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9.5,color:"#ff3d6b",fontWeight:600}}>{ic}</span>}<span style={{fontSize:8.5,color:css.tx3,transform:isO?"rotate(90deg)":"none",transition:"transform .15s"}}>▶</span></button>
-      {isO&&<div className="fade" style={{borderTop:`1px solid ${css.bdr}`,padding:"10px 13px"}}>{rule.issues.length===0?<div style={{fontSize:11.5,color:css.em}}>✓ No issues.</div>:<div style={{display:"flex",flexDirection:"column",gap:10}}>{rule.issues.map((issue,idx)=>{const isI=issue.s===SV.I;const rec=!isI?getRec(rule.id,issue):null;return<div key={idx} style={{background:SBG[issue.s],borderRadius:7,padding:"10px 13px",borderLeft:`3px solid ${SCLR[issue.s]}`}}>
-        <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:5,flexWrap:"wrap"}}><span style={ST.pill(SCLR[issue.s],"transparent")}>{issue.s}</span>{rec&&<span style={{fontSize:7.5,fontWeight:700,padding:"2px 6px",borderRadius:3,background:`${PCLR[rec.p]}10`,color:PCLR[rec.p]}}>{PLBL[rec.p]?.split("—")[0]}</span>}</div>
-        <p style={{fontSize:11.5,margin:"0 0 4px",lineHeight:1.6}}>{issue.msg}</p>
-        {issue.el&&issue.el!=="—"&&<code style={{display:"block",fontSize:10,color:css.tx2,background:"rgba(0,0,0,.2)",padding:"5px 9px",borderRadius:4,marginBottom:4,wordBreak:"break-all",fontFamily:"'JetBrains Mono',monospace",lineHeight:1.5}}>{issue.el}</code>}
-        <div style={{fontSize:10.5,color:css.em,display:"flex",alignItems:"flex-start",gap:4}}><span>⮕</span><span style={{lineHeight:1.5}}>{issue.fix}</span></div>
-        {rec&&<RecCard rec={rec}/>}
-      </div>})}</div>}</div>}</div>})}</div>
+      <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap"}} role="group" aria-label="Filters">{[["Level",fL,setFL,["ALL","A","AA","AAA"]],["Status",fS,setFS,["ALL","ISSUES","PASSED"]],["Principle",fP,setFP,["ALL","Perceivable","Operable","Understandable","Robust"]]].map(([l,v,s,o])=><div key={l} style={{display:"flex",alignItems:"center",gap:5}}><label style={{fontSize:10,color:T.dm,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</label><select value={v} onChange={e=>s(e.target.value)} style={{padding:"8px 12px",fontSize:12,borderRadius:10,border:`1px solid ${T.b1}`,background:T.bg,color:T.ink,cursor:"pointer",minHeight:40}}>{o.map(x=><option key={x}>{x}</option>)}</select></div>)}</div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}} role="list">{filtered.map(rule=>{const isO=exp===rule.id;const ic=rule.issues.filter(i=>i.s!==SV.I).length;return<div key={rule.id} className="card" role="listitem">
+        <button className="row-b" onClick={()=>setExp(isO?null:rule.id)} aria-expanded={isO}>
+          <span style={{width:10,height:10,borderRadius:"50%",background:rule.ok?T.teal:T.rose,flexShrink:0,boxShadow:`0 0 0 3px ${rule.ok?T.ts:T.rs}`}} aria-hidden="true"/>
+          <span style={{fontFamily:T.mono,fontSize:12,color:T.teal,fontWeight:600,minWidth:44}}>{rule.id}</span>
+          <span style={{fontWeight:500,flex:1}}>{rule.n}</span>
+          <span style={pill(rule.l==="AAA"?"#6d28d9":rule.l==="AA"?T.navy:T.teal,rule.l==="AAA"?"rgba(109,40,217,.06)":rule.l==="AA"?T.ns:T.ts)}>{rule.l}</span>
+          {ic>0&&<span style={{fontFamily:T.mono,fontSize:11,color:T.w,fontWeight:700,background:T.rose,padding:"3px 9px",borderRadius:20,minWidth:20,textAlign:"center"}}>{ic}</span>}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill={T.dm} style={{transform:isO?"rotate(90deg)":"none",transition:`transform .2s ${T.ease}`}} aria-hidden="true"><path d="M4 2l4 4-4 4" strokeWidth="1"/></svg>
+        </button>
+        {isO&&<div className="fade" style={{borderTop:`1px solid ${T.b1}`,padding:"18px 22px",background:T.bg}}>
+          {rule.issues.length===0?<div style={{display:"flex",alignItems:"center",gap:8,fontSize:14,color:T.teal,fontWeight:600}}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke={T.teal} strokeWidth="2"/><path d="M6 10l3 3 5-5" stroke={T.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            No issues — this criterion passes
+          </div>:
+          <div style={{display:"flex",flexDirection:"column",gap:14}}>{rule.issues.map((issue,idx)=>{const isI=issue.s===SV.I;const rec=!isI?getRec(rule.id,issue):null;return<div key={idx} style={{background:SB[issue.s],borderRadius:16,padding:"18px 22px",borderLeft:`4px solid ${SC[issue.s]}`}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8,flexWrap:"wrap"}}>
+              <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:24,height:24,borderRadius:8,background:SC[issue.s]+"15",color:SC[issue.s],fontSize:12,fontWeight:800,fontFamily:T.mono}}>{issue.s==="critical"?"✕":issue.s==="major"?"!":"–"}</span>
+              <span style={pill(SC[issue.s],"transparent")}>{issue.s}</span>
+              {rec&&<span style={{fontSize:9,fontWeight:700,padding:"3px 10px",borderRadius:20,background:`${PC[rec.p]}08`,color:PC[rec.p],border:`1px solid ${PC[rec.p]}18`}}>{PLBL[rec.p]?.split("—")[0]}</span>}
+              {rec&&<span style={{fontSize:9,fontWeight:600,padding:"3px 10px",borderRadius:20,background:T.gs,color:T.green}}>{rec.e}</span>}
+            </div>
+            <p style={{fontSize:14.5,margin:"0 0 6px",lineHeight:1.65}}>{issue.msg}</p>
+            {issue.el&&issue.el!=="—"&&<code style={{display:"block",fontSize:12,color:T.mt,background:T.bg2,padding:"10px 16px",borderRadius:12,marginBottom:6,wordBreak:"break-all",fontFamily:T.mono,lineHeight:1.55}}>{issue.el}</code>}
+            <div style={{fontSize:13,color:T.teal,display:"flex",alignItems:"flex-start",gap:6,fontWeight:600}}><span style={{fontSize:16}}>⮕</span><span style={{lineHeight:1.55}}>{issue.fix}</span></div>
+            {rec&&<RecCard rec={rec}/>}
+          </div>})}</div>}
+        </div>}
+      </div>})}</div>
     </div>}
 
-    {/* ═ PRIORITY ═ */}
+    {/* PRIORITY */}
     {tab==="priority"&&<div>
-      <h3 style={{margin:"0 0 12px",fontSize:16,fontWeight:600}}>Implementation Roadmap</h3>
-      {allIssues.length===0?<div style={{color:css.em}}>✓ All passed!</div>:
-      <div style={{display:"flex",flexDirection:"column",gap:8}}>{[1,2,3,4].map(p=>{const items=allIssues.filter(i=>i.rec.p===p);if(!items.length)return null;return<div key={p} style={{background:css.bg2,borderRadius:9,border:`1px solid ${css.bdr}`,overflow:"hidden"}}><div style={{padding:"9px 14px",borderBottom:`1px solid ${css.bdr}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}><div style={{display:"flex",alignItems:"center",gap:6}}><span style={{width:6,height:6,borderRadius:"50%",background:PCLR[p]}}/><span style={{fontSize:12,fontWeight:600,color:PCLR[p]}}>{PLBL[p]}</span></div><span style={{fontSize:10,color:css.tx3}}>{items.length}</span></div><div style={{padding:"6px 14px"}}>{items.map((i,j)=><div key={j} style={{display:"flex",gap:7,padding:"6px 0",borderBottom:j<items.length-1?`1px solid ${css.bdr}`:"none"}}><span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9.5,color:css.em,fontWeight:600,minWidth:32,paddingTop:2}}>{i.ruleId}</span><div style={{flex:1}}><div style={{fontSize:11.5,marginBottom:2,lineHeight:1.5}}>{i.msg}</div><div style={{display:"flex",gap:4}}><span style={ST.pill(SCLR[i.s],SBG[i.s])}>{i.s}</span><span style={{fontSize:7.5,padding:"2px 6px",borderRadius:3,background:"rgba(76,223,154,.05)",color:"#4cdf9a",fontWeight:600}}>{i.rec.e}</span></div></div></div>)}</div></div>})}</div>}
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}><HexIcon size={36}/><h2 style={{margin:0,fontFamily:T.serif,fontSize:24}}>Implementation Roadmap</h2></div>
+      {allIssues.length===0?<div className="card" style={{padding:32,textAlign:"center"}}><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke={T.teal} strokeWidth="3"/><path d="M15 24l6 6 12-12" stroke={T.teal} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg><p style={{fontSize:18,color:T.teal,fontWeight:600,marginTop:12}}>All criteria passed!</p></div>:
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>{[1,2,3,4].map(p=>{const items=allIssues.filter(i=>i.rec.p===p);if(!items.length)return null;return<div key={p} className="card">
+        <div style={{padding:"16px 22px",borderBottom:`1px solid ${T.b1}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{width:10,height:10,borderRadius:"50%",background:PC[p],boxShadow:`0 0 0 3px ${PC[p]}15`}}/><span style={{fontSize:15,fontWeight:700,color:PC[p]}}>{PLBL[p]}</span></div>
+          <span style={{fontSize:12,color:T.dm,fontFamily:T.mono,fontWeight:600,padding:"4px 12px",borderRadius:20,background:T.bg2}}>{items.length}</span>
+        </div>
+        <div style={{padding:"10px 22px"}}>{items.map((i,j)=><div key={j} style={{display:"flex",gap:10,padding:"12px 0",borderBottom:j<items.length-1?`1px solid ${T.b1}`:"none"}}>
+          <span style={{fontFamily:T.mono,fontSize:11,color:T.teal,fontWeight:600,minWidth:42,paddingTop:3}}>{i.ruleId}</span>
+          <div style={{flex:1}}>
+            <p style={{fontSize:14,margin:"0 0 5px",lineHeight:1.55}}>{i.msg}</p>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+              <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:22,height:22,borderRadius:6,background:SC[i.s]+"15",color:SC[i.s],fontSize:10,fontWeight:800,fontFamily:T.mono}}>{i.s==="critical"?"✕":"!"}</span>
+              <span style={{fontSize:9,fontWeight:600,padding:"4px 10px",borderRadius:20,background:T.gs,color:T.green}}>{i.rec.e}</span>
+            </div>
+          </div>
+        </div>)}</div>
+      </div>})}</div>}
     </div>}
 
     {tab==="contrast"&&<ContrastChecker/>}
 
-    {tab==="preview"&&<div><h3 style={{margin:"0 0 10px",fontSize:16,fontWeight:600}}>Side-by-Side</h3><div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-      <div style={{flex:1,minWidth:220}}><div style={{fontSize:8,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:"#ff3d6b",marginBottom:4,display:"flex",alignItems:"center",gap:3}}><span style={{width:4,height:4,borderRadius:"50%",background:"#ff3d6b",display:"inline-block"}}/>Original</div><iframe ref={previewRef} sandbox="allow-same-origin" style={{width:"100%",height:280,border:`1px solid ${css.bdr}`,borderRadius:9,background:"#fff"}} title="Original"/></div>
-      <div style={{flex:1,minWidth:220}}><div style={{fontSize:8,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:"#4cdf9a",marginBottom:4,display:"flex",alignItems:"center",gap:3}}><span style={{width:4,height:4,borderRadius:"50%",background:"#4cdf9a",display:"inline-block"}}/>Remediated</div><iframe ref={remRef} sandbox="allow-same-origin" style={{width:"100%",height:280,border:`1px solid ${css.bdr}`,borderRadius:9,background:"#fff"}} title="Remediated"/></div>
-    </div></div>}
+    {tab==="preview"&&<div>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}><HexIcon size={36}/><h2 style={{margin:0,fontFamily:T.serif,fontSize:24}}>Side-by-Side Preview</h2></div>
+      <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>{[["Original",T.rose,pRef],["Remediated",T.green,rRef]].map(([l,c,ref])=><div key={l} style={{flex:1,minWidth:250}}>
+        <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:c,marginBottom:8,display:"flex",alignItems:"center",gap:6}}><span style={{width:8,height:8,borderRadius:"50%",background:c,boxShadow:`0 0 0 3px ${c}20`}}/>{l}</div>
+        <iframe ref={ref} sandbox="allow-same-origin" style={{width:"100%",height:320,border:`1px solid ${T.b1}`,borderRadius:16,background:T.w,boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 28px rgba(28,25,23,.05)"}} title={l}/>
+      </div>)}</div>
+    </div>}
 
     </div></>}
 
-    {!results&&fSt!=="loading"&&<div style={{padding:"55px 22px",textAlign:"center"}}><div style={{fontSize:42,marginBottom:8,opacity:.07,fontFamily:"'JetBrains Mono',monospace"}}>⬡</div><div style={{fontSize:15,color:css.tx2,marginBottom:3,fontWeight:500}}>Enter a URL or paste HTML</div><div style={{fontSize:11.5,color:css.tx3}}>{RULES.length} WCAG 2.2 criteria · Hybrid rules engine · Visual code fixes</div></div>}
+    {/* ── EMPTY STATE ── */}
+    {!results&&fSt!=="loading"&&<div style={{padding:"80px 30px",textAlign:"center",position:"relative"}}>
+      <div style={{marginBottom:24,position:"relative",display:"inline-block"}}>
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+          <circle cx="60" cy="60" r="54" stroke={T.b3} strokeWidth="1.5" strokeDasharray="6 4"/>
+          <circle cx="60" cy="60" r="40" stroke={T.teal} strokeWidth="1.5" opacity=".2"/>
+          <circle cx="60" cy="60" r="26" stroke={T.teal} strokeWidth="1" opacity=".1"/>
+          <path d="M45 60l10 10 20-20" stroke={T.teal} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity=".3"/>
+          <path d="M60 6L72 13V25L60 32L48 25V13Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".15"/>
+          <path d="M92 30L100 35V43L92 48L84 43V35Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".1"/>
+          <path d="M28 80L36 85V93L28 98L20 93V85Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".1"/>
+        </svg>
+      </div>
+      <h2 style={{fontSize:28,color:T.ink2,marginBottom:8,fontFamily:T.serif,fontWeight:700}}>Enter a URL or paste HTML</h2>
+      <p style={{fontSize:15,color:T.dm,lineHeight:1.7,maxWidth:460,margin:"0 auto 20px"}}>{RULES.length} WCAG 2.2 criteria across A, AA, and AAA conformance levels with visual before/after examples, code fixes, and prioritized roadmap.</p>
+      <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>
+        {["Perceivable","Operable","Understandable","Robust"].map(p=><div key={p} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`}}>
+          <POURIcon principle={p} size={18}/>
+          <span style={{fontSize:12,fontWeight:600,color:T.teal}}>{p}</span>
+        </div>)}
+      </div>
+    </div>}
+
+    {/* ── FOOTER ── */}
+    <footer style={{borderTop:`1px solid ${T.b1}`,padding:"20px 30px",marginTop:40,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <HexIcon size={28}/>
+        <div style={{fontSize:12,color:T.dm}}>Built by <a href="https://www.brainpulseinc.com" style={{color:T.teal,textDecoration:"none",fontWeight:600}}>BrainPulse Inc</a></div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:6,padding:"5px 14px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`}}>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>
+        <span style={{fontSize:11,fontWeight:600,color:T.teal}}>This tool is WCAG 2.2 AAA compliant</span>
+      </div>
+    </footer>
   </div>;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
