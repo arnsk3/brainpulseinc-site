@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WCAG 2.2 AAA Remediation Tool — Brainpulse Inc</title>
-<meta name="description" content="AI-powered WCAG 2.2 AAA compliance audit and remediation tool. Scan any URL or HTML for ADA accessibility issues with AI-powered design suggestions and code fixes.">
+<meta name="description" content="AI-powered WCAG 2.2 AAA compliance audit and remediation tool. Scan any URL or HTML for ADA accessibility issues with design suggestions, visual examples, and prioritized fixes.">
 <link rel="canonical" href="https://www.brainpulseinc.com/wcag-tool.html">
-<meta property="og:title" content="WCAG 2.2 AAA Remediation Tool — Brainpulse Inc">
-<meta property="og:description" content="Scan any URL for WCAG 2.2 AAA compliance. AI-powered ADA audit engine with automated remediation.">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
@@ -16,18 +14,19 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
 --bg:#06090f;--bg2:#0c1017;--bg3:#121722;--bg4:#1a2030;
---border:rgba(140,160,200,0.07);--text:#e0e7f2;--text2:#8896b0;--text3:#4d5b73;
---accent:#0ff0d4;--accent2:rgba(15,240,212,0.1);--red:#ff4570;--orange:#ffaa30;--blue:#4cacff;--purple:#b888ff;
+--bdr:rgba(140,160,200,0.07);--tx:#e0e7f2;--tx2:#8896b0;--tx3:#4d5b73;
+--ac:#0ff0d4;--ac2:rgba(15,240,212,0.1);--rd:#ff4570;--or:#ffaa30;--bl:#4cacff;--pu:#b888ff;--gn:#34d399;
 --f1:'Instrument Serif',Georgia,serif;--f2:'Outfit',sans-serif;--f3:'JetBrains Mono',monospace;
 }
-body{font-family:var(--f2);background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:var(--f2);background:var(--bg);color:var(--tx);min-height:100vh}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
-.spinner{width:18px;height:18px;border:2px solid rgba(15,240,212,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
-.pill{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:5px;white-space:nowrap}
-button{font-family:var(--f2)}
-input,textarea,select{font-family:var(--f2)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spinner{width:18px;height:18px;border:2px solid rgba(15,240,212,.15);border-top-color:var(--ac);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+.pill{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:5px;white-space:nowrap}
+button,input,textarea,select{font-family:var(--f2)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.preview-frame{border:1px solid var(--bdr);border-radius:8px;background:#fff;padding:16px;min-height:60px;font-family:sans-serif;font-size:14px;color:#333;line-height:1.6}
+.ba-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ba-label span{width:5px;height:5px;border-radius:50%}
 </style>
 </head>
 <body>
@@ -35,229 +34,373 @@ input,textarea,select{font-family:var(--f2)}
 <script type="text/babel">
 const {useState,useCallback,useMemo,useRef,useEffect}=React;
 
-/* ═══════════════════════════════════════════════════════════════════
-   COLOR UTILITIES
-   ═══════════════════════════════════════════════════════════════════ */
+/* ═══ COLOR ═══ */
 const NAMED={white:[255,255,255],black:[0,0,0],red:[255,0,0],green:[0,128,0],blue:[0,0,255],yellow:[255,255,0],gray:[128,128,128],grey:[128,128,128],orange:[255,165,0],purple:[128,0,128],pink:[255,192,203],navy:[0,0,128],teal:[0,128,128],maroon:[128,0,0],lime:[0,255,0],aqua:[0,255,255],silver:[192,192,192],transparent:[255,255,255]};
 function parseColor(s){if(!s)return null;s=s.trim().toLowerCase();if(NAMED[s])return NAMED[s];let m=s.match(/^#([0-9a-f]{3,8})$/);if(m){let h=m[1];if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]}m=s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);if(m)return[+m[1],+m[2],+m[3]];return null}
 function relLum([r,g,b]){const f=c=>{c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)}
-function contrast(a,b){const l1=relLum(a),l2=relLum(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)}
+function CR(a,b){const l1=relLum(a),l2=relLum(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)}
 
-/* ═══════════════════════════════════════════════════════════════════
-   URL FETCHER — multiple CORS proxy strategies
-   ═══════════════════════════════════════════════════════════════════ */
-const PROXIES=[
-  url=>`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url=>`https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-];
-
-async function fetchURL(url){
-  if(!/^https?:\/\//i.test(url)) url='https://'+url;
-  for(const proxy of PROXIES){
-    try{
-      const resp=await fetch(proxy(url),{signal:AbortSignal.timeout(15000)});
-      if(resp.ok){const html=await resp.text();if(html.length>100)return{ok:true,html,url};}
-    }catch{}
+/* ═══ URL FETCH ═══ */
+function fetchWithTimeout(proxyUrl, ms) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return fetch(proxyUrl, { signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+async function fetchURL(url) {
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const enc = encodeURIComponent(url);
+  const strategies = [
+    { name:'allorigins-raw', url:`https://api.allorigins.win/raw?url=${enc}`, mode:'text' },
+    { name:'codetabs', url:`https://api.codetabs.com/v1/proxy?quest=${enc}`, mode:'text' },
+    { name:'allorigins-json', url:`https://api.allorigins.win/get?url=${enc}`, mode:'json' },
+    { name:'corsproxy', url:`https://corsproxy.io/?${enc}`, mode:'text' },
+  ];
+  const tried = [];
+  for (const s of strategies) {
+    try {
+      const resp = await fetchWithTimeout(s.url, 12000);
+      if (!resp.ok) { tried.push(`${s.name}: HTTP ${resp.status}`); continue; }
+      let html = '';
+      if (s.mode === 'json') {
+        const json = await resp.json();
+        html = json.contents || json.content || json.data || '';
+      } else {
+        html = await resp.text();
+      }
+      if (html.length > 100 && (html.includes('<') || html.includes('<!') || html.includes('html'))) {
+        return { ok: true, html, url, proxy: s.name };
+      }
+      tried.push(`${s.name}: response too short (${html.length} chars)`);
+    } catch (e) {
+      tried.push(`${s.name}: ${e.name === 'AbortError' ? 'timeout' : 'failed'}`);
+    }
   }
-  return{ok:false,html:'',url,error:'Could not fetch URL. The site may block CORS proxies. Try pasting the HTML source directly (View Source → Ctrl+A → Ctrl+C).'};
+  return { ok: false, html: '', url, error: `Could not fetch URL through ${tried.length} proxy strategies (${tried.join('; ')}). Try: Right-click the page → "View Page Source" → Ctrl+A → Ctrl+C → paste in the HTML tab.` };
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   WCAG 2.2 AAA — COMPLETE RULE ENGINE (20+ criteria)
+   BUILT-IN RECOMMENDATION ENGINE
+   Complete context-aware fix database — no API needed
+   ═══════════════════════════════════════════════════════════════════ */
+const REC_DB = {
+  "1.1.1": {
+    explanation: "Screen readers cannot interpret images without text alternatives. Blind users, users with slow connections who disable images, and search engines all rely on alt text to understand image content.",
+    designTip: "Write alt text that conveys the image's PURPOSE, not just its appearance. For hero images, describe the message. For icons, describe the action. For decorative images (borders, spacers), use alt=\"\" to hide them from assistive tech.",
+    effort: "Quick fix",
+    priority: 1,
+    genFix: (el) => {
+      if (el.includes("<img")) {
+        const src = el.match(/src="([^"]+)"/)?.[1] || "image.jpg";
+        const name = src.split('/').pop().replace(/\.\w+$/, '').replace(/[-_]/g, ' ');
+        return {
+          before: el,
+          after: `<img src="${src}" alt="${name || 'Descriptive text about the image content'}" />`,
+          beforeHtml: `<div style="border:2px dashed #ff4570;padding:8px;border-radius:6px"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' fill='%23ddd'%3E%3Crect width='120' height='80'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='12'%3Eimage%3C/text%3E%3C/svg%3E" style="display:block"><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ No alt text — invisible to screen readers</div></div>`,
+          afterHtml: `<div style="border:2px solid #34d399;padding:8px;border-radius:6px"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' fill='%23ddd'%3E%3Crect width='120' height='80'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='12'%3Eimage%3C/text%3E%3C/svg%3E" alt="${name}" style="display:block"><div style="color:#34d399;font-size:11px;margin-top:4px">✓ alt="${name}"</div></div>`
+        };
+      }
+      if (el.includes("<svg")) return { before: el, after: `<svg role="img" aria-label="Descriptive label">...<title>Chart title</title>...</svg>`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:8px;border-radius:6px"><svg width="60" height="40"><circle cx="30" cy="20" r="15" fill="#4cacff"/></svg><div style="color:#ff4570;font-size:11px">⚠ SVG has no accessible name</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:8px;border-radius:6px"><svg width="60" height="40" role="img" aria-label="Blue circle icon"><title>Blue circle icon</title><circle cx="30" cy="20" r="15" fill="#4cacff"/></svg><div style="color:#34d399;font-size:11px">✓ role="img" + aria-label added</div></div>` };
+      return { before: el, after: el.replace(/<(\w+)/, '<$1 aria-label="Descriptive label"'), beforeHtml: `<div style="color:#ff4570;font-size:12px">⚠ Media element without text alternative</div>`, afterHtml: `<div style="color:#34d399;font-size:12px">✓ aria-label added to media element</div>` };
+    }
+  },
+  "1.3.1": {
+    explanation: "When tables lack headers, screen readers read cells as a flat list of data without context. Users can't tell which column or row a value belongs to. Similarly, fieldsets without legends leave radio/checkbox groups unlabeled.",
+    designTip: "Use <th scope=\"col\"> for column headers and <th scope=\"row\"> for row headers. Add <caption> to describe the table's purpose. For form groups, always wrap related inputs in <fieldset> with a <legend>.",
+    effort: "Medium",
+    priority: 2,
+    genFix: (el) => {
+      if (el.includes("<table")) return { before: `<table>\n  <tr><td>Name</td><td>Price</td></tr>\n  <tr><td>Widget</td><td>$9.99</td></tr>\n</table>`, after: `<table aria-label="Product pricing">\n  <caption>Product Pricing</caption>\n  <thead>\n    <tr><th scope="col">Name</th><th scope="col">Price</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Widget</td><td>$9.99</td></tr>\n  </tbody>\n</table>`, beforeHtml: `<table style="border-collapse:collapse;width:100%"><tr><td style="border:1px solid #ddd;padding:6px;color:#ff4570">Name</td><td style="border:1px solid #ddd;padding:6px;color:#ff4570">Price</td></tr><tr><td style="border:1px solid #ddd;padding:6px">Widget</td><td style="border:1px solid #ddd;padding:6px">$9.99</td></tr></table><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ No &lt;th&gt; headers — data cells indistinguishable</div>`, afterHtml: `<table style="border-collapse:collapse;width:100%"><caption style="text-align:left;font-weight:600;margin-bottom:4px;color:#333">Product Pricing</caption><tr><th scope="col" style="border:1px solid #34d399;padding:6px;background:#f0fdf4;text-align:left;font-weight:600">Name</th><th scope="col" style="border:1px solid #34d399;padding:6px;background:#f0fdf4;text-align:left;font-weight:600">Price</th></tr><tr><td style="border:1px solid #ddd;padding:6px">Widget</td><td style="border:1px solid #ddd;padding:6px">$9.99</td></tr></table><div style="color:#34d399;font-size:11px;margin-top:4px">✓ Semantic headers + caption</div>` };
+      return { before: `<fieldset>\n  <input type="checkbox"> Option\n</fieldset>`, after: `<fieldset>\n  <legend>Choose options</legend>\n  <label><input type="checkbox"> Option</label>\n</fieldset>`, beforeHtml: `<fieldset style="border:2px dashed #ff4570;padding:8px;border-radius:4px"><label style="font-size:13px"><input type="checkbox"> I agree</label><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ No &lt;legend&gt; — group has no label</div></fieldset>`, afterHtml: `<fieldset style="border:2px solid #34d399;padding:8px;border-radius:4px"><legend style="font-weight:600;font-size:13px;padding:0 6px">Terms</legend><label style="font-size:13px"><input type="checkbox"> I agree to terms</label><div style="color:#34d399;font-size:11px;margin-top:4px">✓ &lt;legend&gt; provides group context</div></fieldset>` };
+    }
+  },
+  "1.4.3": {
+    explanation: "Low contrast text is difficult or impossible to read for users with low vision, color blindness, or in bright sunlight. This affects ~8% of men and ~0.5% of women with color vision deficiency, plus anyone over 40 with age-related vision changes.",
+    designTip: "Use a contrast ratio of at least 7:1 for AAA compliance. Dark text (#1a1a1a) on white works well. Avoid light gray text (#999) on white backgrounds. For colored backgrounds, test with a contrast checker. Consider offering a high-contrast mode toggle.",
+    effort: "Quick fix",
+    priority: 1,
+    genFix: (el) => ({ before: el, after: el.replace(/color\s*:\s*#[0-9a-fA-F]+/i, 'color: #1a1a1a').replace(/color\s*:\s*\w+/i, 'color: #1a1a1a'), beforeHtml: `<div style="padding:10px;border-radius:6px"><p style="color:#999;background:#fff;padding:8px;border:2px dashed #ff4570;border-radius:4px;font-size:14px">This text has poor contrast (2.85:1)</p><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ Ratio 2.85:1 — fails AA (4.5:1) and AAA (7:1)</div></div>`, afterHtml: `<div style="padding:10px;border-radius:6px"><p style="color:#1a1a1a;background:#fff;padding:8px;border:2px solid #34d399;border-radius:4px;font-size:14px">This text has excellent contrast (16.6:1)</p><div style="color:#34d399;font-size:11px;margin-top:4px">✓ Ratio 16.6:1 — passes AAA</div></div>` })
+  },
+  "1.4.8": {
+    explanation: "Justified text creates uneven word spacing ('rivers of white space') that makes reading difficult for users with dyslexia or cognitive disabilities. Tight line-height reduces readability for everyone, especially on long passages.",
+    designTip: "Use text-align:left, line-height ≥ 1.5, paragraph spacing ≥ 2× font size, letter-spacing ≥ 0.12em, and word-spacing ≥ 0.16em. Limit line width to ~80 characters. Allow users to override these in their browser.",
+    effort: "Quick fix",
+    priority: 2,
+    genFix: (el) => ({ before: el, after: el.replace(/text-align\s*:\s*justify/gi, 'text-align: left').replace(/line-height\s*:\s*[0-9.]+/gi, 'line-height: 1.6'), beforeHtml: `<div style="padding:10px"><p style="text-align:justify;line-height:1.1;max-width:280px;border:2px dashed #ff4570;padding:8px;border-radius:4px;font-size:13px;color:#333;background:#fff">This justified text creates uneven spacing between words making it harder to read especially for users with dyslexia or cognitive disabilities who track lines.</p><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ Justified + line-height 1.1</div></div>`, afterHtml: `<div style="padding:10px"><p style="text-align:left;line-height:1.6;max-width:280px;border:2px solid #34d399;padding:8px;border-radius:4px;font-size:13px;color:#333;background:#fff">This left-aligned text with proper line spacing is much easier to read, especially for users with dyslexia or cognitive disabilities who track lines.</p><div style="color:#34d399;font-size:11px;margin-top:4px">✓ Left-aligned + line-height 1.6</div></div>` })
+  },
+  "1.4.10": {
+    explanation: "Users with low vision need to zoom to 400% to read content. When viewport meta restricts scaling, these users are locked out entirely. This is one of the most impactful accessibility barriers on mobile.",
+    designTip: "Remove maximum-scale and user-scalable=no from your viewport meta. Use responsive design (%, em, rem, vw units) instead of fixed pixel sizes so content reflows naturally when zoomed.",
+    effort: "Quick fix",
+    priority: 1,
+    genFix: (el) => ({ before: `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">`, after: `<meta name="viewport" content="width=device-width, initial-scale=1">`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;font-size:12px;font-family:monospace;color:#333;background:#fff"><code>maximum-scale=1, user-scalable=no</code><div style="color:#ff4570;font-size:11px;margin-top:6px;font-family:sans-serif">⚠ Zoom is disabled — low vision users cannot magnify</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;font-size:12px;font-family:monospace;color:#333;background:#fff"><code>width=device-width, initial-scale=1</code><div style="color:#34d399;font-size:11px;margin-top:6px;font-family:sans-serif">✓ Zoom enabled — users can scale up to 500%</div></div>` })
+  },
+  "2.1.1": {
+    explanation: "Users who cannot use a mouse (motor disabilities, power users, screen reader users) navigate entirely with keyboard. Elements with only mouse handlers are completely inaccessible to them — they're invisible walls.",
+    designTip: "Replace <div onclick> with <button> or <a> elements which are natively keyboard-accessible. If you must use a div, add tabindex=\"0\", role=\"button\", and onkeydown handlers for Enter and Space keys.",
+    effort: "Medium",
+    priority: 1,
+    genFix: (el) => {
+      const text = el.match(/>([^<]+)</)?.[1] || 'Action';
+      return { before: el, after: `<button type="button" onclick="navigate('/home')">${text}</button>`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff"><div style="cursor:pointer;padding:8px 16px;background:#eee;border-radius:4px;display:inline-block;color:#333;font-size:13px" onclick="void(0)">${text}</div><div style="color:#ff4570;font-size:11px;margin-top:6px">⚠ &lt;div onclick&gt; — not focusable, no keyboard access</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff"><button style="padding:8px 16px;background:#eee;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:13px;color:#333">${text}</button><div style="color:#34d399;font-size:11px;margin-top:6px">✓ &lt;button&gt; — focusable, keyboard-accessible</div></div>` };
+    }
+  },
+  "2.4.1": {
+    explanation: "Keyboard users and screen reader users must tab through every navigation link on every page before reaching the main content. On a site with 30 nav links, that's 30 Tab presses before reading anything. Skip links and landmarks solve this.",
+    designTip: "Add a skip-to-content link as the very first focusable element. Wrap your content in <main id=\"main\">. Use <header>, <nav>, <aside>, and <footer> landmarks so screen readers can jump between sections.",
+    effort: "Quick fix",
+    priority: 1,
+    genFix: (el) => ({ before: `<body>\n  <nav>...30 links...</nav>\n  <div class="content">...</div>\n</body>`, after: `<body>\n  <a href="#main" class="skip-link">Skip to main content</a>\n  <header>\n    <nav aria-label="Main">...links...</nav>\n  </header>\n  <main id="main">...</main>\n  <footer>...</footer>\n</body>`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff"><div style="background:#f3f4f6;padding:6px 12px;border-radius:4px;margin-bottom:6px;font-size:12px;color:#666">🔗 Link 1 → 🔗 Link 2 → 🔗 Link 3 → ... → 🔗 Link 30</div><div style="padding:6px;font-size:13px;color:#333">Main content buried below</div><div style="color:#ff4570;font-size:11px;margin-top:6px">⚠ No skip link — keyboard users must tab through 30+ links</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff"><a href="#main" style="display:inline-block;padding:6px 14px;background:#0ff0d4;color:#000;border-radius:4px;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:6px">Skip to main content</a><div style="background:#f3f4f6;padding:4px 8px;border-radius:4px;margin-bottom:4px;font-size:11px;color:#999">nav links</div><div style="border:1px solid #34d399;padding:6px;border-radius:4px"><span style="font-size:10px;color:#34d399;font-weight:600">&lt;main&gt;</span><div style="font-size:13px;color:#333;margin-top:2px">Main content — one keypress away</div></div><div style="color:#34d399;font-size:11px;margin-top:6px">✓ Skip link + &lt;main&gt; landmark</div></div>` })
+  },
+  "2.4.2": {
+    explanation: "The page title is the first thing screen readers announce. Without it, users with multiple tabs open can't tell pages apart, and search engines can't properly index the page.",
+    designTip: "Format: 'Page Name — Site Name'. Be specific: 'Contact Us — Acme Corp' not just 'Acme Corp'. Update dynamically for single-page apps.",
+    effort: "Quick fix",
+    priority: 2,
+    genFix: () => ({ before: `<title></title>`, after: `<title>Page Name — Your Site</title>`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:8px 12px;border-radius:6px;background:#fff;display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:#ff4570"></div><span style="color:#999;font-size:12px;font-style:italic">(untitled)</span><span style="color:#ff4570;font-size:11px">⚠ Empty title</span></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:8px 12px;border-radius:6px;background:#fff;display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:#34d399"></div><span style="color:#333;font-size:12px;font-weight:500">Contact Us — Acme Corp</span><span style="color:#34d399;font-size:11px">✓</span></div>` })
+  },
+  "2.4.4": {
+    explanation: "Screen reader users often navigate by listing all links on a page. 'Click here' and 'Read more' are meaningless out of context — imagine hearing a list of 15 'click here' links with no idea where they go.",
+    designTip: "Link text should describe the destination: 'View our accessibility policy' not 'Click here'. For links that open new windows, add aria-label or visible text indicating this.",
+    effort: "Quick fix",
+    priority: 2,
+    genFix: (el) => ({ before: el, after: el.replace(/>click here</i, '>View our pricing plans<').replace(/>read more</i, '>Read the full article<').replace(/>here</i, '>Visit our help center<'), beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff"><p style="font-size:13px;color:#333">To learn about our services, <a href="#" style="color:#ff4570">click here</a>.</p><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ "click here" is meaningless to screen readers</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff"><p style="font-size:13px;color:#333">Learn about our <a href="#" style="color:#2563eb">UX design services</a>.</p><div style="color:#34d399;font-size:11px;margin-top:4px">✓ Descriptive link text</div></div>` })
+  },
+  "2.4.6": {
+    explanation: "Screen readers use heading levels to build a navigable outline. Skipping from h1 to h3 breaks this outline — users can't tell if content is a subsection or a new section. Empty headings create phantom navigation points.",
+    designTip: "Think of headings like a book outline: h1 is the title, h2s are chapters, h3s are sections within chapters. Never skip levels. Never use headings just for visual sizing — use CSS instead.",
+    effort: "Medium",
+    priority: 2,
+    genFix: () => ({ before: `<h1>Welcome</h1>\n<h3>Quick Start</h3>\n<h5>Step 1</h5>`, after: `<h1>Welcome</h1>\n<h2>Quick Start</h2>\n<h3>Step 1</h3>`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff"><div style="font-size:22px;font-weight:700;color:#333">h1: Welcome</div><div style="font-size:16px;font-weight:600;color:#ff4570;margin:4px 0 0 0">h3: Quick Start ⚠ skipped h2</div><div style="font-size:13px;font-weight:600;color:#ff4570;margin:2px 0 0 20px">h5: Step 1 ⚠ skipped h4</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff"><div style="font-size:22px;font-weight:700;color:#333">h1: Welcome</div><div style="font-size:18px;font-weight:600;color:#333;margin:4px 0 0 0">h2: Quick Start ✓</div><div style="font-size:15px;font-weight:600;color:#333;margin:2px 0 0 20px">h3: Step 1 ✓</div></div>` })
+  },
+  "2.4.7": {
+    explanation: "When outline:none removes focus indicators, keyboard users have no idea which element is currently focused. It's like using a mouse with the cursor invisible.",
+    designTip: "Never remove focus outlines without providing a visible alternative. Use :focus-visible to show focus only for keyboard users (not mouse clicks). Custom focus styles can be beautiful — try a colored ring or underline.",
+    effort: "Quick fix",
+    priority: 1,
+    genFix: () => ({ before: `button:focus { outline: none; }`, after: `button:focus-visible {\n  outline: 2px solid #0ff0d4;\n  outline-offset: 2px;\n}`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff"><button style="padding:8px 16px;border:1px solid #ccc;border-radius:4px;outline:none;font-size:13px;background:#eee;color:#333">Focused button</button><div style="color:#ff4570;font-size:11px;margin-top:6px">⚠ outline:none — focus is invisible</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff"><button style="padding:8px 16px;border:1px solid #ccc;border-radius:4px;outline:2px solid #0ff0d4;outline-offset:2px;font-size:13px;background:#eee;color:#333">Focused button</button><div style="color:#34d399;font-size:11px;margin-top:6px">✓ Visible focus indicator</div></div>` })
+  },
+  "3.1.1": {
+    explanation: "Without a lang attribute, screen readers may use the wrong language pronunciation engine. A French screen reader trying to read English text produces gibberish. This also affects auto-translation tools.",
+    designTip: "Always set lang on <html>. For multilingual pages, use lang on specific elements containing foreign-language text, e.g. <span lang=\"fr\">Bonjour</span>.",
+    effort: "Quick fix",
+    priority: 1,
+    genFix: () => ({ before: `<html>`, after: `<html lang="en">`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff;font-family:monospace;font-size:12px;color:#333"><code>&lt;html&gt;</code><div style="color:#ff4570;font-size:11px;margin-top:4px;font-family:sans-serif">⚠ Screen reader doesn't know which language to use</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff;font-family:monospace;font-size:12px;color:#333"><code>&lt;html lang="en"&gt;</code><div style="color:#34d399;font-size:11px;margin-top:4px;font-family:sans-serif">✓ English pronunciation engine activated</div></div>` })
+  },
+  "3.3.2": {
+    explanation: "Form inputs without labels are unusable for screen reader users — they hear 'edit text' with no idea what to type. Placeholder text disappears on focus and isn't announced by all screen readers, so it's not a substitute.",
+    designTip: "Every input needs a visible <label> connected by for/id or by wrapping. Place labels above or to the left of inputs. For search fields, aria-label is acceptable if the icon makes the purpose clear visually.",
+    effort: "Quick fix",
+    priority: 1,
+    genFix: (el) => {
+      const name = el.match(/name="([^"]+)"/)?.[1] || 'field';
+      return { before: el, after: `<label for="${name}">${name.charAt(0).toUpperCase()+name.slice(1)}</label>\n<input type="text" name="${name}" id="${name}" autocomplete="${name}">`, beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff"><input type="text" placeholder="${name}" style="padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:13px;width:200px;color:#333"><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ No label — screen reader says "edit text, blank"</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff"><label for="${name}" style="display:block;font-size:13px;font-weight:500;margin-bottom:3px;color:#333">${name.charAt(0).toUpperCase()+name.slice(1)}</label><input type="text" id="${name}" placeholder="${name}" style="padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:13px;width:200px;color:#333"><div style="color:#34d399;font-size:11px;margin-top:4px">✓ Screen reader says "Email, edit text"</div></div>` };
+    }
+  },
+  "4.1.2": {
+    explanation: "Invalid ARIA roles confuse assistive technology. Focusable content inside aria-hidden=\"true\" creates a dangerous trap — screen readers skip it but keyboard users can focus on invisible elements, losing their place entirely.",
+    designTip: "Remove aria-hidden from containers with focusable children, or add tabindex=\"-1\" to all interactive elements inside. Use valid WAI-ARIA roles — check the spec at w3.org/TR/wai-aria.",
+    effort: "Medium",
+    priority: 1,
+    genFix: (el) => ({ before: el, after: el.replace(' aria-hidden="true"', ''), beforeHtml: `<div style="border:2px dashed #ff4570;padding:10px;border-radius:6px;background:#fff"><div style="opacity:0.4"><a href="#" style="color:#2563eb;font-size:13px">Privacy Link</a><span style="margin:0 4px">|</span><button style="font-size:13px;padding:4px 12px;border:1px solid #ccc;border-radius:4px;color:#333">Contact</button></div><div style="color:#ff4570;font-size:11px;margin-top:4px">⚠ aria-hidden="true" but links/buttons are still focusable</div></div>`, afterHtml: `<div style="border:2px solid #34d399;padding:10px;border-radius:6px;background:#fff"><div><a href="#" style="color:#2563eb;font-size:13px">Privacy Link</a><span style="margin:0 4px">|</span><button style="font-size:13px;padding:4px 12px;border:1px solid #ccc;border-radius:4px;color:#333">Contact</button></div><div style="color:#34d399;font-size:11px;margin-top:4px">✓ aria-hidden removed — content visible to all</div></div>` })
+  },
+  "_default": {
+    explanation: "This criterion ensures your content is accessible to users with disabilities. Failing it means some users cannot perceive, operate, understand, or interact with your content effectively.",
+    designTip: "Review the WCAG 2.2 specification for this criterion at w3.org/WAI/WCAG22/quickref. Consider testing with a screen reader (NVDA/VoiceOver) and keyboard-only navigation.",
+    effort: "Medium",
+    priority: 3,
+    genFix: (el) => ({ before: el || 'Current code', after: 'See fix suggestion above', beforeHtml: `<div style="color:#ff4570;font-size:12px;padding:8px;border:2px dashed #ff4570;border-radius:6px;background:#fff">⚠ Issue detected</div>`, afterHtml: `<div style="color:#34d399;font-size:12px;padding:8px;border:2px solid #34d399;border-radius:6px;background:#fff">✓ Apply the fix suggestion above</div>` })
+  }
+};
+
+function getRecommendation(ruleId, issue) {
+  const db = REC_DB[ruleId] || REC_DB["_default"];
+  const fix = db.genFix(issue.el || '');
+  return { explanation: db.explanation, designTip: db.designTip, effort: db.effort, priority: db.priority, ...fix };
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   WCAG 2.2 AAA RULE ENGINE (25 criteria)
    ═══════════════════════════════════════════════════════════════════ */
 const S={C:"critical",M:"major",m:"minor",I:"info"};
-const SC={critical:"#ff4570",major:"#ffaa30",minor:"#4cacff",info:"#4d5b73"};
-const SB={critical:"rgba(255,69,112,.07)",major:"rgba(255,170,48,.07)",minor:"rgba(76,172,255,.07)",info:"rgba(77,91,115,.05)"};
-
+const SC_={critical:"#ff4570",major:"#ffaa30",minor:"#4cacff",info:"#4d5b73"};
+const SB_={critical:"rgba(255,69,112,.07)",major:"rgba(255,170,48,.07)",minor:"rgba(76,172,255,.07)",info:"rgba(77,91,115,.05)"};
 const RULES=[
-// ── Perceivable ──────────────────────────────────────────────
-{id:"1.1.1",name:"Non-text Content",level:"A",p:"Perceivable",check(d){const r=[];d.querySelectorAll("img").forEach((e,i)=>{if(!e.getAttribute("alt")&&e.getAttribute("alt")!=="")r.push({s:S.C,el:e.outerHTML.substring(0,150),msg:`Image #${i+1} missing alt attribute`,fix:`Add alt="description" or alt="" for decorative`})});d.querySelectorAll("svg").forEach((e,i)=>{if(!e.getAttribute("role")&&!e.querySelector("title"))r.push({s:S.M,el:"<svg>",msg:`SVG #${i+1} missing accessible name`,fix:`Add role="img" aria-label or <title>`})});d.querySelectorAll("input[type='image']").forEach((e,i)=>{if(!e.getAttribute("alt"))r.push({s:S.C,el:e.outerHTML.substring(0,150),msg:`Image input #${i+1} missing alt`,fix:`Add alt="description"`})});d.querySelectorAll("canvas,object,embed,video,audio").forEach((e,i)=>{if(!e.getAttribute("aria-label")&&!e.getAttribute("aria-labelledby")&&!e.textContent?.trim())r.push({s:S.M,el:`<${e.tagName.toLowerCase()}>`,msg:`${e.tagName} #${i+1} missing text alternative`,fix:`Add aria-label or text alternative`})});return r}},
-{id:"1.3.1",name:"Info and Relationships",level:"A",p:"Perceivable",check(d){const r=[];d.querySelectorAll("table").forEach((t,i)=>{if(!t.querySelector("th,[role='columnheader']"))r.push({s:S.M,el:"<table>",msg:`Table #${i+1} has no headers`,fix:`Use <th scope="col/row"> for headers`});if(!t.querySelector("caption")&&!t.getAttribute("aria-label")&&!t.getAttribute("aria-labelledby"))r.push({s:S.m,el:"<table>",msg:`Table #${i+1} missing caption`,fix:`Add <caption> or aria-label`})});d.querySelectorAll("fieldset").forEach((f,i)=>{if(!f.querySelector("legend"))r.push({s:S.M,el:"<fieldset>",msg:`Fieldset #${i+1} missing <legend>`,fix:`Add <legend> as first child`})});return r}},
-{id:"1.3.5",name:"Identify Input Purpose",level:"AA",p:"Perceivable",check(d){const r=[];d.querySelectorAll("input[type='text'],input[type='email'],input[type='tel'],input[type='url'],input:not([type]),input[type='password']").forEach(e=>{if(!e.getAttribute("autocomplete")&&!e.closest("[autocomplete]")){const n=e.getAttribute("name")||e.getAttribute("id")||"";if(/name|email|phone|tel|address|city|state|zip|postal|country|birth|cc|card|password|user/i.test(n))r.push({s:S.m,el:e.outerHTML.substring(0,150),msg:`Input "${n}" likely personal data but lacks autocomplete`,fix:`Add autocomplete="given-name|email|tel|..."`})}});return r}},
-{id:"1.4.3",name:"Contrast (Minimum)",level:"AA",p:"Perceivable",check(d){const r=[];let c=0;d.querySelectorAll("p,span,a,li,td,th,h1,h2,h3,h4,h5,h6,label,button,div").forEach(e=>{if(c>60)return;const st=e.getAttribute("style")||"";const cm=st.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);const bm=st.match(/background(?:-color)?\s*:\s*([^;]+)/i);if(cm&&bm){c++;const fg=parseColor(cm[1].trim()),bg=parseColor(bm[1].trim());if(fg&&bg){const r8=contrast(fg,bg);if(r8<4.5)r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Contrast ${r8.toFixed(2)}:1 — needs ≥4.5:1 (AA) / ≥7:1 (AAA)`,fix:`Darken text or lighten background to ≥7:1`});else if(r8<7)r.push({s:S.m,el:e.outerHTML.substring(0,120),msg:`Contrast ${r8.toFixed(2)}:1 passes AA, fails AAA (≥7:1)`,fix:`Increase to 7:1 for AAA`})}}});return r}},
-{id:"1.4.6",name:"Contrast (Enhanced AAA)",level:"AAA",p:"Perceivable",check(){return[{s:S.I,el:"—",msg:`AAA: 7:1 normal text, 4.5:1 large text (18pt+/14pt bold+)`,fix:`Audit all color pairs with contrast checker`}]}},
-{id:"1.4.8",name:"Visual Presentation (AAA)",level:"AAA",p:"Perceivable",check(d){const r=[];d.querySelectorAll("p,div,span,li,td,section,article").forEach(e=>{const st=e.getAttribute("style")||"";if(/text-align\s*:\s*justify/i.test(st))r.push({s:S.M,el:e.outerHTML.substring(0,100),msg:`Justified text — AAA prohibits full justification`,fix:`Use text-align: left`});const lh=st.match(/line-height\s*:\s*([0-9.]+)/i);if(lh&&parseFloat(lh[1])<1.5&&!lh[0].includes("px"))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Line-height ${lh[1]} below AAA min 1.5`,fix:`Set line-height ≥ 1.5`})});return r}},
-{id:"1.4.10",name:"Reflow",level:"AA",p:"Perceivable",check(d){const r=[];const m=d.querySelector('meta[name="viewport"]');if(m){const c=m.getAttribute("content")||"";if(/maximum-scale\s*=\s*1/i.test(c)||/user-scalable\s*=\s*no/i.test(c))r.push({s:S.C,el:m.outerHTML,msg:`Viewport restricts zoom`,fix:`Remove maximum-scale=1 and user-scalable=no`})}return r}},
-{id:"1.4.12",name:"Text Spacing (AA)",level:"AA",p:"Perceivable",check(d){const r=[];const hasOverflowHidden=d.querySelectorAll('[style*="overflow"]');let count=0;hasOverflowHidden.forEach(e=>{const st=e.getAttribute("style")||"";if(/overflow\s*:\s*hidden/i.test(st)&&/height\s*:\s*\d+px/i.test(st)){count++;if(count<=3)r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Fixed height + overflow:hidden may clip text when spacing increased`,fix:`Use min-height and overflow:visible or auto`})}});return r}},
-// ── Operable ─────────────────────────────────────────────────
-{id:"2.1.1",name:"Keyboard",level:"A",p:"Operable",check(d){const r=[];d.querySelectorAll("[onclick],[onmousedown],[onmouseup]").forEach((e,i)=>{if(!e.getAttribute("onkeydown")&&!e.getAttribute("onkeyup")&&!["A","BUTTON","INPUT","SELECT","TEXTAREA","SUMMARY"].includes(e.tagName))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Element #${i+1} has mouse handler but no keyboard`,fix:`Use <button>/<a> or add keyboard handlers + tabindex="0"`})});d.querySelectorAll("div[onclick],span[onclick],div[role='button'],span[role='button']").forEach((e,i)=>{if(!e.getAttribute("tabindex"))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Clickable element #${i+1} not keyboard-focusable`,fix:`Add tabindex="0" + keyboard handlers, or use <button>`})});return r}},
-{id:"2.4.1",name:"Bypass Blocks",level:"A",p:"Operable",check(d){const r=[];if(!d.querySelector('a[href^="#main"],a[href^="#content"],[class*="skip"],[id*="skip"]')&&!d.querySelector("main,[role='main']"))r.push({s:S.M,el:"—",msg:`No skip link or <main> landmark`,fix:`Add <a href="#main" class="skip-link">Skip to content</a> + <main id="main">`});const landmarks=d.querySelectorAll("header,[role='banner'],nav,[role='navigation'],main,[role='main'],footer,[role='contentinfo']");if(landmarks.length===0&&d.querySelectorAll("div").length>5)r.push({s:S.M,el:"—",msg:`No ARIA landmarks found`,fix:`Use semantic HTML: <header>, <nav>, <main>, <footer>`});return r}},
-{id:"2.4.2",name:"Page Titled",level:"A",p:"Operable",check(d){const r=[];const t=d.querySelector("title");if(!t||!t.textContent?.trim())r.push({s:S.M,el:"<head>",msg:`Page missing or empty <title>`,fix:`Add descriptive <title> in <head>`});return r}},
-{id:"2.4.4",name:"Link Purpose (In Context)",level:"A",p:"Operable",check(d){const r=[];const vague=["click here","here","read more","more","link","this","learn more","download"];d.querySelectorAll("a").forEach((a,i)=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();if(vague.includes(t))r.push({s:S.M,el:a.outerHTML.substring(0,120),msg:`Link #${i+1} text "${t}" is ambiguous`,fix:`Use descriptive text, e.g. "Read our accessibility policy"`});if(!t&&!a.querySelector("img[alt]")&&!a.getAttribute("aria-labelledby"))r.push({s:S.C,el:a.outerHTML.substring(0,120),msg:`Link #${i+1} has no accessible text`,fix:`Add text, aria-label, or img with alt`})});return r}},
-{id:"2.4.6",name:"Headings and Labels",level:"AA",p:"Operable",check(d){const r=[];const hs=d.querySelectorAll("h1,h2,h3,h4,h5,h6");let prev=0,h1c=0;hs.forEach(h=>{const l=+h.tagName[1];if(l===1)h1c++;if(prev>0&&l>prev+1)r.push({s:S.M,el:h.outerHTML.substring(0,100),msg:`Heading skips h${prev} → h${l}`,fix:`Use sequential levels`});if(!h.textContent?.trim())r.push({s:S.M,el:h.outerHTML.substring(0,100),msg:`Empty heading h${l}`,fix:`Add text or remove`});prev=l});if(h1c===0&&hs.length>0)r.push({s:S.M,el:"—",msg:`No <h1> found`,fix:`Add <h1> as primary heading`});if(h1c>1)r.push({s:S.m,el:"—",msg:`Multiple <h1> (${h1c})`,fix:`Use single <h1>`});return r}},
-{id:"2.4.7",name:"Focus Visible",level:"AA",p:"Operable",check(d){const r=[];const styles=d.querySelectorAll("style");let hasOutlineNone=false;styles.forEach(s=>{if(/outline\s*:\s*(none|0)/i.test(s.textContent||""))hasOutlineNone=true});d.querySelectorAll("[style]").forEach(e=>{if(/outline\s*:\s*(none|0)/i.test(e.getAttribute("style")||""))hasOutlineNone=true});if(hasOutlineNone)r.push({s:S.M,el:"—",msg:`outline:none found — keyboard focus may be invisible`,fix:`Never remove focus outlines without a visible alternative`});return r}},
-{id:"2.4.11",name:"Focus Not Obscured (Minimum)",level:"AA",p:"Operable",check(d){const r=[];d.querySelectorAll('[style*="position"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/position\s*:\s*(fixed|sticky)/i.test(st)&&/z-index/i.test(st))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Fixed/sticky element may obscure focused content`,fix:`Ensure focused elements aren't hidden behind fixed headers/footers`})});return r}},
-{id:"2.4.9",name:"Link Purpose (Link Only — AAA)",level:"AAA",p:"Operable",check(d){const r=[];const map={};d.querySelectorAll("a[href]").forEach(a=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();const h=a.getAttribute("href");if(t&&h){if(map[t]&&map[t]!==h)r.push({s:S.m,el:a.outerHTML.substring(0,120),msg:`"${t}" links to different URLs`,fix:`Same text → same destination (AAA)`});map[t]=h}});return r}},
-{id:"2.5.3",name:"Label in Name",level:"A",p:"Operable",check(d){const r=[];d.querySelectorAll("button[aria-label],a[aria-label],input[aria-label]").forEach(e=>{const al=(e.getAttribute("aria-label")||"").toLowerCase();const vt=(e.textContent||"").trim().toLowerCase();if(vt&&al&&!al.includes(vt))r.push({s:S.M,el:e.outerHTML.substring(0,120),msg:`aria-label "${al}" doesn't contain visible "${vt}"`,fix:`aria-label must include visible text`})});return r}},
-{id:"2.5.8",name:"Target Size (Minimum)",level:"AA",p:"Operable",check(d){const r=[];d.querySelectorAll("a,button,input[type='checkbox'],input[type='radio'],.btn,[role='button']").forEach((e,i)=>{const st=e.getAttribute("style")||"";const wm=st.match(/width\s*:\s*(\d+)px/i);const hm=st.match(/height\s*:\s*(\d+)px/i);if(wm&&hm&&(+wm[1]<24||+hm[1]<24))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Touch target may be < 24×24px CSS pixels`,fix:`Ensure interactive targets are at least 24×24px (44×44px for AAA)`})});return r}},
-// ── Understandable ───────────────────────────────────────────
-{id:"3.1.1",name:"Language of Page",level:"A",p:"Understandable",check(d){const r=[];const h=d.querySelector("html");if(h&&!h.getAttribute("lang"))r.push({s:S.C,el:"<html>",msg:`Missing lang attribute`,fix:`Add lang="en" (or correct code) to <html>`});return r}},
-{id:"3.1.2",name:"Language of Parts",level:"AA",p:"Understandable",check(d){const r=[];d.querySelectorAll("[lang]").forEach(e=>{const l=e.getAttribute("lang");if(l&&!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(l))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Invalid lang="${l}"`,fix:`Use valid BCP 47 code`})});return r}},
-{id:"3.2.2",name:"On Input",level:"A",p:"Understandable",check(d){const r=[];d.querySelectorAll("select[onchange]").forEach((e,i)=>{if(/submit|location|navigate|href|window\.open/i.test(e.getAttribute("onchange")||""))r.push({s:S.M,el:e.outerHTML.substring(0,120),msg:`Select #${i+1} auto-navigates on change`,fix:`Use explicit submit button`})});return r}},
-{id:"3.2.6",name:"Consistent Help (A)",level:"A",p:"Understandable",check(d){const r=[];const helpLinks=d.querySelectorAll('a[href*="help"],a[href*="support"],a[href*="contact"],a[href*="faq"]');if(helpLinks.length===0&&d.querySelectorAll("a").length>10)r.push({s:S.I,el:"—",msg:`No help/contact/support links detected`,fix:`Provide consistent help mechanism on every page`});return r}},
-{id:"3.3.2",name:"Labels or Instructions",level:"A",p:"Understandable",check(d){const r=[];d.querySelectorAll("input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']):not([type='image']),select,textarea").forEach((e,i)=>{const id=e.getAttribute("id");const has=id&&d.querySelector(`label[for="${id}"]`);if(!has&&!e.closest("label")&&!e.getAttribute("aria-label")&&!e.getAttribute("aria-labelledby")&&!e.getAttribute("title"))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Form control #${i+1} has no label`,fix:`Add <label for="id"> or aria-label`})});return r}},
-{id:"3.3.7",name:"Redundant Entry (A)",level:"A",p:"Understandable",check(d){const r=[];const names={};d.querySelectorAll("input[name],select[name],textarea[name]").forEach(e=>{const n=e.getAttribute("name");if(names[n])r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Duplicate input name "${n}" — may force redundant entry`,fix:`Auto-populate previously entered data or use autocomplete`});names[n]=true});return r}},
-{id:"3.3.8",name:"Accessible Authentication (Minimum)",level:"AA",p:"Understandable",check(d){const r=[];const authInputs=d.querySelectorAll("input[type='password'],input[name*='captcha'],input[name*='otp'],.captcha,[class*='captcha']");if(authInputs.length>0)r.push({s:S.I,el:"—",msg:`Authentication inputs detected — ensure cognitive function test alternatives exist`,fix:`Allow paste in password fields, provide alternatives to CAPTCHAs, support password managers`});return r}},
-// ── Robust ────────────────────────────────────────────────────
-{id:"4.1.2",name:"Name, Role, Value",level:"A",p:"Robust",check(d){const r=[];const valid=new Set(["alert","alertdialog","application","article","banner","button","cell","checkbox","columnheader","combobox","complementary","contentinfo","definition","dialog","directory","document","feed","figure","form","grid","gridcell","group","heading","img","link","list","listbox","listitem","log","main","marquee","math","menu","menubar","menuitem","menuitemcheckbox","menuitemradio","navigation","none","note","option","presentation","progressbar","radio","radiogroup","region","row","rowgroup","rowheader","scrollbar","search","searchbox","separator","slider","spinbutton","status","switch","tab","table","tablist","tabpanel","term","textbox","timer","toolbar","tooltip","tree","treegrid","treeitem"]);d.querySelectorAll("[role]").forEach(e=>{const role=e.getAttribute("role");if(!valid.has(role))r.push({s:S.M,el:e.outerHTML.substring(0,100),msg:`Invalid role="${role}"`,fix:`Use valid WAI-ARIA role`})});d.querySelectorAll("[aria-hidden='true']").forEach(e=>{if(e.querySelector("a[href],button,input,select,textarea,[tabindex]:not([tabindex='-1'])"))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Focusable content inside aria-hidden`,fix:`Remove aria-hidden or defocus inner elements`})});return r}},
-{id:"4.1.1",name:"Parsing / Duplicate IDs",level:"A",p:"Robust",check(d){const r=[];const ids={};d.querySelectorAll("[id]").forEach(e=>{const id=e.getAttribute("id");if(ids[id])r.push({s:S.M,el:e.outerHTML.substring(0,100),msg:`Duplicate id="${id}"`,fix:`All IDs must be unique`});ids[id]=true});return r}},
+{id:"1.1.1",name:"Non-text Content",level:"A",p:"Perceivable",check(d){const r=[];d.querySelectorAll("img").forEach((e,i)=>{if(!e.getAttribute("alt")&&e.getAttribute("alt")!=="")r.push({s:S.C,el:e.outerHTML.substring(0,150),msg:`Image #${i+1} missing alt attribute`,fix:`Add alt="description" or alt="" for decorative`})});d.querySelectorAll("svg").forEach((e,i)=>{if(!e.getAttribute("role")&&!e.querySelector("title"))r.push({s:S.M,el:"<svg>",msg:`SVG #${i+1} missing accessible name`,fix:`Add role="img" aria-label or <title>`})});d.querySelectorAll("input[type='image']").forEach((e,i)=>{if(!e.getAttribute("alt"))r.push({s:S.C,el:e.outerHTML.substring(0,150),msg:`Image input #${i+1} missing alt`,fix:`Add alt="description"`})});d.querySelectorAll("canvas,object,embed,video,audio").forEach((e,i)=>{if(!e.getAttribute("aria-label")&&!e.getAttribute("aria-labelledby")&&!e.textContent?.trim())r.push({s:S.M,el:`<${e.tagName.toLowerCase()}>`,msg:`${e.tagName} #${i+1} missing text alternative`,fix:`Add aria-label`})});return r}},
+{id:"1.3.1",name:"Info and Relationships",level:"A",p:"Perceivable",check(d){const r=[];d.querySelectorAll("table").forEach((t,i)=>{if(!t.querySelector("th,[role='columnheader']"))r.push({s:S.M,el:"<table>",msg:`Table #${i+1} has no headers`,fix:`Use <th scope="col/row">`});if(!t.querySelector("caption")&&!t.getAttribute("aria-label")&&!t.getAttribute("aria-labelledby"))r.push({s:S.m,el:"<table>",msg:`Table #${i+1} missing caption`,fix:`Add <caption> or aria-label`})});d.querySelectorAll("fieldset").forEach((f,i)=>{if(!f.querySelector("legend"))r.push({s:S.M,el:"<fieldset>",msg:`Fieldset #${i+1} missing <legend>`,fix:`Add <legend>`})});return r}},
+{id:"1.3.5",name:"Identify Input Purpose",level:"AA",p:"Perceivable",check(d){const r=[];d.querySelectorAll("input[type='text'],input[type='email'],input[type='tel'],input:not([type]),input[type='password']").forEach(e=>{if(!e.getAttribute("autocomplete")){const n=e.getAttribute("name")||e.getAttribute("id")||"";if(/name|email|phone|tel|address|zip|password|user/i.test(n))r.push({s:S.m,el:e.outerHTML.substring(0,150),msg:`Input "${n}" lacks autocomplete`,fix:`Add autocomplete="..."`})}});return r}},
+{id:"1.4.3",name:"Contrast (Minimum)",level:"AA",p:"Perceivable",check(d){const r=[];let c=0;d.querySelectorAll("p,span,a,li,td,th,h1,h2,h3,h4,h5,h6,label,button,div").forEach(e=>{if(c>60)return;const st=e.getAttribute("style")||"";const cm=st.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);const bm=st.match(/background(?:-color)?\s*:\s*([^;]+)/i);if(cm&&bm){c++;const fg=parseColor(cm[1].trim()),bg=parseColor(bm[1].trim());if(fg&&bg){const r8=CR(fg,bg);if(r8<4.5)r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Contrast ${r8.toFixed(2)}:1 — needs ≥7:1 (AAA)`,fix:`Darken text or lighten background`});else if(r8<7)r.push({s:S.m,el:e.outerHTML.substring(0,120),msg:`Contrast ${r8.toFixed(2)}:1 — passes AA, fails AAA`,fix:`Increase to ≥7:1`})}}});return r}},
+{id:"1.4.6",name:"Contrast Enhanced (AAA)",level:"AAA",p:"Perceivable",check(){return[{s:S.I,el:"—",msg:`AAA: 7:1 normal, 4.5:1 large text`,fix:`Audit all color pairs`}]}},
+{id:"1.4.8",name:"Visual Presentation (AAA)",level:"AAA",p:"Perceivable",check(d){const r=[];d.querySelectorAll("p,div,span,li,td,section,article").forEach(e=>{const st=e.getAttribute("style")||"";if(/text-align\s*:\s*justify/i.test(st))r.push({s:S.M,el:e.outerHTML.substring(0,100),msg:`Justified text — AAA prohibits`,fix:`text-align: left`});const lh=st.match(/line-height\s*:\s*([0-9.]+)/i);if(lh&&parseFloat(lh[1])<1.5&&!lh[0].includes("px"))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Line-height ${lh[1]} < AAA min 1.5`,fix:`line-height ≥ 1.5`})});return r}},
+{id:"1.4.10",name:"Reflow",level:"AA",p:"Perceivable",check(d){const r=[];const m=d.querySelector('meta[name="viewport"]');if(m){const c=m.getAttribute("content")||"";if(/maximum-scale\s*=\s*1/i.test(c)||/user-scalable\s*=\s*no/i.test(c))r.push({s:S.C,el:m.outerHTML,msg:`Viewport restricts zoom`,fix:`Remove zoom restrictions`})}return r}},
+{id:"1.4.12",name:"Text Spacing",level:"AA",p:"Perceivable",check(d){const r=[];d.querySelectorAll('[style*="overflow"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/overflow\s*:\s*hidden/i.test(st)&&/height\s*:\s*\d+px/i.test(st))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`overflow:hidden + fixed height may clip text`,fix:`Use min-height + overflow:auto`})});return r}},
+{id:"2.1.1",name:"Keyboard",level:"A",p:"Operable",check(d){const r=[];d.querySelectorAll("[onclick],[onmousedown]").forEach((e,i)=>{if(!e.getAttribute("onkeydown")&&!["A","BUTTON","INPUT","SELECT","TEXTAREA","SUMMARY"].includes(e.tagName))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Element #${i+1} has mouse-only handler`,fix:`Use <button> or add keyboard handlers`})});d.querySelectorAll("div[onclick],span[onclick],div[role='button']").forEach((e,i)=>{if(!e.getAttribute("tabindex"))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Clickable element not focusable`,fix:`Add tabindex="0" or use <button>`})});return r}},
+{id:"2.4.1",name:"Bypass Blocks",level:"A",p:"Operable",check(d){const r=[];if(!d.querySelector('a[href^="#main"],a[href^="#content"],[class*="skip"],[id*="skip"]')&&!d.querySelector("main,[role='main']"))r.push({s:S.M,el:"—",msg:`No skip link or <main> landmark`,fix:`Add skip link + <main>`});const lm=d.querySelectorAll("header,[role='banner'],nav,[role='navigation'],main,[role='main'],footer,[role='contentinfo']");if(lm.length===0&&d.querySelectorAll("div").length>5)r.push({s:S.M,el:"—",msg:`No ARIA landmarks`,fix:`Use <header>,<nav>,<main>,<footer>`});return r}},
+{id:"2.4.2",name:"Page Titled",level:"A",p:"Operable",check(d){const r=[];const t=d.querySelector("title");if(!t||!t.textContent?.trim())r.push({s:S.M,el:"<head>",msg:`Missing <title>`,fix:`Add descriptive <title>`});return r}},
+{id:"2.4.4",name:"Link Purpose (Context)",level:"A",p:"Operable",check(d){const r=[];const vague=["click here","here","read more","more","link","this","learn more"];d.querySelectorAll("a").forEach((a,i)=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();if(vague.includes(t))r.push({s:S.M,el:a.outerHTML.substring(0,120),msg:`Link "${t}" is ambiguous`,fix:`Use descriptive text`});if(!t&&!a.querySelector("img[alt]"))r.push({s:S.C,el:a.outerHTML.substring(0,120),msg:`Link #${i+1} has no text`,fix:`Add text or aria-label`})});return r}},
+{id:"2.4.6",name:"Headings and Labels",level:"AA",p:"Operable",check(d){const r=[];const hs=d.querySelectorAll("h1,h2,h3,h4,h5,h6");let prev=0,h1c=0;hs.forEach(h=>{const l=+h.tagName[1];if(l===1)h1c++;if(prev>0&&l>prev+1)r.push({s:S.M,el:h.outerHTML.substring(0,100),msg:`Heading skips h${prev}→h${l}`,fix:`Use sequential levels`});if(!h.textContent?.trim())r.push({s:S.M,el:h.outerHTML.substring(0,100),msg:`Empty heading h${l}`,fix:`Add text or remove`});prev=l});if(h1c===0&&hs.length>0)r.push({s:S.M,el:"—",msg:`No <h1>`,fix:`Add <h1>`});if(h1c>1)r.push({s:S.m,el:"—",msg:`Multiple <h1> (${h1c})`,fix:`Single <h1>`});return r}},
+{id:"2.4.7",name:"Focus Visible",level:"AA",p:"Operable",check(d){const r=[];let has=false;d.querySelectorAll("style").forEach(s=>{if(/outline\s*:\s*(none|0)/i.test(s.textContent||""))has=true});d.querySelectorAll("[style]").forEach(e=>{if(/outline\s*:\s*(none|0)/i.test(e.getAttribute("style")||""))has=true});if(has)r.push({s:S.M,el:"—",msg:`outline:none removes focus visibility`,fix:`Use :focus-visible with custom styles`});return r}},
+{id:"2.4.9",name:"Link Purpose (AAA)",level:"AAA",p:"Operable",check(d){const r=[];const map={};d.querySelectorAll("a[href]").forEach(a=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();const h=a.getAttribute("href");if(t&&h){if(map[t]&&map[t]!==h)r.push({s:S.m,el:a.outerHTML.substring(0,120),msg:`"${t}" → different URLs`,fix:`Same text = same destination`});map[t]=h}});return r}},
+{id:"2.4.11",name:"Focus Not Obscured",level:"AA",p:"Operable",check(d){const r=[];d.querySelectorAll('[style*="position"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/position\s*:\s*(fixed|sticky)/i.test(st)&&/z-index/i.test(st))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Fixed element may obscure focus`,fix:`Ensure focus is never hidden behind fixed elements`})});return r}},
+{id:"2.5.3",name:"Label in Name",level:"A",p:"Operable",check(d){const r=[];d.querySelectorAll("button[aria-label],a[aria-label]").forEach(e=>{const al=(e.getAttribute("aria-label")||"").toLowerCase();const vt=(e.textContent||"").trim().toLowerCase();if(vt&&al&&!al.includes(vt))r.push({s:S.M,el:e.outerHTML.substring(0,120),msg:`aria-label doesn't contain visible text`,fix:`Include visible text in aria-label`})});return r}},
+{id:"2.5.8",name:"Target Size",level:"AA",p:"Operable",check(d){const r=[];d.querySelectorAll("a,button,[role='button']").forEach(e=>{const st=e.getAttribute("style")||"";const wm=st.match(/width\s*:\s*(\d+)px/i);const hm=st.match(/height\s*:\s*(\d+)px/i);if(wm&&hm&&(+wm[1]<24||+hm[1]<24))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Target may be < 24×24px`,fix:`Min 24×24px (44×44px for AAA)`})});return r}},
+{id:"3.1.1",name:"Language of Page",level:"A",p:"Understandable",check(d){const r=[];const h=d.querySelector("html");if(h&&!h.getAttribute("lang"))r.push({s:S.C,el:"<html>",msg:`Missing lang attribute`,fix:`Add lang="en"`});return r}},
+{id:"3.1.2",name:"Language of Parts",level:"AA",p:"Understandable",check(d){const r=[];d.querySelectorAll("[lang]").forEach(e=>{const l=e.getAttribute("lang");if(l&&!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(l))r.push({s:S.m,el:e.outerHTML.substring(0,100),msg:`Invalid lang="${l}"`,fix:`Use BCP 47 code`})});return r}},
+{id:"3.2.2",name:"On Input",level:"A",p:"Understandable",check(d){const r=[];d.querySelectorAll("select[onchange]").forEach((e,i)=>{if(/location|navigate|href|window\.open/i.test(e.getAttribute("onchange")||""))r.push({s:S.M,el:e.outerHTML.substring(0,120),msg:`Auto-navigates on change`,fix:`Use submit button`})});return r}},
+{id:"3.3.2",name:"Labels or Instructions",level:"A",p:"Understandable",check(d){const r=[];d.querySelectorAll("input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='reset']):not([type='image']),select,textarea").forEach((e,i)=>{const id=e.getAttribute("id");const has=id&&d.querySelector(`label[for="${id}"]`);if(!has&&!e.closest("label")&&!e.getAttribute("aria-label")&&!e.getAttribute("aria-labelledby")&&!e.getAttribute("title"))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Form control #${i+1} unlabeled`,fix:`Add <label for="id"> or aria-label`})});return r}},
+{id:"4.1.1",name:"Parsing / Duplicate IDs",level:"A",p:"Robust",check(d){const r=[];const ids={};d.querySelectorAll("[id]").forEach(e=>{const id=e.getAttribute("id");if(ids[id])r.push({s:S.M,el:e.outerHTML.substring(0,100),msg:`Duplicate id="${id}"`,fix:`IDs must be unique`});ids[id]=true});return r}},
+{id:"4.1.2",name:"Name, Role, Value",level:"A",p:"Robust",check(d){const r=[];const valid=new Set(["alert","alertdialog","application","article","banner","button","cell","checkbox","columnheader","combobox","complementary","contentinfo","definition","dialog","directory","document","feed","figure","form","grid","gridcell","group","heading","img","link","list","listbox","listitem","log","main","marquee","math","menu","menubar","menuitem","menuitemcheckbox","menuitemradio","navigation","none","note","option","presentation","progressbar","radio","radiogroup","region","row","rowgroup","rowheader","scrollbar","search","searchbox","separator","slider","spinbutton","status","switch","tab","table","tablist","tabpanel","term","textbox","timer","toolbar","tooltip","tree","treegrid","treeitem"]);d.querySelectorAll("[role]").forEach(e=>{const role=e.getAttribute("role");if(!valid.has(role))r.push({s:S.M,el:e.outerHTML.substring(0,100),msg:`Invalid role="${role}"`,fix:`Use valid ARIA role`})});d.querySelectorAll("[aria-hidden='true']").forEach(e=>{if(e.querySelector("a[href],button,input,select,textarea,[tabindex]:not([tabindex='-1'])"))r.push({s:S.C,el:e.outerHTML.substring(0,120),msg:`Focusable inside aria-hidden`,fix:`Remove aria-hidden or defocus children`})});return r}},
 ];
 
 function analyze(html){const p=new DOMParser();const d=p.parseFromString(html,"text/html");return RULES.map(r=>{const issues=r.check(d);return{...r,issues,passed:issues.filter(i=>i.s!==S.I).length===0}})}
 function autoFix(html){let f=html;if(/<html(?![^>]*\slang\s*=)/i.test(f))f=f.replace(/<html/i,'<html lang="en"');f=f.replace(/user-scalable\s*=\s*no/gi,"user-scalable=yes");f=f.replace(/maximum-scale\s*=\s*1(?:\.0)?/gi,"maximum-scale=5.0");f=f.replace(/text-align\s*:\s*justify/gi,"text-align: left");return f}
 
-/* ═══════════════════════════════════════════════════════════════════
-   AI ENGINE
-   ═══════════════════════════════════════════════════════════════════ */
-async function aiFix(issue,html){
-  const snip=html.length>3000?html.substring(0,3000)+"\n<!-- truncated -->":html;
-  try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:`WCAG 2.2 AAA expert. Issue:\n\nWCAG: ${issue.ruleId} — ${issue.ruleName}\nSeverity: ${issue.s}\nIssue: ${issue.msg}\nElement: ${issue.el}\nFix: ${issue.fix}\n\nHTML:\n\`\`\`html\n${snip}\n\`\`\`\n\nRespond ONLY valid JSON:\n{"explanation":"why problem + who affected","designTip":"concrete UX suggestion","fixedCode":"corrected snippet","beforeAfter":"what changed"}`}]})});const d=await r.json();return JSON.parse((d.content?.map(b=>b.text||"").join("")||"").replace(/```json|```/g,"").trim())}catch{return{explanation:"Could not generate.",designTip:"",fixedCode:"",beforeAfter:""}}
-}
-async function aiFullFix(html,issues){
-  const list=issues.slice(0,14).map(i=>`• [${i.s}] ${i.ruleId} ${i.ruleName}: ${i.msg}`).join("\n");
-  const snip=html.length>4000?html.substring(0,4000)+"\n<!-- truncated -->":html;
-  try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:`Fix ALL accessibility issues:\n\n${list}\n\nHTML:\n\`\`\`html\n${snip}\n\`\`\`\n\nReturn ONLY corrected HTML.`}]})});const d=await r.json();return(d.content?.map(b=>b.text||"").join("")||"").replace(/```html|```/g,"").trim()}catch{return html}
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   SUB-COMPONENTS
-   ═══════════════════════════════════════════════════════════════════ */
+/* ═══ COMPONENTS ═══ */
 const Pill=({children,color,bg})=><span className="pill" style={{color,background:bg}}>{children}</span>;
-const Stat=({label,value,color})=><div style={{textAlign:"center",padding:"14px 8px",background:"var(--bg2)",borderRadius:10,border:"1px solid var(--border)",flex:"1 1 72px",minWidth:68}}><div style={{fontSize:24,fontFamily:"var(--f3)",fontWeight:700,color,lineHeight:1}}>{value}</div><div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".07em",color:"var(--text3)",marginTop:5}}>{label}</div></div>;
+const Stat=({label,value,color})=><div style={{textAlign:"center",padding:"12px 8px",background:"var(--bg2)",borderRadius:10,border:"1px solid var(--bdr)",flex:"1 1 68px",minWidth:65}}><div style={{fontSize:22,fontFamily:"var(--f3)",fontWeight:700,color,lineHeight:1}}>{value}</div><div style={{fontSize:8.5,textTransform:"uppercase",letterSpacing:".07em",color:"var(--tx3)",marginTop:4}}>{label}</div></div>;
+const PriorityBadge=({p})=>{const c=["","#ff4570","#ffaa30","#4cacff","#4d5b73"];const l=["","P1 — Critical","P2 — High","P3 — Medium","P4 — Low"];return<span style={{fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:4,background:`${c[p]}15`,color:c[p],letterSpacing:".04em"}}>{l[p]}</span>};
 
-function AICard({rec,loading,onApply,applied}){
-  if(loading)return<div style={{padding:"14px 18px",background:"var(--accent2)",borderRadius:10,border:"1px dashed rgba(15,240,212,.2)",marginTop:10}}><div style={{display:"flex",alignItems:"center",gap:10}}><div className="spinner" style={{width:14,height:14}}/><span style={{fontSize:13,color:"var(--accent)"}}>Generating AI recommendation…</span></div></div>;
+function RecCard({rec,ruleId,issue}){
   if(!rec)return null;
-  return<div style={{marginTop:10,borderRadius:10,border:"1px solid rgba(15,240,212,.12)",overflow:"hidden"}}><div style={{background:"linear-gradient(135deg,rgba(15,240,212,.05),rgba(76,172,255,.02))",padding:"14px 18px"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:8}}><span style={{color:"var(--accent)",fontSize:13}}>✦</span><span style={{fontSize:10,fontWeight:700,color:"var(--accent)",letterSpacing:".05em",textTransform:"uppercase"}}>AI Recommendation</span></div>{rec.explanation&&<p style={{fontSize:12.5,color:"var(--text)",margin:"0 0 10px",lineHeight:1.65}}>{rec.explanation}</p>}{rec.designTip&&<div style={{background:"rgba(15,240,212,.05)",borderRadius:7,padding:"9px 13px",marginBottom:10,borderLeft:"3px solid var(--accent)"}}><div style={{fontSize:9.5,textTransform:"uppercase",color:"var(--accent)",fontWeight:700,marginBottom:3}}>Design Suggestion</div><p style={{fontSize:12,color:"var(--text2)",margin:0,lineHeight:1.6}}>{rec.designTip}</p></div>}{rec.beforeAfter&&<p style={{fontSize:11.5,color:"var(--text3)",margin:0,fontStyle:"italic"}}>↳ {rec.beforeAfter}</p>}</div>{rec.fixedCode&&<div style={{borderTop:"1px solid rgba(15,240,212,.08)"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 18px 0",flexWrap:"wrap",gap:5}}><span style={{fontSize:9.5,textTransform:"uppercase",color:"var(--text3)",fontWeight:700}}>Corrected Code</span>{!applied?<button onClick={onApply} style={{padding:"4px 12px",fontSize:10,borderRadius:5,border:"1px solid rgba(15,240,212,.2)",background:"rgba(15,240,212,.06)",color:"var(--accent)",cursor:"pointer",fontWeight:600}}>↳ Apply Fix</button>:<span style={{fontSize:10,fontWeight:700,color:"var(--accent)",padding:"3px 9px",borderRadius:5,background:"var(--accent2)"}}>✓ Applied</span>}</div><pre style={{fontSize:11,color:"#a8f0e0",background:"rgba(0,0,0,.35)",padding:"10px 18px",margin:"7px 0 0",whiteSpace:"pre-wrap",wordBreak:"break-all",fontFamily:"var(--f3)",lineHeight:1.6,maxHeight:180,overflow:"auto"}}>{rec.fixedCode}</pre></div>}</div>;
-}
-function LivePreview({html,label,color}){const ref=useRef(null);useEffect(()=>{if(!ref.current||!html)return;const d=ref.current.contentDocument;if(d){d.open();d.write(html);d.close()}},[html]);return<div style={{flex:1,minWidth:240}}><div style={{fontSize:10,textTransform:"uppercase",letterSpacing:".07em",color:color||"var(--text3)",fontWeight:700,marginBottom:6,display:"flex",alignItems:"center",gap:5}}><span style={{width:6,height:6,borderRadius:"50%",background:color||"var(--text3)"}}/>{label}</div><iframe ref={ref} sandbox="allow-same-origin" style={{width:"100%",height:320,border:"1px solid var(--border)",borderRadius:10,background:"#fff"}} title={label}/></div>}
-function ContrastChecker(){const[fg,setFg]=useState("#555");const[bg,setBg]=useState("#fff");const fr=parseColor(fg),br=parseColor(bg);const r=fr&&br?contrast(fr,br):null;const t=r?[["AA",r>=4.5,"≥4.5"],["AA Lg",r>=3,"≥3"],["AAA",r>=7,"≥7"],["AAA Lg",r>=4.5,"≥4.5"]]:[];return<div style={{background:"var(--bg2)",borderRadius:12,border:"1px solid var(--border)",padding:22}}><h3 style={{margin:"0 0 16px",fontFamily:"var(--f1)",fontSize:19}}>Contrast Checker</h3><div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:18}}>{[["Foreground",fg,setFg],["Background",bg,setBg]].map(([l,v,s])=><label key={l} style={{display:"flex",flexDirection:"column",gap:5,flex:1,minWidth:140}}><span style={{fontSize:10,color:"var(--text3)",textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span><div style={{display:"flex",gap:7,alignItems:"center"}}><input type="color" value={v} onChange={e=>s(e.target.value)} style={{width:40,height:36,border:"none",cursor:"pointer",borderRadius:6}}/><input type="text" value={v} onChange={e=>s(e.target.value)} style={{flex:1,padding:"8px 11px",background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:7,color:"var(--text)",fontFamily:"var(--f3)",fontSize:12.5}}/></div></label>)}</div><div style={{background:br?bg:"#fff",color:fr?fg:"#000",padding:"20px 24px",borderRadius:9,marginBottom:16,border:"1px solid var(--border)"}}><div style={{fontSize:19,marginBottom:5,fontWeight:500}}>The quick brown fox jumps over the lazy dog</div><div style={{fontSize:13}}>Small text — 13px regular weight</div></div>{r!==null&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))",gap:7}}><div style={{textAlign:"center",padding:12,background:"var(--bg)",borderRadius:7}}><div style={{fontSize:28,fontFamily:"var(--f3)",fontWeight:700,color:r>=7?"var(--accent)":r>=4.5?"var(--orange)":"var(--red)"}}>{r.toFixed(2)}</div><div style={{fontSize:9,color:"var(--text3)",marginTop:2,textTransform:"uppercase"}}>Ratio</div></div>{t.map(([l,pass,req])=><div key={l} style={{textAlign:"center",padding:12,background:pass?"rgba(15,240,212,.05)":"rgba(255,69,112,.05)",borderRadius:7,border:`1px solid ${pass?"rgba(15,240,212,.15)":"rgba(255,69,112,.15)"}`}}><div style={{fontSize:15,fontWeight:700,color:pass?"var(--accent)":"var(--red)"}}>{pass?"PASS":"FAIL"}</div><div style={{fontSize:9,color:"var(--text3)",marginTop:2}}>{l} {req}</div></div>)}</div>}</div>}
-function HeadingOutline({html}){const h=useMemo(()=>{if(!html)return[];const d=new DOMParser().parseFromString(html,"text/html");const r=[];d.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach(h=>r.push({level:+h.tagName[1],text:h.textContent?.trim()||"(empty)",tag:h.tagName}));return r},[html]);if(!h.length)return<div style={{padding:32,color:"var(--text3)",textAlign:"center"}}>No headings found.</div>;let prev=0;return<div style={{background:"var(--bg2)",borderRadius:12,border:"1px solid var(--border)",padding:"18px 22px"}}><h3 style={{margin:"0 0 12px",fontFamily:"var(--f1)",fontSize:19}}>Heading Outline</h3>{h.map((h,i)=>{const skip=prev>0&&h.level>prev+1;prev=h.level;return<div key={i} style={{display:"flex",alignItems:"center",gap:7,paddingLeft:(h.level-1)*20,marginBottom:4}}><span style={{fontFamily:"var(--f3)",fontSize:10,padding:"2px 6px",borderRadius:4,background:skip?"rgba(255,69,112,.1)":"var(--accent2)",color:skip?"var(--red)":"var(--accent)",fontWeight:600}}>{h.tag}</span><span style={{fontSize:12.5,color:h.text==="(empty)"?"var(--red)":"var(--text)"}}>{h.text}</span>{skip&&<span style={{fontSize:9,color:"var(--red)",fontWeight:700}}>⚠ SKIP</span>}</div>})}</div>}
-
-/* ═══════════════════════════════════════════════════════════════════
-   SAMPLE HTML
-   ═══════════════════════════════════════════════════════════════════ */
-const SAMPLE=`<!DOCTYPE html>\n<html>\n<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">\n  <title></title>\n</head>\n<body>\n  <div onclick="navigate('/home')" style="cursor:pointer">Home</div>\n  <h1>Welcome</h1><h3>Quick Start</h3>\n  <p style="text-align:justify;line-height:1.1;color:#999;background-color:#fff">Poor contrast and justified text.</p>\n  <img src="hero.jpg"><a href="/about">Click here</a><a href="/contact"></a>\n  <form><input type="text" name="email"><input type="text" name="phone">\n  <select onchange="window.location=this.value"><option>Go</option></select>\n  <fieldset><input type="checkbox" id="agree"> I agree</fieldset></form>\n  <div id="sidebar" aria-hidden="true"><a href="/privacy">Privacy</a><button>Contact</button></div>\n  <div id="sidebar">Duplicate</div>\n  <table><tr><td>Product</td><td>Price</td></tr><tr><td>Widget</td><td>$9.99</td></tr></table>\n  <svg width="100" height="100"><circle cx="50" cy="50" r="40" fill="blue"/></svg>\n</body></html>`;
-
-/* ═══════════════════════════════════════════════════════════════════
-   MAIN APP
-   ═══════════════════════════════════════════════════════════════════ */
-const TABS=[{k:"audit",l:"Audit",i:"◉"},{k:"preview",l:"Preview",i:"◫"},{k:"contrast",l:"Contrast",i:"◑"},{k:"outline",l:"Outline",i:"≡"},{k:"remediate",l:"AI Remediate",i:"✦"}];
-
-function App(){
-  const[mode,setMode]=useState("url"); // "url" or "html"
-  const[url,setUrl]=useState("");
-  const[html,setHtml]=useState("");
-  const[fetchStatus,setFetchStatus]=useState(null); // null|"loading"|"done"|"error"
-  const[fetchError,setFetchError]=useState("");
-  const[scannedUrl,setScannedUrl]=useState("");
-  const[results,setResults]=useState(null);
-  const[tab,setTab]=useState("audit");
-  const[fL,setFL]=useState("ALL");const[fS,setFS]=useState("ALL");const[fP,setFP]=useState("ALL");
-  const[exp,setExp]=useState(null);
-  const[aiR,setAiR]=useState({});const[aiL,setAiL]=useState({});
-  const[rem,setRem]=useState("");const[aiRem,setAiRem]=useState(false);const[aiRemDone,setAiRemDone]=useState("");
-  const[applied,setApplied]=useState(new Set());
-  const allRef=useRef([]);
-
-  const doAudit=useCallback((sourceHtml,sourceUrl)=>{
-    if(!sourceHtml?.trim())return;
-    const r=analyze(sourceHtml);
-    setHtml(sourceHtml);
-    setResults(r);setRem(autoFix(sourceHtml));
-    setAiR({});setAiL({});setAiRemDone("");setApplied(new Set());
-    setTab("audit");if(sourceUrl)setScannedUrl(sourceUrl);
-  },[]);
-
-  const scanUrl=useCallback(async()=>{
-    if(!url.trim())return;
-    setFetchStatus("loading");setFetchError("");setResults(null);
-    const res=await fetchURL(url.trim());
-    if(res.ok){setFetchStatus("done");doAudit(res.html,res.url);}
-    else{setFetchStatus("error");setFetchError(res.error);}
-  },[url,doAudit]);
-
-  const runHtmlAudit=useCallback(()=>{doAudit(html,"")},[html,doAudit]);
-
-  const allIssues=useMemo(()=>{if(!results)return[];const l=[];results.forEach(r=>r.issues.filter(i=>i.s!==S.I).forEach(i=>l.push({...i,ruleId:r.id,ruleName:r.name})));allRef.current=l;return l},[results]);
-  const reqAI=useCallback(async(issue,idx)=>{setAiL(p=>({...p,[idx]:true}));const rec=await aiFix(issue,html);setAiR(p=>({...p,[idx]:rec}));setAiL(p=>({...p,[idx]:false}))},[html]);
-  const applyF=useCallback((idx,code)=>{const issue=allRef.current[idx];if(!issue||!code)return;setRem(prev=>{if(issue.el&&issue.el!=="—"&&prev.includes(issue.el))return prev.replace(issue.el,code);return prev});setApplied(p=>new Set([...p,idx]))},[]);
-  const runFullAI=useCallback(async()=>{if(!results)return;setAiRem(true);const f=await aiFullFix(html,allRef.current);setAiRemDone(f);setRem(f);setAiRem(false)},[html,results]);
-
-  const filtered=useMemo(()=>{if(!results)return[];return results.filter(r=>{if(fL!=="ALL"&&r.level!==fL)return false;if(fP!=="ALL"&&r.p!==fP)return false;if(fS==="ISSUES"&&r.passed)return false;if(fS==="PASSED"&&!r.passed)return false;return true})},[results,fL,fS,fP]);
-  const stats=useMemo(()=>{if(!results)return null;const t=results.length,p=results.filter(r=>r.passed).length;const all=results.flatMap(r=>r.issues).filter(i=>i.s!==S.I);return{total:t,passed:p,crit:all.filter(i=>i.s===S.C).length,maj:all.filter(i=>i.s===S.M).length,min:all.filter(i=>i.s===S.m).length,score:t>0?Math.round((p/t)*100):0,issues:all.length}},[results]);
-  const sColor=stats?(stats.score>=80?"var(--accent)":stats.score>=50?"var(--orange)":"var(--red)"):"var(--text3)";
-  let gIdx=-1;
-
-  return<div style={{maxWidth:1120,margin:"0 auto",padding:"0 0 50px"}}>
+  const r=rec;
+  return<div style={{marginTop:10,borderRadius:10,border:"1px solid rgba(15,240,212,.12)",overflow:"hidden"}}>
     {/* Header */}
-    <header style={{borderBottom:"1px solid var(--border)",padding:"16px 26px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
-      <div style={{display:"flex",alignItems:"center",gap:13}}>
-        <div style={{width:38,height:38,borderRadius:10,background:"linear-gradient(135deg,#0ff0d4,#0ab89e)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:800,color:"#06090f",fontFamily:"var(--f3)"}}>A</div>
-        <div><h1 style={{margin:0,fontFamily:"var(--f1)",fontSize:25,fontWeight:600,lineHeight:1.1}}>WCAG 2.2 AAA Remediator</h1><p style={{margin:"2px 0 0",fontSize:11,color:"var(--text3)",letterSpacing:".03em"}}>ADA Compliance · AAA Level · URL Scanner · AI Fixes</p></div>
-      </div>
-      {stats&&<div style={{display:"flex",alignItems:"baseline",gap:5}}><span style={{fontSize:42,fontFamily:"var(--f3)",fontWeight:700,color:sColor,lineHeight:1}}>{stats.score}</span><span style={{fontSize:12,color:"var(--text3)"}}>/ 100</span></div>}
-    </header>
-
-    {/* Input Section */}
-    <section style={{padding:"18px 26px",borderBottom:"1px solid var(--border)"}}>
-      {/* Mode Tabs */}
-      <div style={{display:"flex",gap:0,marginBottom:14}}>
-        {[["url","🔗 Scan URL"],["html","<> Paste HTML"]].map(([m,label])=><button key={m} onClick={()=>{setMode(m);setResults(null);setFetchStatus(null)}} style={{padding:"9px 20px",fontSize:12.5,fontWeight:mode===m?700:500,cursor:"pointer",border:"1px solid var(--border)",borderBottom:mode===m?"2px solid var(--accent)":"1px solid var(--border)",background:mode===m?"var(--bg2)":"transparent",color:mode===m?"var(--accent)":"var(--text3)",borderRadius:m==="url"?"8px 0 0 0":"0 8px 0 0"}}>{label}</button>)}
-      </div>
-
-      {mode==="url"&&<div>
-        <div style={{display:"flex",gap:8,marginBottom:8}}>
-          <input type="url" value={url} onChange={e=>{setUrl(e.target.value);setFetchStatus(null)}} onKeyDown={e=>{if(e.key==="Enter")scanUrl()}} placeholder="https://example.com" style={{flex:1,padding:"11px 16px",background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:9,color:"var(--text)",fontFamily:"var(--f3)",fontSize:13}}/>
-          <button onClick={scanUrl} disabled={!url.trim()||fetchStatus==="loading"} style={{padding:"11px 24px",fontSize:12.5,borderRadius:9,border:"none",background:url.trim()?"var(--accent)":"rgba(15,240,212,.2)",color:"#06090f",cursor:url.trim()?"pointer":"default",fontWeight:700,letterSpacing:".03em",opacity:fetchStatus==="loading"?.6:1}}>{fetchStatus==="loading"?<><span className="spinner" style={{width:14,height:14,borderTopColor:"#06090f",borderColor:"rgba(6,9,15,.2)",marginRight:6,verticalAlign:"middle"}}/>Scanning…</>:"◉ Scan"}</button>
+    <div style={{background:"linear-gradient(135deg,rgba(15,240,212,.05),rgba(76,172,255,.02))",padding:"14px 18px"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6,marginBottom:8}}>
+        <div style={{display:"flex",alignItems:"center",gap:7}}>
+          <span style={{color:"var(--ac)",fontSize:13}}>✦</span>
+          <span style={{fontSize:10,fontWeight:700,color:"var(--ac)",letterSpacing:".05em",textTransform:"uppercase"}}>Recommendation</span>
         </div>
-        {fetchStatus==="error"&&<p style={{fontSize:12.5,color:"var(--red)",lineHeight:1.6,padding:"8px 12px",background:"rgba(255,69,112,.06)",borderRadius:8}}>{fetchError}</p>}
-        {fetchStatus==="done"&&scannedUrl&&<p style={{fontSize:12,color:"var(--accent)",padding:"6px 0"}}>✓ Fetched {scannedUrl} — {html.length.toLocaleString()} chars</p>}
-      </div>}
-
-      {mode==="html"&&<div>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:6}}>
-          <span style={{fontSize:10,textTransform:"uppercase",letterSpacing:".07em",color:"var(--text3)",fontWeight:700}}>HTML Source</span>
-          <div style={{display:"flex",gap:7}}><button onClick={()=>{setHtml(SAMPLE);setResults(null)}} style={{padding:"6px 14px",fontSize:11.5,borderRadius:7,border:"1px solid var(--border)",background:"var(--bg2)",color:"var(--text2)",cursor:"pointer"}}>Load Sample</button><button onClick={runHtmlAudit} disabled={!html.trim()} style={{padding:"6px 18px",fontSize:11.5,borderRadius:7,border:"none",background:html.trim()?"var(--accent)":"rgba(15,240,212,.2)",color:"#06090f",cursor:html.trim()?"pointer":"default",fontWeight:700}}>▶ Audit</button></div>
+        <div style={{display:"flex",gap:6,alignItems:"center"}}>
+          <PriorityBadge p={r.priority}/>
+          <span style={{fontSize:9,padding:"3px 8px",borderRadius:4,background:"rgba(52,211,153,.1)",color:"#34d399",fontWeight:600}}>{r.effort}</span>
         </div>
-        <textarea value={html} onChange={e=>{setHtml(e.target.value);setResults(null)}} placeholder="Paste HTML source…" style={{width:"100%",minHeight:120,maxHeight:250,padding:"13px 15px",background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:9,color:"var(--text)",fontFamily:"var(--f3)",fontSize:11.5,lineHeight:1.6,resize:"vertical",boxSizing:"border-box"}}/>
-      </div>}
-    </section>
-
-    {/* Results */}
-    {results&&<>
-      <nav style={{display:"flex",borderBottom:"1px solid var(--border)",padding:"0 18px",overflowX:"auto"}}>{TABS.map(t=><button key={t.k} onClick={()=>setTab(t.k)} style={{position:"relative",padding:"12px 17px",fontSize:12,fontWeight:tab===t.k?600:400,cursor:"pointer",border:"none",background:"transparent",color:tab===t.k?"var(--accent)":"var(--text3)",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap",borderBottom:tab===t.k?"2px solid var(--accent)":"2px solid transparent"}}><span style={{fontSize:13}}>{t.i}</span>{t.l}</button>)}</nav>
-      <div style={{padding:"20px 26px",minHeight:280}}>
-
-      {/* AUDIT */}
-      {tab==="audit"&&<>
-        <div style={{display:"flex",gap:7,marginBottom:16,flexWrap:"wrap"}}><Stat label="Rules" value={stats.total} color="var(--text)"/><Stat label="Passed" value={stats.passed} color="var(--accent)"/><Stat label="Issues" value={stats.issues} color="var(--red)"/><Stat label="Critical" value={stats.crit} color="var(--red)"/><Stat label="Major" value={stats.maj} color="var(--orange)"/><Stat label="Minor" value={stats.min} color="var(--blue)"/></div>
-        <div style={{display:"flex",gap:9,marginBottom:14,flexWrap:"wrap"}}>{[["Level",fL,setFL,["ALL","A","AA","AAA"]],["Status",fS,setFS,["ALL","ISSUES","PASSED"]],["Principle",fP,setFP,["ALL","Perceivable","Operable","Understandable","Robust"]]].map(([l,v,s,o])=><div key={l} style={{display:"flex",alignItems:"center",gap:5}}><span style={{fontSize:9.5,color:"var(--text3)",textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span><select value={v} onChange={e=>s(e.target.value)} style={{padding:"5px 9px",fontSize:11,borderRadius:6,border:"1px solid var(--border)",background:"var(--bg3)",color:"var(--text)",cursor:"pointer"}}>{o.map(x=><option key={x}>{x}</option>)}</select></div>)}</div>
-        <div style={{display:"flex",flexDirection:"column",gap:4}}>
-        {filtered.map(rule=>{const isO=exp===rule.id;const ic=rule.issues.filter(i=>i.s!==S.I).length;return<div key={rule.id} style={{background:"var(--bg2)",border:"1px solid var(--border)",borderRadius:9,overflow:"hidden"}}><button onClick={()=>setExp(isO?null:rule.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:9,padding:"12px 16px",border:"none",background:"transparent",cursor:"pointer",color:"var(--text)",textAlign:"left",fontSize:12.5,transition:"background .1s"}}><span style={{width:7,height:7,borderRadius:"50%",background:rule.passed?"var(--accent)":"var(--red)",flexShrink:0}}/><span style={{fontFamily:"var(--f3)",fontSize:11,color:"var(--accent)",fontWeight:600,minWidth:40}}>{rule.id}</span><span style={{fontWeight:500,flex:1}}>{rule.name}</span><Pill color={rule.level==="AAA"?"var(--purple)":rule.level==="AA"?"var(--blue)":"var(--accent)"} bg={rule.level==="AAA"?"rgba(184,136,255,.08)":rule.level==="AA"?"rgba(76,172,255,.08)":"var(--accent2)"}>{rule.level}</Pill><Pill color="var(--text3)" bg="rgba(140,160,200,.05)">{rule.p}</Pill>{ic>0&&<span style={{fontFamily:"var(--f3)",fontSize:10.5,color:"var(--red)",fontWeight:600}}>{ic}</span>}<span style={{fontSize:9,color:"var(--text3)",transform:isO?"rotate(90deg)":"none",transition:"transform .15s"}}>▶</span></button>
-        {isO&&<div style={{borderTop:"1px solid var(--border)",padding:"12px 16px"}}>{rule.issues.length===0?<p style={{fontSize:12.5,color:"var(--accent)",margin:0}}>✓ No issues.</p>:<div style={{display:"flex",flexDirection:"column",gap:12}}>{rule.issues.map((issue,idx)=>{const isI=issue.s===S.I;if(!isI)gIdx++;const gi=gIdx;return<div key={idx} style={{background:SB[issue.s],borderRadius:8,padding:"12px 16px",borderLeft:`3px solid ${SC[issue.s]}`}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:7,marginBottom:7,flexWrap:"wrap"}}><Pill color={SC[issue.s]} bg="transparent">{issue.s}</Pill>{!isI&&!aiR[gi]&&<button onClick={()=>reqAI({...issue,ruleId:rule.id,ruleName:rule.name},gi)} disabled={aiL[gi]} style={{padding:"4px 12px",fontSize:10,borderRadius:5,border:"1px solid rgba(15,240,212,.18)",background:"rgba(15,240,212,.05)",color:"var(--accent)",cursor:aiL[gi]?"default":"pointer",fontWeight:600,display:"inline-flex",alignItems:"center",gap:5}}>{aiL[gi]?<><span className="spinner" style={{width:11,height:11}}/>Working…</>:<>✦ AI Fix</>}</button>}</div><p style={{fontSize:12.5,margin:"0 0 5px",lineHeight:1.6}}>{issue.msg}</p>{issue.el&&issue.el!=="—"&&<code style={{display:"block",fontSize:10.5,color:"var(--text2)",background:"rgba(0,0,0,.25)",padding:"7px 11px",borderRadius:5,marginBottom:5,wordBreak:"break-all",fontFamily:"var(--f3)",lineHeight:1.5}}>{issue.el}</code>}<div style={{fontSize:11.5,color:"var(--accent)",display:"flex",alignItems:"flex-start",gap:5}}><span>⮕</span><span style={{lineHeight:1.55}}>{issue.fix}</span></div>{!isI&&<AICard rec={aiR[gi]} loading={aiL[gi]} applied={applied.has(gi)} onApply={()=>applyF(gi,aiR[gi]?.fixedCode)}/>}</div>})}</div>}</div>}</div>})}
-        </div>
-      </>}
-
-      {tab==="preview"&&<div><h3 style={{margin:"0 0 14px",fontFamily:"var(--f1)",fontSize:19}}>Side-by-Side Preview</h3><div style={{display:"flex",gap:14,flexWrap:"wrap"}}><LivePreview html={html} label="Original" color="var(--red)"/><LivePreview html={rem} label="Remediated" color="var(--accent)"/></div></div>}
-      {tab==="contrast"&&<ContrastChecker/>}
-      {tab==="outline"&&<HeadingOutline html={html}/>}
-      {tab==="remediate"&&<div style={{display:"flex",flexDirection:"column",gap:18}}>
-        <div style={{background:"linear-gradient(135deg,rgba(15,240,212,.03),rgba(76,172,255,.02))",borderRadius:11,border:"1px solid rgba(15,240,212,.1)",padding:"22px 24px"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12,marginBottom:12}}><div><h3 style={{margin:"0 0 4px",fontFamily:"var(--f1)",fontSize:20}}>✦ AI Full Remediation</h3><p style={{margin:0,fontSize:12.5,color:"var(--text2)",lineHeight:1.5,maxWidth:560}}>Send HTML to Claude for comprehensive fix of all detected issues.</p></div><button onClick={runFullAI} disabled={aiRem} style={{padding:"10px 22px",fontSize:12.5,borderRadius:7,border:"1px solid rgba(15,240,212,.18)",background:"rgba(15,240,212,.05)",color:"var(--accent)",cursor:aiRem?"default":"pointer",fontWeight:600,display:"inline-flex",alignItems:"center",gap:6}}>{aiRem?<><span className="spinner"/>Remediating…</>:<>✦ Generate Full Fix</>}</button></div>{aiRemDone&&<div style={{background:"rgba(15,240,212,.03)",borderRadius:7,padding:"10px 14px",border:"1px solid rgba(15,240,212,.08)"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:5}}><span style={{fontSize:10,textTransform:"uppercase",color:"var(--accent)",fontWeight:700}}>✓ Applied</span><div style={{display:"flex",gap:5}}><button onClick={()=>navigator.clipboard?.writeText(aiRemDone)} style={{padding:"4px 11px",fontSize:10.5,borderRadius:6,border:"1px solid var(--border)",background:"var(--bg2)",color:"var(--text2)",cursor:"pointer"}}>Copy</button><button onClick={()=>{setHtml(rem);setResults(null);setMode("html")}} style={{padding:"4px 11px",fontSize:10.5,borderRadius:6,border:"1px solid var(--border)",background:"var(--bg2)",color:"var(--text2)",cursor:"pointer"}}>Re-Audit</button></div></div></div>}</div>
-        <div style={{background:"var(--bg2)",borderRadius:11,border:"1px solid var(--border)",padding:"20px 24px"}}><h3 style={{margin:"0 0 4px",fontFamily:"var(--f1)",fontSize:17}}>Auto-Fixes</h3><p style={{margin:"0 0 12px",fontSize:12.5,color:"var(--text2)",lineHeight:1.6}}>lang="en" added, zoom unlocked, justified text fixed.{applied.size>0&&<> + <strong style={{color:"var(--accent)"}}>{applied.size}</strong> AI fix{applied.size>1?"es":""}.</>}</p><div style={{display:"flex",gap:7,flexWrap:"wrap"}}><button onClick={()=>navigator.clipboard?.writeText(rem)} style={{padding:"7px 18px",fontSize:11.5,borderRadius:7,border:"none",background:"var(--accent)",color:"#06090f",cursor:"pointer",fontWeight:700}}>Copy HTML</button><button onClick={()=>{setHtml(rem);setResults(null);setMode("html")}} style={{padding:"7px 16px",fontSize:11.5,borderRadius:7,border:"1px solid var(--border)",background:"var(--bg2)",color:"var(--text2)",cursor:"pointer"}}>Load & Re-Audit</button></div></div>
-        <div style={{background:"var(--bg2)",borderRadius:11,border:"1px solid var(--border)",padding:"20px 24px"}}><h3 style={{margin:"0 0 8px",fontFamily:"var(--f1)",fontSize:17}}>Output</h3><textarea readOnly value={rem} style={{width:"100%",minHeight:220,padding:"13px 15px",background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:9,color:"#a8f0e0",fontFamily:"var(--f3)",fontSize:11.5,lineHeight:1.6,resize:"vertical",boxSizing:"border-box"}}/></div>
-        <div style={{background:"var(--bg2)",borderRadius:11,border:"1px solid var(--border)",padding:"20px 24px"}}><h3 style={{margin:"0 0 10px",fontFamily:"var(--f1)",fontSize:17}}>Manual Checklist</h3>{results.filter(r=>!r.passed).map(r=><div key={r.id} style={{marginBottom:12,paddingBottom:12,borderBottom:"1px solid var(--border)"}}><div style={{fontSize:12.5,fontWeight:600,color:"var(--accent)",marginBottom:4}}>{r.id} — {r.name} <span style={{fontSize:10,color:"var(--text3)"}}>({r.level})</span></div>{r.issues.filter(i=>i.s!==S.I).map((i,j)=><div key={j} style={{fontSize:11.5,color:"var(--text2)",marginLeft:12,marginBottom:3,lineHeight:1.55}}>• {i.fix}</div>)}</div>)}</div>
-      </div>}
-
       </div>
-    </>}
-
-    {/* Empty */}
-    {!results&&fetchStatus!=="loading"&&<div style={{padding:"65px 26px",textAlign:"center"}}><div style={{fontSize:50,marginBottom:12,opacity:.1,fontFamily:"var(--f3)"}}>⬡</div><p style={{fontSize:17,color:"var(--text2)",margin:"0 0 5px",fontFamily:"var(--f1)"}}>Enter a URL or paste HTML to begin</p><p style={{fontSize:12.5,color:"var(--text3)"}}>{RULES.length} WCAG 2.2 criteria · A / AA / AAA · AI-powered remediation</p></div>}
+      <p style={{fontSize:12.5,color:"var(--tx)",margin:"0 0 10px",lineHeight:1.65}}>{r.explanation}</p>
+      <div style={{background:"rgba(15,240,212,.05)",borderRadius:7,padding:"9px 13px",borderLeft:"3px solid var(--ac)"}}>
+        <div style={{fontSize:9,textTransform:"uppercase",color:"var(--ac)",fontWeight:700,marginBottom:3}}>Design Suggestion</div>
+        <p style={{fontSize:12,color:"var(--tx2)",margin:0,lineHeight:1.6}}>{r.designTip}</p>
+      </div>
+    </div>
+    {/* Visual Before/After */}
+    {r.beforeHtml&&r.afterHtml&&<div style={{borderTop:"1px solid rgba(15,240,212,.08)",padding:"14px 18px",background:"rgba(0,0,0,.15)"}}>
+      <div style={{fontSize:10,fontWeight:700,color:"var(--tx3)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>Visual Before → After</div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+        <div style={{flex:1,minWidth:200}}>
+          <div className="ba-label" style={{color:"var(--rd)"}}><span style={{background:"var(--rd)"}}/>Before</div>
+          <div className="preview-frame" dangerouslySetInnerHTML={{__html:r.beforeHtml}}/>
+        </div>
+        <div style={{flex:1,minWidth:200}}>
+          <div className="ba-label" style={{color:"var(--gn)"}}><span style={{background:"var(--gn)"}}/>After</div>
+          <div className="preview-frame" dangerouslySetInnerHTML={{__html:r.afterHtml}}/>
+        </div>
+      </div>
+    </div>}
+    {/* Code Fix */}
+    {r.before&&r.after&&<div style={{borderTop:"1px solid rgba(15,240,212,.08)"}}>
+      <div style={{padding:"10px 18px 0"}}>
+        <span style={{fontSize:9,textTransform:"uppercase",color:"var(--tx3)",fontWeight:700,letterSpacing:".05em"}}>Code Fix</span>
+      </div>
+      <div style={{display:"flex",gap:0,flexWrap:"wrap"}}>
+        <div style={{flex:1,minWidth:200}}>
+          <pre style={{fontSize:10.5,color:"#ffa0b0",background:"rgba(255,69,112,.06)",padding:"10px 18px",margin:0,whiteSpace:"pre-wrap",wordBreak:"break-all",fontFamily:"var(--f3)",lineHeight:1.55,maxHeight:140,overflow:"auto",borderRight:"1px solid rgba(140,160,200,.05)"}}>{r.before}</pre>
+        </div>
+        <div style={{flex:1,minWidth:200}}>
+          <pre style={{fontSize:10.5,color:"#a8f0e0",background:"rgba(15,240,212,.04)",padding:"10px 18px",margin:0,whiteSpace:"pre-wrap",wordBreak:"break-all",fontFamily:"var(--f3)",lineHeight:1.55,maxHeight:140,overflow:"auto"}}>{r.after}</pre>
+        </div>
+      </div>
+    </div>}
   </div>;
 }
 
+function ContrastChecker(){const[fg,setFg]=useState("#555");const[bg,setBg]=useState("#fff");const fr=parseColor(fg),br=parseColor(bg);const r=fr&&br?CR(fr,br):null;const t=r?[["AA",r>=4.5,"≥4.5"],["AA Lg",r>=3,"≥3"],["AAA",r>=7,"≥7"],["AAA Lg",r>=4.5,"≥4.5"]]:[];return<div style={{background:"var(--bg2)",borderRadius:12,border:"1px solid var(--bdr)",padding:22}}><h3 style={{margin:"0 0 16px",fontFamily:"var(--f1)",fontSize:19}}>Contrast Checker</h3><div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:18}}>{[["Foreground",fg,setFg],["Background",bg,setBg]].map(([l,v,s])=><label key={l} style={{display:"flex",flexDirection:"column",gap:5,flex:1,minWidth:140}}><span style={{fontSize:10,color:"var(--tx3)",textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span><div style={{display:"flex",gap:7,alignItems:"center"}}><input type="color" value={v} onChange={e=>s(e.target.value)} style={{width:40,height:36,border:"none",cursor:"pointer",borderRadius:6}}/><input type="text" value={v} onChange={e=>s(e.target.value)} style={{flex:1,padding:"8px 11px",background:"var(--bg3)",border:"1px solid var(--bdr)",borderRadius:7,color:"var(--tx)",fontFamily:"var(--f3)",fontSize:12.5}}/></div></label>)}</div><div style={{background:br?bg:"#fff",color:fr?fg:"#000",padding:"20px 24px",borderRadius:9,marginBottom:16,border:"1px solid var(--bdr)"}}><div style={{fontSize:19,marginBottom:5,fontWeight:500}}>The quick brown fox jumps over the lazy dog</div><div style={{fontSize:13}}>Small text — 13px regular</div></div>{r!==null&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))",gap:7}}><div style={{textAlign:"center",padding:12,background:"var(--bg)",borderRadius:7}}><div style={{fontSize:28,fontFamily:"var(--f3)",fontWeight:700,color:r>=7?"var(--ac)":r>=4.5?"var(--or)":"var(--rd)"}}>{r.toFixed(2)}</div><div style={{fontSize:9,color:"var(--tx3)",marginTop:2,textTransform:"uppercase"}}>Ratio</div></div>{t.map(([l,pass,req])=><div key={l} style={{textAlign:"center",padding:12,background:pass?"rgba(15,240,212,.05)":"rgba(255,69,112,.05)",borderRadius:7,border:`1px solid ${pass?"rgba(15,240,212,.15)":"rgba(255,69,112,.15)"}`}}><div style={{fontSize:15,fontWeight:700,color:pass?"var(--ac)":"var(--rd)"}}>{pass?"PASS":"FAIL"}</div><div style={{fontSize:9,color:"var(--tx3)",marginTop:2}}>{l} {req}</div></div>)}</div>}</div>}
+
+function HeadingOutline({html}){const h=useMemo(()=>{if(!html)return[];const d=new DOMParser().parseFromString(html,"text/html");const r=[];d.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach(h=>r.push({level:+h.tagName[1],text:h.textContent?.trim()||"(empty)",tag:h.tagName}));return r},[html]);if(!h.length)return<div style={{padding:32,color:"var(--tx3)",textAlign:"center"}}>No headings found.</div>;let prev=0;return<div style={{background:"var(--bg2)",borderRadius:12,border:"1px solid var(--bdr)",padding:"18px 22px"}}><h3 style={{margin:"0 0 12px",fontFamily:"var(--f1)",fontSize:19}}>Heading Outline</h3>{h.map((h,i)=>{const skip=prev>0&&h.level>prev+1;prev=h.level;return<div key={i} style={{display:"flex",alignItems:"center",gap:7,paddingLeft:(h.level-1)*20,marginBottom:4}}><span style={{fontFamily:"var(--f3)",fontSize:10,padding:"2px 6px",borderRadius:4,background:skip?"rgba(255,69,112,.1)":"var(--ac2)",color:skip?"var(--rd)":"var(--ac)",fontWeight:600}}>{h.tag}</span><span style={{fontSize:12.5,color:h.text==="(empty)"?"var(--rd)":"var(--tx)"}}>{h.text}</span>{skip&&<span style={{fontSize:9,color:"var(--rd)",fontWeight:700}}>⚠ SKIP</span>}</div>})}</div>}
+
+function LivePreview({html,label,color}){const ref=useRef(null);useEffect(()=>{if(!ref.current||!html)return;const d=ref.current.contentDocument;if(d){d.open();d.write(html);d.close()}},[html]);return<div style={{flex:1,minWidth:240}}><div className="ba-label" style={{color:color||"var(--tx3)"}}><span style={{background:color}}/>{label}</div><iframe ref={ref} sandbox="allow-same-origin" style={{width:"100%",height:320,border:"1px solid var(--bdr)",borderRadius:10,background:"#fff"}} title={label}/></div>}
+
+const SAMPLE=`<!DOCTYPE html>\n<html>\n<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">\n  <title></title>\n</head>\n<body>\n  <div onclick="navigate('/home')" style="cursor:pointer">Home</div>\n  <h1>Welcome</h1><h3>Quick Start</h3>\n  <p style="text-align:justify;line-height:1.1;color:#999;background-color:#fff">Poor contrast.</p>\n  <img src="hero.jpg"><a href="/about">Click here</a><a href="/contact"></a>\n  <form><input type="text" name="email"><input type="text" name="phone">\n  <select onchange="window.location=this.value"><option>Go</option></select>\n  <fieldset><input type="checkbox" id="agree"> I agree</fieldset></form>\n  <div id="sidebar" aria-hidden="true"><a href="/privacy">Privacy</a><button>Contact</button></div>\n  <div id="sidebar">Duplicate</div>\n  <table><tr><td>Product</td><td>Price</td></tr></table>\n  <svg width="100" height="100"><circle cx="50" cy="50" r="40" fill="blue"/></svg>\n</body></html>`;
+
+/* ═══ MAIN APP ═══ */
+const TABS=[{k:"audit",l:"Audit",i:"◉"},{k:"priority",l:"Priority",i:"⚡"},{k:"preview",l:"Preview",i:"◫"},{k:"contrast",l:"Contrast",i:"◑"},{k:"outline",l:"Outline",i:"≡"}];
+
+function App(){
+  const[mode,setMode]=useState("url");const[url,setUrl]=useState("");const[html,setHtml]=useState("");
+  const[fSt,setFSt]=useState(null);const[fErr,setFErr]=useState("");const[scUrl,setScUrl]=useState("");
+  const[results,setResults]=useState(null);const[tab,setTab]=useState("audit");
+  const[fL,setFL]=useState("ALL");const[fS,setFS]=useState("ALL");const[fP,setFP]=useState("ALL");
+  const[exp,setExp]=useState(null);const[rem,setRem]=useState("");
+
+  const doAudit=useCallback((h,u)=>{if(!h?.trim())return;setHtml(h);setResults(analyze(h));setRem(autoFix(h));setTab("audit");if(u)setScUrl(u)},[]);
+  const scanUrl=useCallback(async()=>{if(!url.trim())return;setFSt("loading");setFErr("");setResults(null);const r=await fetchURL(url.trim());if(r.ok){setFSt("done");setScUrl(r.url);setFErr(r.proxy||'');doAudit(r.html,r.url)}else{setFSt("error");setFErr(r.error)}},[url,doAudit]);
+
+  const allIssues=useMemo(()=>{if(!results)return[];const l=[];results.forEach(r=>r.issues.filter(i=>i.s!==S.I).forEach(i=>{const rec=getRecommendation(r.id,i);l.push({...i,ruleId:r.id,ruleName:r.name,level:r.level,rec})}));return l.sort((a,b)=>a.rec.priority-b.rec.priority)},[results]);
+
+  const filtered=useMemo(()=>{if(!results)return[];return results.filter(r=>{if(fL!=="ALL"&&r.level!==fL)return false;if(fP!=="ALL"&&r.p!==fP)return false;if(fS==="ISSUES"&&r.passed)return false;if(fS==="PASSED"&&!r.passed)return false;return true})},[results,fL,fS,fP]);
+
+  const stats=useMemo(()=>{if(!results)return null;const t=results.length,p=results.filter(r=>r.passed).length;const all=results.flatMap(r=>r.issues).filter(i=>i.s!==S.I);return{total:t,passed:p,crit:all.filter(i=>i.s===S.C).length,maj:all.filter(i=>i.s===S.M).length,min:all.filter(i=>i.s===S.m).length,score:t>0?Math.round((p/t)*100):0,issues:all.length}},[results]);
+  const sColor=stats?(stats.score>=80?"var(--ac)":stats.score>=50?"var(--or)":"var(--rd)"):"var(--tx3)";
+
+  return<div style={{maxWidth:1120,margin:"0 auto",padding:"0 0 50px"}}>
+    <header style={{borderBottom:"1px solid var(--bdr)",padding:"16px 26px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
+      <div style={{display:"flex",alignItems:"center",gap:13}}>
+        <div style={{width:38,height:38,borderRadius:10,background:"linear-gradient(135deg,#0ff0d4,#0ab89e)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:800,color:"#06090f",fontFamily:"var(--f3)"}}>A</div>
+        <div><h1 style={{margin:0,fontFamily:"var(--f1)",fontSize:25,fontWeight:600,lineHeight:1.1}}>WCAG 2.2 AAA Remediator</h1><p style={{margin:"2px 0 0",fontSize:11,color:"var(--tx3)"}}>ADA Compliance · AAA · URL Scanner · Prioritized Fixes</p></div>
+      </div>
+      {stats&&<div style={{display:"flex",alignItems:"baseline",gap:5}}><span style={{fontSize:42,fontFamily:"var(--f3)",fontWeight:700,color:sColor,lineHeight:1}}>{stats.score}</span><span style={{fontSize:12,color:"var(--tx3)"}}>/ 100</span></div>}
+    </header>
+
+    <section style={{padding:"18px 26px",borderBottom:"1px solid var(--bdr)"}}>
+      <div style={{display:"flex",gap:0,marginBottom:14}}>
+        {[["url","🔗 Scan URL"],["html","<> Paste HTML"]].map(([m,l])=><button key={m} onClick={()=>{setMode(m);setResults(null);setFSt(null)}} style={{padding:"9px 20px",fontSize:12.5,fontWeight:mode===m?700:500,cursor:"pointer",border:"1px solid var(--bdr)",borderBottom:mode===m?"2px solid var(--ac)":"1px solid var(--bdr)",background:mode===m?"var(--bg2)":"transparent",color:mode===m?"var(--ac)":"var(--tx3)",borderRadius:m==="url"?"8px 0 0 0":"0 8px 0 0"}}>{l}</button>)}
+      </div>
+      {mode==="url"&&<div><div style={{display:"flex",gap:8,marginBottom:8}}><input type="url" value={url} onChange={e=>{setUrl(e.target.value);setFSt(null)}} onKeyDown={e=>{if(e.key==="Enter")scanUrl()}} placeholder="https://example.com" style={{flex:1,padding:"11px 16px",background:"var(--bg3)",border:"1px solid var(--bdr)",borderRadius:9,color:"var(--tx)",fontFamily:"var(--f3)",fontSize:13}}/><button onClick={scanUrl} disabled={!url.trim()||fSt==="loading"} style={{padding:"11px 24px",fontSize:12.5,borderRadius:9,border:"none",background:url.trim()?"var(--ac)":"rgba(15,240,212,.2)",color:"#06090f",cursor:url.trim()?"pointer":"default",fontWeight:700,opacity:fSt==="loading"?.6:1}}>{fSt==="loading"?<><span className="spinner" style={{width:14,height:14,borderTopColor:"#06090f",borderColor:"rgba(0,0,0,.15)",marginRight:6,verticalAlign:"middle"}}/>Scanning…</>:"◉ Scan"}</button></div>{fSt==="error"&&<p style={{fontSize:12.5,color:"var(--rd)",padding:"8px 12px",background:"rgba(255,69,112,.06)",borderRadius:8,lineHeight:1.6}}>{fErr}</p>}{fSt==="done"&&<p style={{fontSize:12,color:"var(--ac)",padding:"6px 0"}}>✓ Fetched {scUrl} via {fErr} — {html.length.toLocaleString()} chars analyzed</p>}</div>}
+      {mode==="html"&&<div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:6}}><span style={{fontSize:10,textTransform:"uppercase",letterSpacing:".07em",color:"var(--tx3)",fontWeight:700}}>HTML Source</span><div style={{display:"flex",gap:7}}><button onClick={()=>{setHtml(SAMPLE);setResults(null)}} style={{padding:"6px 14px",fontSize:11.5,borderRadius:7,border:"1px solid var(--bdr)",background:"var(--bg2)",color:"var(--tx2)",cursor:"pointer"}}>Load Sample</button><button onClick={()=>doAudit(html,"")} disabled={!html.trim()} style={{padding:"6px 18px",fontSize:11.5,borderRadius:7,border:"none",background:html.trim()?"var(--ac)":"rgba(15,240,212,.2)",color:"#06090f",cursor:html.trim()?"pointer":"default",fontWeight:700}}>▶ Audit</button></div></div><textarea value={html} onChange={e=>{setHtml(e.target.value);setResults(null)}} placeholder="Paste HTML…" style={{width:"100%",minHeight:120,maxHeight:250,padding:"13px 15px",background:"var(--bg3)",border:"1px solid var(--bdr)",borderRadius:9,color:"var(--tx)",fontFamily:"var(--f3)",fontSize:11.5,lineHeight:1.6,resize:"vertical",boxSizing:"border-box"}}/></div>}
+    </section>
+
+    {results&&<><nav style={{display:"flex",borderBottom:"1px solid var(--bdr)",padding:"0 18px",overflowX:"auto"}}>{TABS.map(t=><button key={t.k} onClick={()=>setTab(t.k)} style={{position:"relative",padding:"12px 16px",fontSize:12,fontWeight:tab===t.k?600:400,cursor:"pointer",border:"none",background:"transparent",color:tab===t.k?"var(--ac)":"var(--tx3)",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap",borderBottom:tab===t.k?"2px solid var(--ac)":"2px solid transparent"}}><span style={{fontSize:13}}>{t.i}</span>{t.l}</button>)}</nav>
+    <div style={{padding:"20px 26px",minHeight:260}}>
+
+    {/* ═ AUDIT ═ */}
+    {tab==="audit"&&<><div style={{display:"flex",gap:7,marginBottom:14,flexWrap:"wrap"}}><Stat label="Rules" value={stats.total} color="var(--tx)"/><Stat label="Passed" value={stats.passed} color="var(--ac)"/><Stat label="Issues" value={stats.issues} color="var(--rd)"/><Stat label="Critical" value={stats.crit} color="var(--rd)"/><Stat label="Major" value={stats.maj} color="var(--or)"/><Stat label="Minor" value={stats.min} color="var(--bl)"/></div>
+    <div style={{display:"flex",gap:9,marginBottom:14,flexWrap:"wrap"}}>{[["Level",fL,setFL,["ALL","A","AA","AAA"]],["Status",fS,setFS,["ALL","ISSUES","PASSED"]],["Principle",fP,setFP,["ALL","Perceivable","Operable","Understandable","Robust"]]].map(([l,v,s,o])=><div key={l} style={{display:"flex",alignItems:"center",gap:5}}><span style={{fontSize:9,color:"var(--tx3)",textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span><select value={v} onChange={e=>s(e.target.value)} style={{padding:"5px 9px",fontSize:11,borderRadius:6,border:"1px solid var(--bdr)",background:"var(--bg3)",color:"var(--tx)",cursor:"pointer"}}>{o.map(x=><option key={x}>{x}</option>)}</select></div>)}</div>
+    <div style={{display:"flex",flexDirection:"column",gap:4}}>{filtered.map(rule=>{const isO=exp===rule.id;const ic=rule.issues.filter(i=>i.s!==S.I).length;return<div key={rule.id} style={{background:"var(--bg2)",border:"1px solid var(--bdr)",borderRadius:9,overflow:"hidden"}}><button onClick={()=>setExp(isO?null:rule.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:9,padding:"11px 16px",border:"none",background:"transparent",cursor:"pointer",color:"var(--tx)",textAlign:"left",fontSize:12.5}}><span style={{width:7,height:7,borderRadius:"50%",background:rule.passed?"var(--ac)":"var(--rd)",flexShrink:0}}/><span style={{fontFamily:"var(--f3)",fontSize:11,color:"var(--ac)",fontWeight:600,minWidth:40}}>{rule.id}</span><span style={{fontWeight:500,flex:1}}>{rule.name}</span><Pill color={rule.level==="AAA"?"var(--pu)":rule.level==="AA"?"var(--bl)":"var(--ac)"} bg={rule.level==="AAA"?"rgba(184,136,255,.08)":rule.level==="AA"?"rgba(76,172,255,.08)":"var(--ac2)"}>{rule.level}</Pill><Pill color="var(--tx3)" bg="rgba(140,160,200,.05)">{rule.p}</Pill>{ic>0&&<span style={{fontFamily:"var(--f3)",fontSize:10,color:"var(--rd)",fontWeight:600}}>{ic}</span>}<span style={{fontSize:9,color:"var(--tx3)",transform:isO?"rotate(90deg)":"none",transition:"transform .15s"}}>▶</span></button>
+    {isO&&<div style={{borderTop:"1px solid var(--bdr)",padding:"12px 16px"}}>{rule.issues.length===0?<p style={{fontSize:12.5,color:"var(--ac)",margin:0}}>✓ No issues.</p>:<div style={{display:"flex",flexDirection:"column",gap:12}}>{rule.issues.map((issue,idx)=>{const isI=issue.s===S.I;const rec=!isI?getRecommendation(rule.id,issue):null;return<div key={idx} style={{background:SB_[issue.s],borderRadius:8,padding:"12px 16px",borderLeft:`3px solid ${SC_[issue.s]}`}}>
+      <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:6,flexWrap:"wrap"}}><Pill color={SC_[issue.s]} bg="transparent">{issue.s}</Pill>{rec&&<PriorityBadge p={rec.priority}/>}</div>
+      <p style={{fontSize:12.5,margin:"0 0 5px",lineHeight:1.6}}>{issue.msg}</p>
+      {issue.el&&issue.el!=="—"&&<code style={{display:"block",fontSize:10.5,color:"var(--tx2)",background:"rgba(0,0,0,.25)",padding:"7px 11px",borderRadius:5,marginBottom:5,wordBreak:"break-all",fontFamily:"var(--f3)",lineHeight:1.5}}>{issue.el}</code>}
+      <div style={{fontSize:11.5,color:"var(--ac)",display:"flex",alignItems:"flex-start",gap:5}}><span>⮕</span><span style={{lineHeight:1.55}}>{issue.fix}</span></div>
+      {rec&&<RecCard rec={rec} ruleId={rule.id} issue={issue}/>}
+    </div>})}</div>}</div>}</div>})}</div></>}
+
+    {/* ═ PRIORITY ═ */}
+    {tab==="priority"&&<div>
+      <h3 style={{margin:"0 0 14px",fontFamily:"var(--f1)",fontSize:19}}>Implementation Priority</h3>
+      {allIssues.length===0?<p style={{color:"var(--ac)",fontSize:13}}>✓ No issues to prioritize — all checks passed!</p>:
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {[1,2,3,4].map(p=>{const items=allIssues.filter(i=>i.rec.priority===p);if(!items.length)return null;const labels=["","P1 — Fix Immediately","P2 — Fix This Sprint","P3 — Plan for Next Sprint","P4 — Backlog"];const colors=["","var(--rd)","var(--or)","var(--bl)","var(--tx3)"];return<div key={p} style={{background:"var(--bg2)",borderRadius:10,border:"1px solid var(--bdr)",overflow:"hidden"}}>
+          <div style={{padding:"12px 18px",borderBottom:"1px solid var(--bdr)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{width:8,height:8,borderRadius:"50%",background:colors[p]}}/><span style={{fontSize:13,fontWeight:600,color:colors[p]}}>{labels[p]}</span></div>
+            <span style={{fontSize:11,color:"var(--tx3)"}}>{items.length} issue{items.length>1?"s":""}</span>
+          </div>
+          <div style={{padding:"10px 18px"}}>{items.map((issue,i)=><div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"8px 0",borderBottom:i<items.length-1?"1px solid var(--bdr)":"none"}}>
+            <span style={{fontFamily:"var(--f3)",fontSize:10,color:"var(--ac)",fontWeight:600,minWidth:36,paddingTop:2}}>{issue.ruleId}</span>
+            <div style={{flex:1}}>
+              <p style={{fontSize:12.5,margin:"0 0 3px",lineHeight:1.5}}>{issue.msg}</p>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}><Pill color={SC_[issue.s]} bg={SB_[issue.s]}>{issue.s}</Pill><span style={{fontSize:9,color:"var(--gn)",fontWeight:600,padding:"3px 8px",borderRadius:4,background:"rgba(52,211,153,.08)"}}>{issue.rec.effort}</span></div>
+            </div>
+          </div>)}</div>
+        </div>})}
+      </div>}
+    </div>}
+
+    {tab==="preview"&&<div><h3 style={{margin:"0 0 14px",fontFamily:"var(--f1)",fontSize:19}}>Side-by-Side Preview</h3><div style={{display:"flex",gap:14,flexWrap:"wrap"}}><LivePreview html={html} label="Original" color="var(--rd)"/><LivePreview html={rem} label="Remediated" color="var(--ac)"/></div></div>}
+    {tab==="contrast"&&<ContrastChecker/>}
+    {tab==="outline"&&<HeadingOutline html={html}/>}
+    </div></>}
+
+    {!results&&fSt!=="loading"&&<div style={{padding:"65px 26px",textAlign:"center"}}><div style={{fontSize:50,marginBottom:12,opacity:.1,fontFamily:"var(--f3)"}}>⬡</div><p style={{fontSize:17,color:"var(--tx2)",margin:"0 0 5px",fontFamily:"var(--f1)"}}>Enter a URL or paste HTML to begin</p><p style={{fontSize:12.5,color:"var(--tx3)"}}>{RULES.length} WCAG 2.2 criteria · A/AA/AAA · Visual before/after examples</p></div>}
+  </div>;
+}
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
