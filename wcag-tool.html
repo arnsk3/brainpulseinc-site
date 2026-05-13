@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BrainPulse A11y — WCAG 2.2 AAA Compliance Engine</title>
-<meta name="description" content="Industry-grade WCAG 2.2 AAA compliance audit and remediation engine by BrainPulse Inc.">
+<meta name="description" content="WCAG 2.2 AAA compliance audit, remediation, and report export engine by BrainPulse Inc.">
 <link rel="canonical" href="https://www.brainpulseinc.com/wcag-tool.html">
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
@@ -33,7 +33,10 @@ function pC(s){if(!s)return null;s=s.trim().toLowerCase();if(NC[s])return NC[s];
 function rL([r,g,b]){const f=c=>{c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)}
 function CR(a,b){const l1=rL(a),l2=rL(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)}
 function fTO(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).finally(()=>clearTimeout(t))}
-async function fetchURL(url){if(!/^https?:\/\//i.test(url))url='https://'+url;const e=encodeURIComponent(url);const S=[{n:'codetabs',u:`https://api.codetabs.com/v1/proxy?quest=${e}`,m:'t'},{n:'allorigins',u:`https://api.allorigins.win/raw?url=${e}`,m:'t'},{n:'allorigins-json',u:`https://api.allorigins.win/get?url=${e}`,m:'j'},{n:'corsproxy',u:`https://corsproxy.io/?${e}`,m:'t'},{n:'direct',u:url,m:'t'}];const tried=[];for(const s of S){try{const r=await fTO(s.u,12000);if(!r.ok){tried.push(`${s.n}:${r.status}`);continue}let h='';if(s.m==='j'){const j=await r.json();h=j.contents||''}else{h=await r.text()}if(h.length>80&&h.includes('<'))return{ok:true,html:h,url,via:s.n};tried.push(`${s.n}:${h.length}ch`)}catch(e){tried.push(`${s.n}:${e.name==='AbortError'?'timeout':'err'}`)}}return{ok:false,html:'',url,error:`Tried ${tried.length} proxies. Click Retry or paste HTML.`}}
+async function fetchURL(url,attempt=1){if(!/^https?:\/\//i.test(url))url='https://'+url;const e=encodeURIComponent(url);const S=[{n:'codetabs',u:`https://api.codetabs.com/v1/proxy?quest=${e}`,m:'t'},{n:'allorigins',u:`https://api.allorigins.win/raw?url=${e}`,m:'t'},{n:'allorigins-json',u:`https://api.allorigins.win/get?url=${e}`,m:'j'},{n:'corsproxy',u:`https://corsproxy.io/?${e}`,m:'t'},{n:'direct',u:url,m:'t'}];const tried=[];for(const s of S){try{const r=await fTO(s.u,12000);if(!r.ok){tried.push(`${s.n}:${r.status}`);continue}let h='';if(s.m==='j'){const j=await r.json();h=j.contents||''}else{h=await r.text()}if(h.length>80&&h.includes('<'))return{ok:true,html:h,url,via:s.n};tried.push(`${s.n}:${h.length}ch`)}catch(e){tried.push(`${s.n}:${e.name==='AbortError'?'timeout':'err'}`)}}
+  if(attempt<3){await new Promise(r=>setTimeout(r,1500*attempt));return fetchURL(url,attempt+1)}
+  const inSandbox=tried.every(t=>t.includes('err'));
+  return{ok:false,html:'',url,tried,inSandbox,error:inSandbox?'sandbox':'proxy'}}
 
 // ── Decorative SVGs ──
 const HexIcon=({size=52,children})=><svg viewBox="0 0 52 52" width={size} height={size} aria-hidden="true"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke={T.teal} strokeWidth="1.6" strokeLinejoin="round"/><path d="M26 14L38 21V33L26 40L14 33V21Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".2"/>{children}</svg>;
@@ -154,6 +157,208 @@ const RULES=[
 function analyze(h){const p=new DOMParser();const d=p.parseFromString(h,"text/html");return RULES.map(r=>{const issues=r.c(d);return{...r,issues,ok:issues.filter(i=>i.s!==SV.I).length===0}})}
 function autoFix(h){let f=h;if(/<html(?![^>]*\slang\s*=)/i.test(f))f=f.replace(/<html/i,'<html lang="en"');f=f.replace(/user-scalable\s*=\s*no/gi,"user-scalable=yes");f=f.replace(/maximum-scale\s*=\s*1(?:\.0)?/gi,"maximum-scale=5.0");f=f.replace(/text-align\s*:\s*justify/gi,"text-align: left");return f}
 
+// ── Export Engine ──
+function dl(content,filename,type){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href)}
+function ts(){return new Date().toISOString().split('T')[0]}
+
+function exportCSV(results,scUrl){
+  const rows=[['WCAG ID','Criterion','Level','Principle','Status','Severity','Issue','Fix','Priority','Effort']];
+  results.forEach(r=>{
+    if(r.ok)rows.push([r.id,r.n,r.l,r.pr,'PASS','','','','','']);
+    r.issues.filter(i=>i.s!==SV.I).forEach(i=>{
+      const rec=getRec(r.id,i);
+      rows.push([r.id,r.n,r.l,r.pr,'FAIL',i.s,`"${i.msg.replace(/"/g,'""')}"`,`"${i.fix.replace(/"/g,'""')}"`,`P${rec.p}`,rec.e]);
+    });
+  });
+  dl(rows.map(r=>r.join(',')).join('\n'),`wcag-audit-${ts()}.csv`,'text/csv;charset=utf-8');
+}
+
+function exportJSON(results,stats,scUrl){
+  const report={
+    meta:{tool:"BrainPulse A11y",version:"2.2",standard:"WCAG 2.2 AAA",date:new Date().toISOString(),url:scUrl||"Manual HTML input"},
+    summary:{score:stats.score,totalRules:stats.total,passed:stats.passed,issues:stats.issues,critical:stats.crit,major:stats.maj,minor:stats.min},
+    results:results.map(r=>({
+      id:r.id,name:r.n,level:r.l,principle:r.pr,status:r.ok?"PASS":"FAIL",
+      issues:r.issues.filter(i=>i.s!==SV.I).map(i=>{const rec=getRec(r.id,i);return{severity:i.s,message:i.msg,element:i.el,fix:i.fix,priority:`P${rec.p}`,effort:rec.e,explanation:rec.x,designTip:rec.dt}})
+    }))
+  };
+  dl(JSON.stringify(report,null,2),`wcag-audit-${ts()}.json`,'application/json');
+}
+
+function exportMarkdown(results,stats,scUrl,allIssues){
+  let md=`# WCAG 2.2 AAA Audit Report\n\n`;
+  md+=`**Date:** ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}\n`;
+  md+=`**URL:** ${scUrl||'Manual HTML input'}\n`;
+  md+=`**Tool:** BrainPulse A11y — WCAG 2.2 AAA Compliance Engine\n\n`;
+  md+=`---\n\n## Summary\n\n`;
+  md+=`| Metric | Value |\n|--------|-------|\n`;
+  md+=`| Score | **${stats.score}/100** |\n`;
+  md+=`| Rules Checked | ${stats.total} |\n`;
+  md+=`| Passed | ${stats.passed} |\n`;
+  md+=`| Issues Found | ${stats.issues} |\n`;
+  md+=`| Critical | ${stats.crit} |\n`;
+  md+=`| Major | ${stats.maj} |\n`;
+  md+=`| Minor | ${stats.min} |\n\n`;
+  md+=`## POUR Principle Breakdown\n\n`;
+  ["Perceivable","Operable","Understandable","Robust"].forEach(p=>{
+    const R=results.filter(r=>r.pr===p);const pass=R.filter(r=>r.ok).length;
+    md+=`- **${p}:** ${pass}/${R.length} passed (${R.length?Math.round(pass/R.length*100):100}%)\n`;
+  });
+  md+=`\n## Level Breakdown\n\n`;
+  ["A","AA","AAA"].forEach(l=>{
+    const R=results.filter(r=>r.l===l);const pass=R.filter(r=>r.ok).length;
+    md+=`- **Level ${l}:** ${pass}/${R.length} passed (${R.length?Math.round(pass/R.length*100):100}%)\n`;
+  });
+  if(allIssues.length>0){
+    md+=`\n---\n\n## Issues Found\n\n`;
+    md+=`### Priority Roadmap\n\n`;
+    [1,2,3,4].forEach(p=>{
+      const items=allIssues.filter(i=>i.rec.p===p);
+      if(!items.length)return;
+      md+=`#### ${PLBL[p]}\n\n`;
+      items.forEach(i=>{
+        md+=`- **${i.ruleId} ${i.ruleName}** (${i.s}) — ${i.msg}\n`;
+        md+=`  - Fix: ${i.fix}\n`;
+        md+=`  - ${i.rec.x}\n`;
+        md+=`  - Design tip: ${i.rec.dt}\n\n`;
+      });
+    });
+  }
+  md+=`\n---\n\n## Detailed Results\n\n`;
+  md+=`| ID | Criterion | Level | Status | Issues |\n|-----|-----------|-------|--------|--------|\n`;
+  results.forEach(r=>{
+    const ic=r.issues.filter(i=>i.s!==SV.I).length;
+    md+=`| ${r.id} | ${r.n} | ${r.l} | ${r.ok?'✅ Pass':'❌ Fail'} | ${ic} |\n`;
+  });
+  md+=`\n---\n\n*Generated by [BrainPulse A11y](https://www.brainpulseinc.com/wcag-tool.html)*\n`;
+  dl(md,`wcag-audit-${ts()}.md`,'text/markdown;charset=utf-8');
+}
+
+function exportHTMLReport(results,stats,scUrl,allIssues){
+  const clr=stats.score>=80?T.teal:stats.score>=50?T.peach:T.rose;
+  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WCAG 2.2 AAA Audit Report — ${scUrl||'Manual'}</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:#FBF9F6;color:#1C1917;padding:40px;max-width:900px;margin:0 auto;line-height:1.6}
+h1{font-family:'Libre Baskerville',serif;font-size:28px;margin-bottom:8px}
+h2{font-family:'Libre Baskerville',serif;font-size:20px;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(28,25,23,.1)}
+h3{font-size:16px;margin:20px 0 8px}
+.meta{color:#57534E;font-size:13px;margin-bottom:24px}
+.score{display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;border:4px solid ${clr};font-size:28px;font-weight:700;color:${clr};font-family:'JetBrains Mono',monospace;margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:16px 0}
+.stat{text-align:center;padding:14px;background:#fff;border-radius:12px;border:1px solid rgba(28,25,23,.07)}
+.stat b{display:block;font-size:22px;font-family:'JetBrains Mono',monospace}
+.stat span{font-size:10px;text-transform:uppercase;color:#57534E;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(28,25,23,.07)}
+th{background:#F5F2ED;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.pass{color:#166534}.fail{color:#9F1239}.sev{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase}
+.critical{background:rgba(159,18,57,.06);color:#9F1239}.major{background:rgba(146,64,14,.06);color:#92400E}.minor{background:rgba(30,58,95,.06);color:#1E3A5F}
+.issue{background:#fff;border-radius:12px;border:1px solid rgba(28,25,23,.07);padding:16px;margin:10px 0}
+.fix{color:#0D7377;font-size:12px;margin-top:6px}.tip{background:rgba(13,115,119,.06);padding:10px 14px;border-radius:8px;margin-top:8px;font-size:12px;border-left:3px solid #0D7377}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid rgba(28,25,23,.1);font-size:12px;color:#57534E;text-align:center}
+@media print{body{padding:20px}h2{break-before:auto}.issue{break-inside:avoid}}
+</style></head><body>
+<h1>WCAG 2.2 AAA Audit Report</h1>
+<div class="meta">
+<strong>URL:</strong> ${scUrl||'Manual HTML input'}<br>
+<strong>Date:</strong> ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}<br>
+<strong>Standard:</strong> WCAG 2.2 AAA · ${results.length} criteria checked
+</div>
+<div class="score">${stats.score}</div>
+<div class="grid">
+<div class="stat"><b>${stats.total}</b><span>Rules</span></div>
+<div class="stat"><b style="color:#166534">${stats.passed}</b><span>Passed</span></div>
+<div class="stat"><b style="color:#9F1239">${stats.issues}</b><span>Issues</span></div>
+<div class="stat"><b style="color:#9F1239">${stats.crit}</b><span>Critical</span></div>
+<div class="stat"><b style="color:#92400E">${stats.maj}</b><span>Major</span></div>
+<div class="stat"><b style="color:#1E3A5F">${stats.min}</b><span>Minor</span></div>
+</div>
+<h2>POUR Principles</h2><div class="grid">`;
+  ["Perceivable","Operable","Understandable","Robust"].forEach(p=>{
+    const R=results.filter(r=>r.pr===p);const pass=R.filter(r=>r.ok).length;const pct=R.length?Math.round(pass/R.length*100):100;
+    h+=`<div class="stat"><b style="color:${pct>=80?'#0D7377':pct>=50?'#92400E':'#9F1239'}">${pct}%</b><span>${p}<br>${pass}/${R.length}</span></div>`;
+  });
+  h+=`</div><h2>Level Breakdown</h2><div class="grid">`;
+  ["A","AA","AAA"].forEach(l=>{
+    const R=results.filter(r=>r.l===l);const pass=R.filter(r=>r.ok).length;const pct=R.length?Math.round(pass/R.length*100):100;
+    h+=`<div class="stat"><b style="color:${pct>=80?'#0D7377':'#9F1239'}">${pct}%</b><span>Level ${l}<br>${pass}/${R.length}</span></div>`;
+  });
+  h+=`</div><h2>All Criteria</h2><table><thead><tr><th>ID</th><th>Criterion</th><th>Level</th><th>Principle</th><th>Status</th><th>Issues</th></tr></thead><tbody>`;
+  results.forEach(r=>{
+    const ic=r.issues.filter(i=>i.s!==SV.I).length;
+    h+=`<tr><td style="font-family:'JetBrains Mono',monospace;color:#0D7377">${r.id}</td><td>${r.n}</td><td>${r.l}</td><td>${r.pr}</td><td class="${r.ok?'pass':'fail'}">${r.ok?'✅ Pass':'❌ Fail'}</td><td>${ic||'—'}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  if(allIssues.length>0){
+    h+=`<h2>Issues & Recommendations</h2>`;
+    [1,2,3,4].forEach(p=>{
+      const items=allIssues.filter(i=>i.rec.p===p);if(!items.length)return;
+      h+=`<h3 style="color:${PC[p]}">${PLBL[p]} (${items.length} issue${items.length>1?'s':''})</h3>`;
+      items.forEach(i=>{
+        h+=`<div class="issue"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="sev ${i.s}">${i.s}</span><strong style="font-family:'JetBrains Mono',monospace;color:#0D7377;font-size:12px">${i.ruleId}</strong><span>${i.ruleName}</span></div>`;
+        h+=`<p>${i.msg}</p>`;
+        if(i.el&&i.el!=='—')h+=`<code style="display:block;background:#F5F2ED;padding:8px 12px;border-radius:6px;margin:8px 0;font-size:11px;word-break:break-all;font-family:'JetBrains Mono',monospace">${i.el.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code>`;
+        h+=`<div class="fix">⮕ ${i.fix}</div>`;
+        h+=`<div class="tip"><strong>Why it matters:</strong> ${i.rec.x}<br><strong>Design tip:</strong> ${i.rec.dt}</div>`;
+        h+=`</div>`;
+      });
+    });
+  }
+  h+=`<footer>Generated by <strong>BrainPulse A11y</strong> — WCAG 2.2 AAA Compliance Engine<br><a href="https://www.brainpulseinc.com/wcag-tool.html" style="color:#0D7377">brainpulseinc.com</a></footer></body></html>`;
+  dl(h,`wcag-audit-${ts()}.html`,'text/html;charset=utf-8');
+}
+
+function exportPrint(results,stats,scUrl,allIssues){
+  const win=window.open('','_blank');
+  if(!win)return;
+  // Reuse the HTML report generator and write to new window
+  const clr=stats.score>=80?T.teal:stats.score>=50?T.peach:T.rose;
+  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>WCAG Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;color:#1C1917;padding:32px;max-width:800px;margin:0 auto;line-height:1.6;font-size:12px}
+h1{font-family:'Libre Baskerville',serif;font-size:22px;margin-bottom:4px}h2{font-family:'Libre Baskerville',serif;font-size:16px;margin:24px 0 8px;border-bottom:1px solid #ddd;padding-bottom:6px}
+h3{font-size:13px;margin:14px 0 6px}
+.meta{color:#666;font-size:11px;margin-bottom:16px}.score{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;border:3px solid ${clr};font-size:22px;font-weight:700;color:${clr};font-family:'JetBrains Mono',monospace;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0}th,td{padding:6px 8px;text-align:left;border-bottom:1px solid #eee}th{background:#f5f5f5;font-weight:600;font-size:10px;text-transform:uppercase}
+.pass{color:#166534}.fail{color:#9F1239}
+.issue{border:1px solid #eee;border-radius:8px;padding:10px;margin:6px 0;page-break-inside:avoid}
+.sev{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase}
+.critical{background:#fde;color:#9F1239}.major{background:#fef3e0;color:#92400E}.minor{background:#e8f0fe;color:#1E3A5F}
+.fix{color:#0D7377;font-size:11px;margin-top:4px}.tip{background:#f5f5f5;padding:8px;border-radius:6px;margin-top:6px;font-size:11px;border-left:3px solid #0D7377}
+@media print{body{padding:16px}@page{margin:1cm}}
+</style></head><body>`;
+  h+=`<h1>WCAG 2.2 AAA Audit Report</h1><div class="meta"><b>URL:</b> ${scUrl||'Manual'} · <b>Date:</b> ${new Date().toLocaleDateString()} · <b>${results.length} criteria</b></div><div class="score">${stats.score}</div>`;
+  h+=`<table><tr><th>Passed</th><th>Issues</th><th>Critical</th><th>Major</th><th>Minor</th></tr><tr><td class="pass"><b>${stats.passed}</b></td><td class="fail"><b>${stats.issues}</b></td><td>${stats.crit}</td><td>${stats.maj}</td><td>${stats.min}</td></tr></table>`;
+  h+=`<h2>Results</h2><table><thead><tr><th>ID</th><th>Criterion</th><th>Level</th><th>Status</th></tr></thead><tbody>`;
+  results.forEach(r=>{h+=`<tr><td style="font-family:monospace;color:#0D7377">${r.id}</td><td>${r.n}</td><td>${r.l}</td><td class="${r.ok?'pass':'fail'}">${r.ok?'✅':'❌'}</td></tr>`});
+  h+=`</tbody></table>`;
+  if(allIssues.length){
+    h+=`<h2>Issues</h2>`;
+    allIssues.forEach(i=>{
+      h+=`<div class="issue"><span class="sev ${i.s}">${i.s}</span> <b style="font-family:monospace;color:#0D7377">${i.ruleId}</b> ${i.ruleName}<p style="margin:4px 0">${i.msg}</p><div class="fix">⮕ ${i.fix}</div><div class="tip">${i.rec.x}</div></div>`;
+    });
+  }
+  h+=`<div style="margin-top:24px;text-align:center;color:#999;font-size:10px">BrainPulse A11y · brainpulseinc.com</div></body></html>`;
+  win.document.write(h);
+  win.document.close();
+  setTimeout(()=>{win.print()},600);
+}
+
+function copyClipboard(results,stats,scUrl,allIssues){
+  let t=`WCAG 2.2 AAA AUDIT REPORT\n`;
+  t+=`${'═'.repeat(40)}\n`;
+  t+=`URL: ${scUrl||'Manual HTML'}\nDate: ${new Date().toLocaleDateString()}\n\n`;
+  t+=`SCORE: ${stats.score}/100\n`;
+  t+=`Passed: ${stats.passed}/${stats.total} | Issues: ${stats.issues} (${stats.crit} critical, ${stats.maj} major, ${stats.min} minor)\n\n`;
+  if(allIssues.length){
+    t+=`ISSUES:\n${'─'.repeat(40)}\n`;
+    allIssues.forEach(i=>{t+=`[${i.s.toUpperCase()}] ${i.ruleId} ${i.ruleName}: ${i.msg}\n  Fix: ${i.fix}\n\n`});
+  }
+  t+=`Generated by BrainPulse A11y — brainpulseinc.com\n`;
+  navigator.clipboard?.writeText(t);
+  return true;
+}
+
 // ── Rec Card ──
 function RecCard({rec}){
   if(!rec)return null;
@@ -215,9 +420,55 @@ function ContrastChecker(){
   </div>;
 }
 
+// ── Export Tab Component ──
+function ExportTab({results,stats,scUrl,allIssues}){
+  const[copied,setCopied]=useState(false);
+  const formats=[
+    {id:"pdf",name:"PDF Report",desc:"Print-optimized report with full details, recommendations, and code fixes. Opens print dialog.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="2" width="16" height="22" rx="2" stroke={T.rose} strokeWidth="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke={T.rose} strokeWidth="1.5" strokeLinecap="round"/><rect x="18" y="10" width="6" height="8" rx="1" fill={T.rose} opacity=".15"/><path d="M20 13h2M20 15h2" stroke={T.rose} strokeWidth="1" strokeLinecap="round"/></svg>,color:T.rose,fn:()=>exportPrint(results,stats,scUrl,allIssues)},
+    {id:"html",name:"HTML Report",desc:"Standalone styled HTML file. Share with stakeholders — opens in any browser, no tools needed.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M5 6l3 16 6 3 6-3 3-16" stroke={T.teal} strokeWidth="2" strokeLinejoin="round"/><path d="M9 10l2 8 3 1.5 3-1.5 2-8" stroke={T.teal} strokeWidth="1.5" strokeLinejoin="round" opacity=".4"/><circle cx="14" cy="14" r="2" fill={T.teal} opacity=".3"/></svg>,color:T.teal,fn:()=>exportHTMLReport(results,stats,scUrl,allIssues)},
+    {id:"csv",name:"CSV Spreadsheet",desc:"Every issue as a row with ID, severity, message, fix, priority, and effort. Import into Excel or Google Sheets.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="4" width="22" height="18" rx="2" stroke={T.green} strokeWidth="2"/><path d="M3 10h22M3 16h22M10 4v18M17 4v18" stroke={T.green} strokeWidth="1" opacity=".3"/><rect x="11" y="11" width="5" height="4" fill={T.green} opacity=".15" rx="1"/></svg>,color:T.green,fn:()=>exportCSV(results,scUrl)},
+    {id:"json",name:"JSON Data",desc:"Machine-readable structured data. Feed into CI/CD pipelines, dashboards, or tracking systems.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M10 4C7 4 6 6 6 8v3c0 2-2 3-2 3s2 1 2 3v3c0 2 1 4 4 4" stroke={T.peach} strokeWidth="2" strokeLinecap="round"/><path d="M18 4c3 0 4 2 4 4v3c0 2 2 3 2 3s-2 1-2 3v3c0 2-1 4-4 4" stroke={T.peach} strokeWidth="2" strokeLinecap="round"/><circle cx="11" cy="14" r="1.5" fill={T.peach}/><circle cx="17" cy="14" r="1.5" fill={T.peach}/></svg>,color:T.peach,fn:()=>exportJSON(results,stats,scUrl)},
+    {id:"md",name:"Markdown",desc:"GitHub/Confluence-ready report with tables, priority roadmap, and full recommendations.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="5" width="22" height="16" rx="2" stroke={T.navy} strokeWidth="2"/><path d="M7 16V10l3 3.5L13 10v6M17 13h2.5l-2.5 3-2.5-3H17V10" stroke={T.navy} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,color:T.navy,fn:()=>exportMarkdown(results,stats,scUrl,allIssues)},
+    {id:"clip",name:"Copy to Clipboard",desc:"Plain text summary copied to clipboard. Paste into Slack, email, or Jira tickets.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="8" y="6" width="14" height="18" rx="2" stroke={T.dm} strokeWidth="2"/><rect x="6" y="4" width="14" height="18" rx="2" stroke={T.dm} strokeWidth="2" fill={T.w}/><path d="M10 10h6M10 14h8M10 18h4" stroke={T.dm} strokeWidth="1.5" strokeLinecap="round"/></svg>,color:T.dm,fn:()=>{if(copyClipboard(results,stats,scUrl,allIssues)){setCopied(true);setTimeout(()=>setCopied(false),2500)}}},
+  ];
+  return<div>
+    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}><HexIcon size={36}/><h2 style={{margin:0,fontFamily:T.serif,fontSize:24,color:T.ink}}>Export Report</h2></div>
+    <p style={{fontSize:14,color:T.dm,lineHeight:1.6,marginBottom:20,maxWidth:560}}>Download your WCAG 2.2 AAA compliance report in multiple formats. Each export includes the full audit results, recommendations, and prioritized implementation roadmap.</p>
+    
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:14}}>
+      {formats.map(f=><button key={f.id} onClick={f.fn} aria-label={`Export as ${f.name}`} style={{background:T.w,borderRadius:18,border:`1px solid ${T.b1}`,padding:"22px 24px",textAlign:"left",cursor:"pointer",boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 24px rgba(28,25,23,.04)",transition:`all .25s ${T.ease}`,display:"flex",gap:16,alignItems:"flex-start"}}>
+        <div style={{width:52,height:52,borderRadius:14,background:`${f.color}08`,border:`1px solid ${f.color}15`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{f.icon}</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:15,fontWeight:700,color:T.ink,marginBottom:3,display:"flex",alignItems:"center",gap:6}}>
+            {f.name}
+            {f.id==="clip"&&copied&&<span style={{fontSize:10,color:T.green,fontWeight:600,padding:"2px 8px",borderRadius:20,background:T.gs}}>✓ Copied!</span>}
+          </div>
+          <div style={{fontSize:12.5,color:T.dm,lineHeight:1.55}}>{f.desc}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{flexShrink:0,marginTop:4}}><path d="M8 2v9M4 7l4 4 4-4" stroke={f.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 12v2h12v-2" stroke={f.color} strokeWidth="2" strokeLinecap="round"/></svg>
+      </button>)}
+    </div>
+
+    <div style={{marginTop:20,background:T.ts,borderRadius:14,padding:"16px 20px",border:`1px solid ${T.tm}`}}>
+      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 11H7V7h2v4zm0-6H7V3h2v2z"/></svg>
+        <span style={{fontSize:12,fontWeight:700,color:T.teal}}>Export Guide</span>
+      </div>
+      <div style={{fontSize:12.5,color:T.mt,lineHeight:1.65}}>
+        <strong>PDF</strong> — Best for sharing with leadership and compliance teams. Print to PDF or paper.<br/>
+        <strong>HTML</strong> — Self-contained styled report. Email as attachment or host on your site.<br/>
+        <strong>CSV</strong> — Import into Excel, Google Sheets, or project trackers for sprint planning.<br/>
+        <strong>JSON</strong> — Integrate into CI/CD pipelines, automated dashboards, or JIRA via API.<br/>
+        <strong>Markdown</strong> — Paste into GitHub Issues, Confluence pages, or README files.<br/>
+        <strong>Clipboard</strong> — Quick paste into Slack messages, emails, or meeting notes.
+      </div>
+    </div>
+  </div>;
+}
+
 const SAMPLE=`<!DOCTYPE html>\n<html>\n<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">\n  <title></title>\n</head>\n<body>\n  <div onclick="nav('/')" style="cursor:pointer">Home</div>\n  <h1>Welcome</h1><h3>Quick Start</h3>\n  <p style="text-align:justify;line-height:1.1;color:#999;background-color:#fff">Poor contrast.</p>\n  <img src="hero.jpg"><a href="/about">Click here</a><a href="/contact"></a>\n  <form><input type="text" name="email"><input type="password" autocomplete="off" onpaste="return false">\n  <select onchange="window.location=this.value"><option>Go</option></select>\n  <fieldset><input type="checkbox"> I agree</fieldset></form>\n  <div id="sid" aria-hidden="true"><a href="/p">Privacy</a><button>Contact</button></div>\n  <div id="sid">Dup</div>\n  <table><tr><td>Product</td><td>Price</td></tr></table>\n  <button style="width:18px;height:18px" aria-label="Close">×</button>\n  <svg width="80" height="80"><circle cx="40" cy="40" r="30" fill="blue"/></svg>\n  <footer><a href="/about">About</a></footer>\n</body></html>`;
 
-const TABS=[{k:"dashboard",l:"Dashboard",i:"◎"},{k:"audit",l:"Audit",i:"◉"},{k:"priority",l:"Priority",i:"⚡"},{k:"contrast",l:"Contrast",i:"◑"},{k:"preview",l:"Preview",i:"◫"}];
+const TABS=[{k:"dashboard",l:"Dashboard",i:"◎"},{k:"audit",l:"Audit",i:"◉"},{k:"priority",l:"Priority",i:"⚡"},{k:"contrast",l:"Contrast",i:"◑"},{k:"preview",l:"Preview",i:"◫"},{k:"export",l:"Export",i:"⬇"}];
 
 function App(){
   const[mode,setMode]=useState("url");const[url,setUrl]=useState("");const[html,setHtml]=useState("");
@@ -227,7 +478,7 @@ function App(){
   const[exp,setExp]=useState(null);const[rem,setRem]=useState("");
 
   const doAudit=useCallback((h,u)=>{if(!h?.trim())return;setHtml(h);setResults(analyze(h));setRem(autoFix(h));setTab("dashboard");if(u)setScUrl(u)},[]);
-  const scanUrl=useCallback(async()=>{if(!url.trim())return;setFSt("loading");setFErr("");setResults(null);const r=await fetchURL(url.trim());if(r.ok){setFSt("done");setScUrl(r.url);setFErr(r.via||'');doAudit(r.html,r.url)}else{setFSt("error");setFErr(r.error)}},[url,doAudit]);
+  const scanUrl=useCallback(async()=>{if(!url.trim())return;setFSt("loading");setFErr("");setResults(null);const r=await fetchURL(url.trim());if(r.ok){setFSt("done");setScUrl(r.url);setFErr(r.via||'');doAudit(r.html,r.url)}else{setFSt("error");setFErr(r)}},[url,doAudit]);
 
   const allIssues=useMemo(()=>{if(!results)return[];const l=[];results.forEach(r=>r.issues.filter(i=>i.s!==SV.I).forEach(i=>l.push({...i,ruleId:r.id,ruleName:r.n,level:r.l,rec:getRec(r.id,i)})));return l.sort((a,b)=>a.rec.p-b.rec.p)},[results]);
   const filtered=useMemo(()=>{if(!results)return[];return results.filter(r=>{if(fL!=="ALL"&&r.l!==fL)return false;if(fP!=="ALL"&&r.pr!==fP)return false;if(fS==="ISSUES"&&r.ok)return false;if(fS==="PASSED"&&!r.ok)return false;return true})},[results,fL,fS,fP]);
@@ -283,7 +534,40 @@ function App(){
         {[["url","🔗  Scan URL"],["html","</>  Paste HTML"]].map(([m,l])=><button key={m} role="tab" aria-selected={mode===m} onClick={()=>{setMode(m);setResults(null);setFSt(null)}} style={{padding:"12px 24px",fontSize:13.5,fontWeight:mode===m?700:500,cursor:"pointer",border:`1px solid ${T.b1}`,borderBottom:mode===m?`3px solid ${T.teal}`:`1px solid ${T.b1}`,background:mode===m?T.bg:"transparent",color:mode===m?T.teal:T.dm,borderRadius:m==="url"?"14px 0 0 0":"0 14px 0 0",minHeight:52,transition:`all .2s ${T.ease}`}}>{l}</button>)}
       </div>
       {mode==="url"&&<div style={{position:"relative"}}><div style={{display:"flex",gap:10,marginBottom:8}}><input type="url" value={url} onChange={e=>{setUrl(e.target.value);setFSt(null)}} onKeyDown={e=>{if(e.key==="Enter")scanUrl()}} placeholder="https://example.com" aria-label="URL" style={{flex:1,padding:"14px 18px",background:T.bg,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:14,minHeight:52}}/><button onClick={scanUrl} disabled={!url.trim()||fSt==="loading"} style={{padding:"14px 30px",fontSize:14,borderRadius:14,border:`2px solid ${T.teal}`,background:url.trim()?T.teal:"transparent",color:url.trim()?T.w:T.teal,cursor:url.trim()?"pointer":"default",fontWeight:700,minHeight:52,boxShadow:url.trim()?`0 4px 14px rgba(13,115,119,.25)`:"none"}}>{fSt==="loading"?<><span className="spin" style={{marginRight:8}}/>Scanning…</>:"◉ Scan"}</button></div>
-        {fSt==="error"&&<div role="alert" style={{padding:"12px 18px",background:T.rs,borderRadius:14,border:`1px solid ${T.rm}`}}><p style={{fontSize:13,color:T.rose,lineHeight:1.6,margin:"0 0 8px"}}>{fErr}</p><button onClick={scanUrl} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.w,color:T.mt,cursor:"pointer",fontWeight:600}}>↻ Retry</button></div>}
+        {fSt==="error"&&<div role="alert" className="fade" style={{borderRadius:16,border:`1px solid ${T.rm}`,overflow:"hidden",marginTop:4}}>
+          <div style={{padding:"16px 20px",background:T.rs}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill={T.rose}><circle cx="10" cy="10" r="9"/><path d="M10 6v5M10 13v1" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
+              <span style={{fontSize:14,fontWeight:700,color:T.rose}}>{fErr?.inSandbox?"Preview Sandbox Restriction":"Could not reach the URL"}</span>
+            </div>
+            <p style={{fontSize:13,color:T.mt,lineHeight:1.65,margin:0}}>
+              {fErr?.inSandbox
+                ?"This preview runs inside a sandboxed environment that blocks network requests. The tool works correctly when deployed to your website."
+                :`Attempted 3 retry rounds across 5 proxies. The site may block automated requests.`}
+            </p>
+          </div>
+          <div style={{padding:"16px 20px",background:T.w,borderTop:`1px solid ${T.b1}`}}>
+            <div style={{fontSize:12,fontWeight:700,color:T.ink,marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 11H7V7h2v4zm0-6H7V3h2v2z"/></svg>
+              Quick Fix — Paste the HTML source
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {[
+                ["1","Open the URL in a new tab",`Navigate to ${url} in your browser`],
+                ["2","View Page Source","Right-click anywhere → View Page Source (or Ctrl+U / ⌘+U)"],
+                ["3","Copy all","Press Ctrl+A then Ctrl+C (or ⌘+A then ⌘+C)"],
+                ["4","Paste here","Switch to the </> HTML tab above and paste"]
+              ].map(([n,title,desc])=><div key={n} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{width:24,height:24,borderRadius:8,background:T.ts,border:`1px solid ${T.tm}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:T.teal,flexShrink:0}}>{n}</span>
+                <div><div style={{fontSize:13,fontWeight:600,color:T.ink}}>{title}</div><div style={{fontSize:12,color:T.dm}}>{desc}</div></div>
+              </div>)}
+            </div>
+            <div style={{display:"flex",gap:8,marginTop:14}}>
+              <button onClick={scanUrl} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:`2px solid ${T.teal}`,background:T.teal,color:T.w,cursor:"pointer",fontWeight:700}}>↻ Retry Scan</button>
+              <button onClick={()=>{setMode("html");setFSt(null)}} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.bg,color:T.mt,cursor:"pointer",fontWeight:600}}>Switch to HTML tab</button>
+            </div>
+          </div>
+        </div>}
         {fSt==="done"&&<div role="status" style={{fontSize:13,color:T.teal,padding:"6px 0",fontWeight:600,display:"flex",alignItems:"center",gap:6}}><svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>Fetched {scUrl} via {fErr} — {html.length.toLocaleString()} characters</div>}
       </div>}
       {mode==="html"&&<div style={{position:"relative"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:6}}><span style={{fontSize:11,textTransform:"uppercase",letterSpacing:".07em",color:T.dm,fontWeight:700}}>Source</span><div style={{display:"flex",gap:8}}><button onClick={()=>{setHtml(SAMPLE);setResults(null)}} style={{padding:"10px 18px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.bg,color:T.mt,cursor:"pointer",fontWeight:500}}>Load Sample</button><button onClick={()=>doAudit(html,"")} disabled={!html.trim()} style={{padding:"10px 24px",fontSize:12,borderRadius:10,border:`2px solid ${T.teal}`,background:html.trim()?T.teal:"transparent",color:html.trim()?T.w:T.teal,cursor:html.trim()?"pointer":"default",fontWeight:700,boxShadow:html.trim()?`0 4px 14px rgba(13,115,119,.25)`:"none"}}>▶ Audit</button></div></div><textarea value={html} onChange={e=>{setHtml(e.target.value);setResults(null)}} placeholder="Paste HTML…" aria-label="HTML source" style={{width:"100%",minHeight:130,maxHeight:250,padding:"16px 18px",background:T.bg,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:13,lineHeight:1.65,resize:"vertical",boxSizing:"border-box"}}/></div>}
@@ -395,6 +679,8 @@ function App(){
         <iframe ref={ref} sandbox="allow-same-origin" style={{width:"100%",height:320,border:`1px solid ${T.b1}`,borderRadius:16,background:T.w,boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 28px rgba(28,25,23,.05)"}} title={l}/>
       </div>)}</div>
     </div>}
+
+    {tab==="export"&&<ExportTab results={results} stats={stats} scUrl={scUrl} allIssues={allIssues}/>}
 
     </div></>}
 
