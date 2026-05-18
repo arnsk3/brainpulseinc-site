@@ -10,125 +10,129 @@
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.9/babel.min.js"></script>
-<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',system-ui,sans-serif;background:#FBF9F6;color:#1C1917;min-height:100vh;-webkit-font-smoothing:antialiased}</style>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#FBF9F6;color:#1C1917;min-height:100vh;-webkit-font-smoothing:antialiased}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.fade{animation:fadeUp .4s cubic-bezier(.22,1,.36,1)}
+.spin{width:16px;height:16px;border:2.5px solid rgba(13,115,119,.15);border-top-color:#0D7377;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
+.float{animation:float 3s ease-in-out infinite}
+.pulse-dot{animation:pulse 2s ease-in-out infinite}
+button,input,textarea,select{font-family:'DM Sans',sans-serif}
+:focus-visible{outline:3px solid #0D7377;outline-offset:2px}
+textarea:focus,input:focus{outline:none;border-color:rgba(13,115,119,.25)!important}
+</style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useCallback,useMemo,useRef,useEffect}=React;
 
-/* BRAINPULSE A11Y — Heavy Visual Edition
-   brainpulseinc.com design: #FBF9F6 cream, #0D7377 teal, Libre Baskerville, hexagonal motifs */
-
-const T={bg:"#FBF9F6",bg2:"#F5F2ED",bg3:"#ECEAE4",w:"#fff",ink:"#1C1917",ink2:"#292524",mt:"#44403C",dm:"#57534E",teal:"#0D7377",tealLt:"#11959A",ts:"rgba(13,115,119,.06)",tm:"rgba(13,115,119,.14)",peach:"#92400E",ps:"rgba(146,64,14,.06)",rose:"#9F1239",rs:"rgba(159,18,57,.06)",rm:"rgba(159,18,57,.12)",green:"#166534",gs:"rgba(22,101,52,.06)",navy:"#1E3A5F",ns:"rgba(30,58,95,.06)",b1:"rgba(28,25,23,.07)",b2:"rgba(28,25,23,.12)",b3:"rgba(28,25,23,.18)",serif:"'Libre Baskerville',Georgia,serif",sans:"'DM Sans',system-ui,sans-serif",mono:"'JetBrains Mono',monospace",ease:"cubic-bezier(.22,1,.36,1)"};
+/* ═══ TOKENS ═══ */
+const T={bg:"#FBF9F6",bg2:"#F5F2ED",bg3:"#ECEAE4",w:"#fff",ink:"#1C1917",ink2:"#292524",mt:"#44403C",dm:"#57534E",teal:"#0D7377",tealLt:"#11959A",ts:"rgba(13,115,119,.06)",tm:"rgba(13,115,119,.14)",peach:"#92400E",ps:"rgba(146,64,14,.06)",rose:"#9F1239",rs:"rgba(159,18,57,.06)",rm:"rgba(159,18,57,.12)",green:"#166534",gs:"rgba(22,101,52,.06)",navy:"#1E3A5F",ns:"rgba(30,58,95,.06)",b1:"rgba(28,25,23,.07)",b2:"rgba(28,25,23,.12)",serif:"'Libre Baskerville',Georgia,serif",sans:"'DM Sans',sans-serif",mono:"'JetBrains Mono',monospace"};
 const SC={critical:T.rose,major:T.peach,minor:T.navy,info:T.dm};
 const SB={critical:T.rs,major:T.ps,minor:T.ns,info:"rgba(87,83,78,.04)"};
 const SV={C:"critical",M:"major",m:"minor",I:"info"};
 const PLBL=["","P1 — Fix Now","P2 — High","P3 — Medium","P4 — Low"];
 const PC=["",T.rose,T.peach,T.navy,T.dm];
 
-// ── Utilities ──
+/* ═══ UTILS ═══ */
 const NC={white:[255,255,255],black:[0,0,0],red:[255,0,0],green:[0,128,0],blue:[0,0,255],yellow:[255,255,0],gray:[128,128,128],grey:[128,128,128],orange:[255,165,0],purple:[128,0,128],pink:[255,192,203],navy:[0,0,128],teal:[0,128,128],maroon:[128,0,0],lime:[0,255,0],aqua:[0,255,255],silver:[192,192,192],transparent:[255,255,255]};
 function pC(s){if(!s)return null;s=s.trim().toLowerCase();if(NC[s])return NC[s];let m=s.match(/^#([0-9a-f]{3,8})$/);if(m){let h=m[1];if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]}m=s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);if(m)return[+m[1],+m[2],+m[3]];return null}
 function rL([r,g,b]){const f=c=>{c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)}
 function CR(a,b){const l1=rL(a),l2=rL(b);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)}
 function fTO(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).finally(()=>clearTimeout(t))}
-async function fetchURL(url,attempt=1){if(!/^https?:\/\//i.test(url))url='https://'+url;const e=encodeURIComponent(url);const S=[{n:'codetabs',u:`https://api.codetabs.com/v1/proxy?quest=${e}`,m:'t'},{n:'allorigins',u:`https://api.allorigins.win/raw?url=${e}`,m:'t'},{n:'allorigins-json',u:`https://api.allorigins.win/get?url=${e}`,m:'j'},{n:'corsproxy',u:`https://corsproxy.io/?${e}`,m:'t'},{n:'direct',u:url,m:'t'}];const tried=[];for(const s of S){try{const r=await fTO(s.u,12000);if(!r.ok){tried.push(`${s.n}:${r.status}`);continue}let h='';if(s.m==='j'){const j=await r.json();h=j.contents||''}else{h=await r.text()}if(h.length>80&&h.includes('<'))return{ok:true,html:h,url,via:s.n};tried.push(`${s.n}:${h.length}ch`)}catch(e){tried.push(`${s.n}:${e.name==='AbortError'?'timeout':'err'}`)}}
-  if(attempt<3){await new Promise(r=>setTimeout(r,1500*attempt));return fetchURL(url,attempt+1)}
-  const inSandbox=tried.every(t=>t.includes('err'));
-  return{ok:false,html:'',url,tried,inSandbox,error:inSandbox?'sandbox':'proxy'}}
+async function fetchURL(url,attempt=1){if(!/^https?:\/\//i.test(url))url='https://'+url;const e=encodeURIComponent(url);const S=[{n:'codetabs',u:`https://api.codetabs.com/v1/proxy?quest=${e}`,m:'t'},{n:'allorigins',u:`https://api.allorigins.win/raw?url=${e}`,m:'t'},{n:'allorigins-json',u:`https://api.allorigins.win/get?url=${e}`,m:'j'},{n:'corsproxy',u:`https://corsproxy.io/?${e}`,m:'t'},{n:'direct',u:url,m:'t'}];const tried=[];for(const s of S){try{const r=await fTO(s.u,12000);if(!r.ok){tried.push(`${s.n}:${r.status}`);continue}let h='';if(s.m==='j'){const j=await r.json();h=j.contents||''}else{h=await r.text()}if(h.length>80&&h.includes('<'))return{ok:true,html:h,url,via:s.n};tried.push(`${s.n}:${h.length}ch`)}catch(er){tried.push(`${s.n}:${er.name==='AbortError'?'timeout':'err'}`)}}if(attempt<3){await new Promise(r=>setTimeout(r,1500*attempt));return fetchURL(url,attempt+1)}const inSandbox=tried.every(t=>t.includes('err'));return{ok:false,html:'',url,tried,inSandbox,error:inSandbox?'sandbox':'proxy'}}
 
-// ── Decorative SVGs ──
-const HexIcon=({size=52,children})=><svg viewBox="0 0 52 52" width={size} height={size} aria-hidden="true"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke={T.teal} strokeWidth="1.6" strokeLinejoin="round"/><path d="M26 14L38 21V33L26 40L14 33V21Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".2"/>{children}</svg>;
+/* ═══ DECORATIVE SVGs ═══ */
+const HexBg=({w=500,h=200,opacity=.04})=><svg width={w} height={h} style={{position:"absolute",top:0,right:0,opacity,pointerEvents:"none"}} aria-hidden="true">{Array.from({length:Math.ceil(w/32)}).flatMap((_,x)=>Array.from({length:Math.ceil(h/28)}).map((_,y)=>{const cx=x*32+(y%2?16:0),cy=y*21;return<path key={`${x}-${y}`} d={`M${cx} ${cy-10}L${cx+8.66} ${cy-5}L${cx+8.66} ${cy+5}L${cx} ${cy+10}L${cx-8.66} ${cy+5}L${cx-8.66} ${cy-5}Z`} fill="none" stroke={T.teal} strokeWidth=".7"/>}))}</svg>;
 
-const DotGrid=({w=200,h=120,spacing=18})=><svg width={w} height={h} aria-hidden="true" style={{position:"absolute",opacity:.3}}>{Array.from({length:Math.ceil(w/spacing)}).flatMap((_,x)=>Array.from({length:Math.ceil(h/spacing)}).map((_,y)=><circle key={`${x}-${y}`} cx={x*spacing+9} cy={y*spacing+9} r="1.2" fill={T.teal} opacity=".35"/>))}</svg>;
+const DotBg=({w=300,h=120,opacity=.25})=><svg width={w} height={h} style={{position:"absolute",opacity,pointerEvents:"none"}} aria-hidden="true">{Array.from({length:Math.ceil(w/16)}).flatMap((_,x)=>Array.from({length:Math.ceil(h/16)}).map((_,y)=><circle key={`${x}-${y}`} cx={x*16+8} cy={y*16+8} r="1" fill={T.teal}/>))}</svg>;
 
-const HexGrid=({w=400,h=200})=>{const hexW=30,hexH=26;return<svg width={w} height={h} aria-hidden="true" style={{position:"absolute",opacity:.06}}>{Array.from({length:Math.ceil(w/hexW)+1}).flatMap((_,x)=>Array.from({length:Math.ceil(h/hexH)+1}).map((_,y)=>{const cx=x*hexW+(y%2?hexW/2:0),cy=y*hexH*0.75;const d=`M${cx} ${cy-10}L${cx+8.66} ${cy-5}L${cx+8.66} ${cy+5}L${cx} ${cy+10}L${cx-8.66} ${cy+5}L${cx-8.66} ${cy-5}Z`;return<path key={`${x}-${y}`} d={d} fill="none" stroke={T.teal} strokeWidth=".8"/>}))}</svg>};
+const WaveSvg=({color=T.teal,h=50})=><svg viewBox="0 0 1440 50" preserveAspectRatio="none" style={{display:"block",width:"100%",height:h}} aria-hidden="true"><path d={`M0 25C240 5 480 45 720 25C960 5 1200 45 1440 25L1440 50L0 50Z`} fill={color} opacity=".04"/><path d={`M0 30C300 15 600 45 900 25C1100 10 1300 35 1440 20L1440 50L0 50Z`} fill={color} opacity=".03"/></svg>;
 
-const WaveDecor=({color=T.teal,height=40})=><svg viewBox="0 0 1200 40" preserveAspectRatio="none" style={{width:"100%",height,display:"block"}} aria-hidden="true"><path d={`M0 20 C200 ${height-5} 400 5 600 20 C800 35 1000 5 1200 20 L1200 ${height} L0 ${height} Z`} fill={color} opacity=".04"/></svg>;
+const GradientBar=({color1=T.teal,color2="#11959A",height=4})=><div style={{height,background:`linear-gradient(90deg,${color1},${color2},${color1})`,borderRadius:2}} aria-hidden="true"/>;
 
-// ── Donut Chart ──
-function Donut({value,size=100,strokeW=8,color,label,sublabel,animate=true}){
+const FloatingHex=({size=40,x,y,delay=0})=><svg width={size} height={size} viewBox="0 0 40 40" style={{position:"absolute",left:x,top:y,opacity:.08,animation:`float 4s ease-in-out ${delay}s infinite`}} aria-hidden="true"><path d="M20 2L36 11V29L20 38L4 29V11Z" fill="none" stroke={T.teal} strokeWidth="1.5"/></svg>;
+
+const IllustratedIcon=({type,size=48})=>{
+  const s=size;
+  const icons={
+    eye:<svg width={s} height={s} viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="24" rx="20" ry="12" stroke={T.teal} strokeWidth="2.5"/><circle cx="24" cy="24" r="6" stroke={T.teal} strokeWidth="2.5"/><circle cx="24" cy="24" r="2.5" fill={T.teal}/><path d="M4 24c4-8 12-14 20-14s16 6 20 14" stroke={T.teal} strokeWidth="1" opacity=".2"/></svg>,
+    keyboard:<svg width={s} height={s} viewBox="0 0 48 48" fill="none"><rect x="4" y="14" width="40" height="22" rx="4" stroke={T.teal} strokeWidth="2.5"/><rect x="8" y="18" width="6" height="5" rx="1.5" stroke={T.teal} strokeWidth="1.5"/><rect x="16" y="18" width="6" height="5" rx="1.5" stroke={T.teal} strokeWidth="1.5"/><rect x="24" y="18" width="6" height="5" rx="1.5" stroke={T.teal} strokeWidth="1.5"/><rect x="34" y="18" width="6" height="5" rx="1.5" stroke={T.teal} strokeWidth="1.5"/><rect x="10" y="25" width="6" height="5" rx="1.5" stroke={T.teal} strokeWidth="1.5"/><rect x="18" y="25" width="12" height="5" rx="1.5" fill={T.ts} stroke={T.teal} strokeWidth="1.5"/><rect x="32" y="25" width="6" height="5" rx="1.5" stroke={T.teal} strokeWidth="1.5"/><rect x="14" y="32" width="20" height="2" rx="1" fill={T.teal} opacity=".15"/></svg>,
+    brain:<svg width={s} height={s} viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke={T.teal} strokeWidth="2.5"/><path d="M18 18c0-3 3-5 6-5s6 2 6 5c0 2-2 3-4 4v2" stroke={T.teal} strokeWidth="2.5" strokeLinecap="round"/><circle cx="24" cy="33" r="2" fill={T.teal}/><circle cx="24" cy="24" r="12" stroke={T.teal} strokeWidth="1" opacity=".15"/></svg>,
+    shield:<svg width={s} height={s} viewBox="0 0 48 48" fill="none"><path d="M24 4L40 12V26C40 34 33 42 24 44C15 42 8 34 8 26V12L24 4Z" stroke={T.teal} strokeWidth="2.5" strokeLinejoin="round"/><path d="M24 12L32 16V24C32 28 29 32 24 34C19 32 16 28 16 24V16L24 12Z" fill={T.ts} stroke={T.teal} strokeWidth="1" opacity=".3"/><path d="M18 24l4 4 8-8" stroke={T.teal} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    check:<svg width={s} height={s} viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke={T.teal} strokeWidth="2.5"/><path d="M14 24l7 7 13-13" stroke={T.teal} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    warn:<svg width={s} height={s} viewBox="0 0 48 48" fill="none"><path d="M24 6L42 40H6L24 6Z" stroke={T.rose} strokeWidth="2.5" strokeLinejoin="round"/><path d="M24 18v10" stroke={T.rose} strokeWidth="2.5" strokeLinecap="round"/><circle cx="24" cy="33" r="2" fill={T.rose}/></svg>,
+  };
+  return icons[type]||null;
+};
+
+/* ═══ DONUT (clean, label OUTSIDE) ═══ */
+function Donut({value,size=100,strokeW=8,sublabel}){
   const [v,setV]=useState(0);
-  useEffect(()=>{if(animate){const t=setTimeout(()=>setV(value),80);return()=>clearTimeout(t)}else setV(value)},[value,animate]);
+  useEffect(()=>{const t=setTimeout(()=>setV(value),80);return()=>clearTimeout(t)},[value]);
   const r=(size-strokeW*2)/2,c=2*Math.PI*r,off=c*(1-v/100);
-  const clr=color||(v>=80?T.teal:v>=50?T.peach:T.rose);
-  return<div style={{display:"inline-flex",flexDirection:"column",alignItems:"center"}} role="img" aria-label={`${label||''}: ${value}%`}>
-    <div style={{position:"relative",display:"inline-flex",alignItems:"center",justifyContent:"center",width:size,height:size}}>
-      <svg width={size} height={size} style={{transform:"rotate(-90deg)",position:"absolute"}}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={T.bg3} strokeWidth={strokeW}/>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={clr} strokeWidth={strokeW} strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:`stroke-dashoffset 1.2s ${T.ease}`,filter:`drop-shadow(0 0 4px ${clr}40)`}}/>
-      </svg>
-      <div style={{fontSize:size*.26,fontFamily:T.mono,fontWeight:700,color:clr,lineHeight:1,position:"relative"}}>{v}</div>
+  const clr=v>=80?T.teal:v>=50?T.peach:T.rose;
+  return<div style={{display:"inline-flex",flexDirection:"column",alignItems:"center"}}>
+    <div style={{position:"relative",width:size,height:size,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <svg width={size} height={size} style={{transform:"rotate(-90deg)",position:"absolute"}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={T.bg3} strokeWidth={strokeW}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={clr} strokeWidth={strokeW} strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{transition:"stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1)",filter:`drop-shadow(0 0 6px ${clr}30)`}}/></svg>
+      <span style={{fontSize:size*.24,fontFamily:T.mono,fontWeight:700,color:clr,position:"relative"}}>{v}</span>
     </div>
-    {sublabel&&<div style={{fontSize:Math.max(8,size*.07),color:T.dm,marginTop:4,textTransform:"uppercase",letterSpacing:".1em",fontWeight:700}}>{sublabel}</div>}
+    {sublabel&&<div style={{fontSize:9,color:T.dm,marginTop:6,textTransform:"uppercase",letterSpacing:".12em",fontWeight:700}}>{sublabel}</div>}
   </div>;
 }
 
-// ── Animated Stat ──
-function AnimStat({value,label,color,icon}){
+/* ═══ ANIMATED STAT CARD ═══ */
+function StatCard({value,label,color,icon}){
   const[v,setV]=useState(0);
-  useEffect(()=>{let start=0;const step=()=>{start+=Math.ceil(value/20);if(start>=value){setV(value);return}setV(start);requestAnimationFrame(step)};requestAnimationFrame(step)},[value]);
-  return<div style={{background:T.w,borderRadius:16,border:`1px solid ${T.b1}`,padding:"20px 14px 18px",textAlign:"center",boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 24px rgba(28,25,23,.04)",position:"relative",overflow:"hidden",transition:`all .2s ${T.ease}`}}>
-    {icon&&<div style={{marginBottom:10,display:"flex",justifyContent:"center"}}><div style={{width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center"}}>{icon}</div></div>}
-    <div style={{fontSize:26,fontFamily:T.mono,fontWeight:700,color,lineHeight:1,position:"relative",zIndex:1}}>{v}</div>
-    <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".08em",color:T.dm,marginTop:6,fontWeight:600,position:"relative",zIndex:1}}>{label}</div>
-    <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${color}00,${color}25,${color}00)`}} aria-hidden="true"/>
+  useEffect(()=>{let s=0;const step=()=>{s+=Math.ceil(value/15);if(s>=value){setV(value);return}setV(s);requestAnimationFrame(step)};requestAnimationFrame(step)},[value]);
+  return<div style={{background:T.w,borderRadius:18,border:`1px solid ${T.b1}`,padding:"22px 16px 20px",textAlign:"center",boxShadow:"0 2px 10px rgba(28,25,23,.04)",position:"relative",overflow:"hidden"}}>
+    {icon&&<div style={{marginBottom:10,display:"flex",justifyContent:"center"}}>{icon}</div>}
+    <div style={{fontSize:28,fontFamily:T.mono,fontWeight:700,color,lineHeight:1}}>{v}</div>
+    <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".1em",color:T.dm,marginTop:7,fontWeight:600}}>{label}</div>
+    <div style={{position:"absolute",bottom:0,left:"10%",right:"10%",height:3,borderRadius:2,background:`linear-gradient(90deg,transparent,${color}30,transparent)`}}/>
   </div>;
 }
 
-// ── Progress Bar with glow ──
+/* ═══ GLOW PROGRESS BAR ═══ */
 function GlowBar({value,color,label,detail}){
   const[w,setW]=useState(0);
-  useEffect(()=>{setTimeout(()=>setW(value),100)},[value]);
-  return<div style={{marginBottom:14}}>
+  useEffect(()=>{setTimeout(()=>setW(value),120)},[value]);
+  return<div style={{marginBottom:6}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:5}}>
       <span style={{fontSize:14,fontWeight:600,color:T.ink}}>{label}</span>
       <span style={{fontSize:13,fontFamily:T.mono,fontWeight:700,color}}>{value}%</span>
     </div>
-    <div style={{height:10,background:T.bg3,borderRadius:5,overflow:"hidden",position:"relative"}}>
-      <div style={{height:"100%",background:`linear-gradient(90deg,${color},${color}cc)`,borderRadius:5,width:`${w}%`,transition:`width 1s ${T.ease}`,boxShadow:`0 0 12px ${color}40`,position:"relative"}}>
-        <div style={{position:"absolute",top:0,right:0,bottom:0,width:30,background:`linear-gradient(90deg,transparent,${color}60)`,borderRadius:"0 5px 5px 0"}} aria-hidden="true"/>
-      </div>
+    <div style={{height:10,background:T.bg3,borderRadius:5,overflow:"hidden"}}>
+      <div style={{height:"100%",background:`linear-gradient(90deg,${color},${color}bb)`,borderRadius:5,width:`${w}%`,transition:"width 1s cubic-bezier(.22,1,.36,1)",boxShadow:`0 0 14px ${color}35`}}/>
     </div>
-    {detail&&<div style={{fontSize:11,color:T.dm,marginTop:4}}>{detail}</div>}
+    {detail&&<div style={{fontSize:11.5,color:T.dm,marginTop:5}}>{detail}</div>}
   </div>;
 }
 
-// ── POUR Icon ──
-const POURIcon=({principle,size=32})=>{
-  const icons={
-    Perceivable:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="5" stroke={T.teal} strokeWidth="2"/><path d="M16 20v6M10 24h12" stroke={T.teal} strokeWidth="2" strokeLinecap="round"/><circle cx="16" cy="12" r="2" fill={T.teal}/></svg>,
-    Operable:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><rect x="8" y="10" width="16" height="12" rx="2" stroke={T.teal} strokeWidth="2"/><circle cx="12" cy="16" r="1.5" fill={T.teal}/><circle cx="16" cy="16" r="1.5" fill={T.teal}/><circle cx="20" cy="16" r="1.5" fill={T.teal}/><path d="M14 6h4" stroke={T.teal} strokeWidth="2" strokeLinecap="round"/></svg>,
-    Understandable:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" stroke={T.teal} strokeWidth="2"/><path d="M13 14c0-2 1.5-3 3-3s3 1 3 3c0 1.5-1.5 2-3 3v1" stroke={T.teal} strokeWidth="2" strokeLinecap="round"/><circle cx="16" cy="23" r="1.2" fill={T.teal}/></svg>,
-    Robust:<svg width={size} height={size} viewBox="0 0 32 32" fill="none"><path d="M16 6L26 12V20L16 26L6 20V12Z" stroke={T.teal} strokeWidth="2" strokeLinejoin="round"/><path d="M16 14L22 17.5V23" stroke={T.teal} strokeWidth="1.5" opacity=".3"/><circle cx="16" cy="16" r="3" fill="none" stroke={T.teal} strokeWidth="2"/></svg>,
-  };
-  return icons[principle]||null;
-};
-
-// ── Recommendation DB (same as before, condensed) ──
+/* ═══ REC DB (condensed) ═══ */
 const RDB={
-"1.1.1":{x:"Screen readers can't interpret images without alt text — 8.7% of US adults have vision disabilities.",dt:"Describe PURPOSE: 'Submit order' not 'green button'. alt=\"\" for decorative.",e:"Quick",p:1,gen:(el)=>{const nm=el.match(/src="([^"]+)"/)?.[1]?.split('/').pop()?.replace(/\.\w+$/,'').replace(/[-_]/g,' ')||'image';return{before:`<img src="...">`,after:`<img src="..." alt="${nm}" />`,bH:`<div style="border:2px dashed ${T.rose};padding:12px;border-radius:12px"><div style="width:100px;height:60px;background:#eee;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:28px">🖼</div><p style="color:${T.rose};font-size:12px;margin:8px 0 0">⚠ No alt</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:12px;border-radius:12px"><div style="width:100px;height:60px;background:#eee;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:28px">🖼</div><p style="color:${T.green};font-size:12px;margin:8px 0 0">✓ alt="${nm}"</p></div>`}}},
-"1.4.3":{x:"Low contrast affects 12M+ with vision impairments, 8% of men with color blindness.",dt:"AAA ≥7:1. #1C1917 on #FBF9F6 = 15.4:1. Never #999 on white.",e:"Quick",p:1,gen:()=>({before:`color:#999;background:#fff`,after:`color:#1C1917;background:#FBF9F6`,bH:`<p style="color:#999;background:#fff;padding:10px;border:2px dashed ${T.rose};border-radius:12px;font-size:14px">2.85:1 — fails</p>`,aH:`<p style="color:#1C1917;background:#FBF9F6;padding:10px;border:2px solid ${T.green};border-radius:12px;font-size:14px">15.4:1 ✓</p>`})},
-"1.4.8":{x:"Justified text creates 'rivers' disrupting reading for 15-20% with dyslexia.",dt:"text-align:left, line-height≥1.5, max-width~80ch.",e:"Quick",p:2,gen:()=>({before:`text-align:justify;line-height:1.1`,after:`text-align:left;line-height:1.6`,bH:`<p style="text-align:justify;line-height:1.1;max-width:220px;border:2px dashed ${T.rose};padding:10px;border-radius:12px;font-size:12px;color:#333;background:#fff">Justified text creates rivers of white space making reading difficult.</p>`,aH:`<p style="text-align:left;line-height:1.6;max-width:220px;border:2px solid ${T.green};padding:10px;border-radius:12px;font-size:12px;color:#333;background:#fff">Left-aligned with generous spacing is easier to read.</p>`})},
-"1.4.10":{x:"Blocking zoom locks out users needing 400%+ magnification.",dt:"Remove maximum-scale and user-scalable=no.",e:"Quick",p:1,gen:()=>({before:`user-scalable=no`,after:`initial-scale=1`,bH:`<code style="display:block;font-size:12px;border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff">user-scalable=<b style="color:${T.rose}">no</b></code>`,aH:`<code style="display:block;font-size:12px;border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff">initial-scale=1 <b style="color:${T.green}">✓</b></code>`})},
-"2.1.1":{x:"Motor-impaired users navigate via keyboard. Click-only = invisible walls.",dt:"<div onclick> → <button>. Native keyboard support built-in.",e:"Medium",p:1,gen:(el)=>{const t=el.match(/>([^<]+)</)?.[1]||'Action';return{before:`<div onclick="fn()">${t}</div>`,after:`<button onclick="fn()">${t}</button>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="padding:8px 16px;background:${T.bg2};border-radius:8px;display:inline-block;font-size:13px">${t}</div><p style="color:${T.rose};font-size:12px;margin:6px 0 0">⚠ div — no keyboard</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><button style="padding:8px 16px;background:${T.teal};color:white;border:none;border-radius:8px;font-size:13px">${t}</button><p style="color:${T.green};font-size:12px;margin:6px 0 0">✓ button</p></div>`}}},
-"2.4.1":{x:"Keyboard users Tab through 30+ nav links to reach content. Skip links solve this.",dt:"First focusable = skip link. Use <header>,<nav>,<main>,<footer>.",e:"Quick",p:1,gen:()=>({before:`<nav>...30 links...</nav>\n<div>content</div>`,after:`<a href="#main">Skip to content</a>\n<header><nav>...</nav></header>\n<main id="main">...</main>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="background:${T.bg2};padding:6px 10px;border-radius:8px;font-size:11px;color:${T.dm};margin-bottom:6px">🔗→🔗→🔗→...→🔗</div><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ No skip</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><a href="#" style="display:inline-block;padding:6px 14px;background:${T.teal};color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;margin-bottom:6px">Skip to content</a><div style="border:1px solid ${T.green};padding:6px;border-radius:8px;font-size:13px;margin-top:4px">main — 1 keypress ✓</div></div>`})},
-"2.4.6":{x:"Heading skips break the outline for screen reader navigation.",dt:"Sequential: h1→h2→h3. Never use for visual sizing.",e:"Medium",p:2,gen:()=>({before:`<h1>Welcome</h1>\n<h3>Guide</h3>`,after:`<h1>Welcome</h1>\n<h2>Guide</h2>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="font-size:18px;font-weight:700">h1</div><div style="font-size:14px;font-weight:600;color:${T.rose}">h3 ⚠ skip</div></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><div style="font-size:18px;font-weight:700">h1</div><div style="font-size:16px;font-weight:600">h2 ✓</div></div>`})},
-"2.5.5":{x:"Touch targets <44×44px cause mis-taps. #1 AAA failure.",dt:"padding+margin trick: padding:12px;margin:-12px;box-sizing:content-box",e:"Quick",p:1,gen:()=>({before:`.close{width:20px;height:20px}`,after:`.close{width:20px;height:20px;\npadding:12px;margin:-12px;\nbox-sizing:content-box}`,bH:`<div style="border:2px dashed ${T.rose};padding:18px;border-radius:12px;background:#fff;text-align:center"><div style="position:relative;display:inline-block"><button style="width:20px;height:20px;font-size:14px;border:1px solid ${T.b2};border-radius:6px;background:${T.bg2};padding:0;line-height:20px">×</button><div style="position:absolute;top:-12px;left:-12px;width:44px;height:44px;border:1px dashed ${T.rose};border-radius:6px;pointer-events:none"></div></div><p style="color:${T.rose};font-size:12px;margin:10px 0 0">⚠ 20px &lt; 44px</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:18px;border-radius:12px;background:#fff;text-align:center"><button style="width:20px;height:20px;font-size:14px;border:1px solid ${T.b2};border-radius:6px;background:${T.bg2};padding:12px;margin:-12px;box-sizing:content-box;line-height:20px">×</button><p style="color:${T.green};font-size:12px;margin:10px 0 0">✓ Touch 44px</p></div>`})},
-"3.1.1":{x:"Without lang, screen readers guess the language — often wrong.",dt:"Set lang on <html>.",e:"Quick",p:1,gen:()=>({before:`<html>`,after:`<html lang="en">`,bH:`<code style="display:block;border:2px dashed ${T.rose};padding:8px;border-radius:8px;background:#fff;font-size:12px">&lt;html&gt; <span style="color:${T.rose}">no lang</span></code>`,aH:`<code style="display:block;border:2px solid ${T.green};padding:8px;border-radius:8px;background:#fff;font-size:12px">&lt;html lang="en"&gt; <span style="color:${T.green}">✓</span></code>`})},
-"3.3.2":{x:"Unlabeled inputs: screen readers say 'edit text, blank'.",dt:"Visible <label> with for/id.",e:"Quick",p:1,gen:(el)=>{const n=el.match(/name="([^"]+)"/)?.[1]||'field';return{before:el,after:`<label for="${n}">${n.charAt(0).toUpperCase()+n.slice(1)}</label>\n<input id="${n}">`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><input disabled placeholder="${n}" style="padding:8px;border:1px solid ${T.b2};border-radius:8px;font-size:13px;width:180px;background:#fff"><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ no label</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:3px">${n.charAt(0).toUpperCase()+n.slice(1)}</label><input disabled style="padding:8px;border:1px solid ${T.b2};border-radius:8px;font-size:13px;width:180px;background:#fff"><p style="color:${T.green};font-size:12px;margin:4px 0 0">✓ labeled</p></div>`}}},
-"4.1.2":{x:"Focusable content in aria-hidden creates keyboard traps.",dt:"Never put links/buttons inside aria-hidden.",e:"Medium",p:1,gen:()=>({before:`<div aria-hidden="true">\n  <a>Link</a>\n</div>`,after:`<div>\n  <a>Link</a>\n</div>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="opacity:0.3"><a href="#" style="color:${T.teal}">Link</a></div><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ hidden but focusable</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><a href="#" style="color:${T.teal}">Link</a><p style="color:${T.green};font-size:12px;margin:4px 0 0">✓ visible</p></div>`})},
-"_":{x:"Ensures accessible content.",dt:"WCAG 2.2 at w3.org/WAI/WCAG22/quickref.",e:"Medium",p:3,gen:()=>({before:'—',after:'Apply fix',bH:`<div style="border:2px dashed ${T.rose};padding:8px;border-radius:8px;background:#fff;font-size:12px;color:${T.rose}">⚠ Issue</div>`,aH:`<div style="border:2px solid ${T.green};padding:8px;border-radius:8px;background:#fff;font-size:12px;color:${T.green}">✓ Fixed</div>`})}
+"1.1.1":{x:"Screen readers can't interpret images without alt — affects 8.7% of US adults.",dt:"Describe PURPOSE: 'Submit order' not 'green button'.",e:"Quick",p:1,gen:(el)=>{const nm=el.match(/src="([^"]+)"/)?.[1]?.split('/').pop()?.replace(/\.\w+$/,'').replace(/[-_]/g,' ')||'image';return{before:`<img src="...">`,after:`<img src="..." alt="${nm}" />`,bH:`<div style="border:2px dashed ${T.rose};padding:12px;border-radius:12px"><div style="width:80px;height:50px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">🖼</div><p style="color:${T.rose};font-size:12px;margin:6px 0 0">⚠ No alt</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:12px;border-radius:12px"><div style="width:80px;height:50px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">🖼</div><p style="color:${T.green};font-size:12px;margin:6px 0 0">✓ alt="${nm}"</p></div>`}}},
+"1.4.3":{x:"Low contrast affects 12M+ Americans with vision impairments.",dt:"AAA ≥7:1. #1C1917 on #FBF9F6 = 15.4:1.",e:"Quick",p:1,gen:()=>({before:`color:#999;background:#fff`,after:`color:#1C1917;background:#FBF9F6`,bH:`<p style="color:#999;background:#fff;padding:10px;border:2px dashed ${T.rose};border-radius:12px;font-size:14px">2.85:1 fails</p>`,aH:`<p style="color:#1C1917;background:#FBF9F6;padding:10px;border:2px solid ${T.green};border-radius:12px;font-size:14px">15.4:1 ✓</p>`})},
+"2.4.1":{x:"Keyboard users Tab through 30+ nav links. Skip links solve this.",dt:"First focusable = skip link. Use <main>, <header>, <nav>, <footer>.",e:"Quick",p:1,gen:()=>({before:`<nav>...30 links...</nav>\n<div>content</div>`,after:`<a href="#main">Skip</a>\n<header><nav>...</nav></header>\n<main id="main">...</main>`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><div style="background:#f3f4f6;padding:5px 10px;border-radius:8px;font-size:11px;color:#888;margin-bottom:4px">🔗→🔗→🔗 (30 tabs)</div><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ No skip link</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><a href="#" style="display:inline-block;padding:5px 12px;background:${T.teal};color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;margin-bottom:4px">Skip to content</a><div style="border:1px solid ${T.green};padding:5px;border-radius:8px;font-size:13px;margin-top:4px">&lt;main&gt; ✓</div></div>`})},
+"2.5.5":{x:"Touch targets <44×44px cause mis-taps. #1 AAA failure.",dt:"padding:12px;margin:-12px;box-sizing:content-box",e:"Quick",p:1,gen:()=>({before:`.close{width:20px;height:20px}`,after:`.close{width:20px;height:20px;\npadding:12px;margin:-12px;\nbox-sizing:content-box}`,bH:`<div style="border:2px dashed ${T.rose};padding:16px;border-radius:12px;background:#fff;text-align:center"><div style="position:relative;display:inline-block"><button style="width:20px;height:20px;font-size:14px;border:1px solid #ccc;border-radius:6px;background:#f5f5f5;padding:0;line-height:20px">×</button><div style="position:absolute;top:-12px;left:-12px;width:44px;height:44px;border:1px dashed ${T.rose};border-radius:6px;pointer-events:none"></div></div><p style="color:${T.rose};font-size:12px;margin:8px 0 0">⚠ 20px &lt; 44px</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:16px;border-radius:12px;background:#fff;text-align:center"><button style="width:20px;height:20px;font-size:14px;border:1px solid #ccc;border-radius:6px;background:#f5f5f5;padding:12px;margin:-12px;box-sizing:content-box;line-height:20px">×</button><p style="color:${T.green};font-size:12px;margin:8px 0 0">✓ Touch 44px</p></div>`})},
+"3.1.1":{x:"Without lang, screen readers guess language — often wrong.",dt:"Set lang on <html>.",e:"Quick",p:1,gen:()=>({before:`<html>`,after:`<html lang="en">`,bH:`<code style="display:block;border:2px dashed ${T.rose};padding:8px;border-radius:8px;background:#fff;font-size:12px">&lt;html&gt; <span style="color:${T.rose}">no lang</span></code>`,aH:`<code style="display:block;border:2px solid ${T.green};padding:8px;border-radius:8px;background:#fff;font-size:12px">&lt;html lang="en"&gt; <span style="color:${T.green}">✓</span></code>`})},
+"3.3.2":{x:"Unlabeled inputs: screen readers say 'edit text, blank'.",dt:"Visible <label> with for/id.",e:"Quick",p:1,gen:(el)=>{const n=el.match(/name="([^"]+)"/)?.[1]||'field';return{before:el,after:`<label for="${n}">${n.charAt(0).toUpperCase()+n.slice(1)}</label>\n<input id="${n}">`,bH:`<div style="border:2px dashed ${T.rose};padding:10px;border-radius:12px;background:#fff"><input disabled placeholder="${n}" style="padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;width:160px;background:#fff"><p style="color:${T.rose};font-size:12px;margin:4px 0 0">⚠ no label</p></div>`,aH:`<div style="border:2px solid ${T.green};padding:10px;border-radius:12px;background:#fff"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:3px">${n.charAt(0).toUpperCase()+n.slice(1)}</label><input disabled style="padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;width:160px;background:#fff"><p style="color:${T.green};font-size:12px;margin:4px 0 0">✓ labeled</p></div>`}}},
+"_":{x:"Ensures accessible content for users with disabilities.",dt:"Review WCAG 2.2 at w3.org/WAI/WCAG22/quickref.",e:"Medium",p:3,gen:()=>({before:'—',after:'Apply fix',bH:`<div style="border:2px dashed ${T.rose};padding:8px;border-radius:8px;background:#fff;font-size:12px;color:${T.rose}">⚠ Issue</div>`,aH:`<div style="border:2px solid ${T.green};padding:8px;border-radius:8px;background:#fff;font-size:12px;color:${T.green}">✓ Fixed</div>`})}
 };
 function getRec(id,iss){const d=RDB[id]||RDB["_"];const f=d.gen(iss.el||'');return{x:d.x,dt:d.dt,e:d.e,p:d.p,...f}}
 
-// ── Rules Engine (28 criteria) ──
+/* ═══ RULES ENGINE (28 criteria) ═══ */
 const RULES=[
 {id:"1.1.1",n:"Non-text Content",l:"A",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("img").forEach((e,i)=>{if(!e.getAttribute("alt")&&e.getAttribute("alt")!=="")r.push({s:SV.C,el:e.outerHTML.substring(0,150),msg:`Image #${i+1} missing alt`,fix:`alt="..." or alt=""`})});d.querySelectorAll("svg").forEach((e,i)=>{if(!e.getAttribute("role")&&!e.querySelector("title"))r.push({s:SV.M,el:"<svg>",msg:`SVG #${i+1} no name`,fix:`role="img"+aria-label`})});d.querySelectorAll("canvas,video,audio,object").forEach((e,i)=>{if(!e.getAttribute("aria-label")&&!e.getAttribute("aria-labelledby"))r.push({s:SV.M,el:`<${e.tagName.toLowerCase()}>`,msg:`${e.tagName} no alt`,fix:`aria-label`})});return r}},
-{id:"1.3.1",n:"Info & Relationships",l:"A",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("table").forEach((t,i)=>{if(!t.querySelector("th,[role='columnheader']"))r.push({s:SV.M,el:"<table>",msg:`Table #${i+1} no headers`,fix:`<th scope>`});if(!t.querySelector("caption")&&!t.getAttribute("aria-label"))r.push({s:SV.m,el:"<table>",msg:`No caption`,fix:`<caption>`})});d.querySelectorAll("fieldset").forEach(f=>{if(!f.querySelector("legend"))r.push({s:SV.M,el:"<fieldset>",msg:`No legend`,fix:`<legend>`})});return r}},
+{id:"1.3.1",n:"Info & Relationships",l:"A",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("table").forEach((t,i)=>{if(!t.querySelector("th,[role='columnheader']"))r.push({s:SV.M,el:"<table>",msg:`Table #${i+1} no headers`,fix:`<th scope>`})});d.querySelectorAll("fieldset").forEach(f=>{if(!f.querySelector("legend"))r.push({s:SV.M,el:"<fieldset>",msg:`No legend`,fix:`<legend>`})});return r}},
 {id:"1.3.5",n:"Input Purpose",l:"AA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("input[type='text'],input[type='email'],input[type='tel'],input:not([type]),input[type='password']").forEach(e=>{if(!e.getAttribute("autocomplete")){const n=e.getAttribute("name")||"";if(/name|email|phone|tel|address|zip|password|user/i.test(n))r.push({s:SV.m,el:e.outerHTML.substring(0,140),msg:`"${n}" no autocomplete`,fix:`autocomplete`})}});return r}},
-{id:"1.4.3",n:"Contrast",l:"AA",pr:"Perceivable",c(d){const r=[];let c=0;d.querySelectorAll("p,span,a,li,td,th,h1,h2,h3,h4,h5,h6,label,button,div").forEach(e=>{if(c>60)return;const st=e.getAttribute("style")||"";const cm=st.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);const bm=st.match(/background(?:-color)?\s*:\s*([^;]+)/i);if(cm&&bm){c++;const fg=pC(cm[1].trim()),bg=pC(bm[1].trim());if(fg&&bg){const ratio=CR(fg,bg);if(ratio<4.5)r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(1)}:1 needs ≥7:1`,fix:`Increase contrast`});else if(ratio<7)r.push({s:SV.m,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(1)}:1 AA ok, AAA needs 7:1`,fix:`To 7:1`})}}});return r}},
+{id:"1.4.3",n:"Contrast",l:"AA",pr:"Perceivable",c(d){const r=[];let c=0;d.querySelectorAll("p,span,a,li,td,th,h1,h2,h3,h4,h5,h6,label,button,div").forEach(e=>{if(c>50)return;const st=e.getAttribute("style")||"";const cm=st.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);const bm=st.match(/background(?:-color)?\s*:\s*([^;]+)/i);if(cm&&bm){c++;const fg=pC(cm[1].trim()),bg=pC(bm[1].trim());if(fg&&bg){const ratio=CR(fg,bg);if(ratio<4.5)r.push({s:SV.C,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(1)}:1 needs ≥7:1`,fix:`Increase contrast`});else if(ratio<7)r.push({s:SV.m,el:e.outerHTML.substring(0,120),msg:`${ratio.toFixed(1)}:1 AA ok, AAA needs 7:1`,fix:`To 7:1`})}}});return r}},
 {id:"1.4.6",n:"Contrast Enhanced",l:"AAA",pr:"Perceivable",c(){return[{s:SV.I,el:"—",msg:`AAA: 7:1 normal, 4.5:1 large`,fix:`Audit colors`}]}},
 {id:"1.4.8",n:"Visual Presentation",l:"AAA",pr:"Perceivable",c(d){const r=[];d.querySelectorAll("p,div,span,li,td,section").forEach(e=>{const st=e.getAttribute("style")||"";if(/text-align\s*:\s*justify/i.test(st))r.push({s:SV.M,el:e.outerHTML.substring(0,100),msg:`Justified`,fix:`left`});const lh=st.match(/line-height\s*:\s*([0-9.]+)/i);if(lh&&parseFloat(lh[1])<1.5&&!lh[0].includes("px"))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`line-height ${lh[1]}<1.5`,fix:`≥1.5`})});return r}},
 {id:"1.4.10",n:"Reflow",l:"AA",pr:"Perceivable",c(d){const r=[];const m=d.querySelector('meta[name="viewport"]');if(m){const c=m.getAttribute("content")||"";if(/maximum-scale\s*=\s*1/i.test(c)||/user-scalable\s*=\s*no/i.test(c))r.push({s:SV.C,el:m.outerHTML,msg:`Zoom blocked`,fix:`Remove`})}return r}},
@@ -141,7 +145,7 @@ const RULES=[
 {id:"2.4.7",n:"Focus Visible",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll("style").forEach(s=>{if(/outline\s*:\s*(none|0)/i.test(s.textContent||""))r.push({s:SV.M,el:"—",msg:`outline:none`,fix:`:focus-visible`})});return r}},
 {id:"2.4.9",n:"Link Purpose (AAA)",l:"AAA",pr:"Operable",c(d){const r=[];const m={};d.querySelectorAll("a[href]").forEach(a=>{const t=(a.getAttribute("aria-label")||a.textContent||"").trim().toLowerCase();const h=a.getAttribute("href");if(t&&h){if(m[t]&&m[t]!==h)r.push({s:SV.m,el:a.outerHTML.substring(0,120),msg:`"${t}"→diff URLs`,fix:`Same text=URL`});m[t]=h}});return r}},
 {id:"2.4.11",n:"Focus Not Obscured",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll('[style*="position"]').forEach(e=>{const st=e.getAttribute("style")||"";if(/position\s*:\s*(fixed|sticky)/i.test(st)&&/z-index/i.test(st))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`May obscure`,fix:`scroll-padding`})});return r}},
-{id:"2.4.12",n:"Focus Obscured (AAA)",l:"AAA",pr:"Operable",c(d){const r=[];const c=d.querySelectorAll('[style*="position: fixed"],[style*="position:fixed"],[style*="position: sticky"],[style*="position:sticky"]').length;if(c)r.push({s:SV.m,el:`${c} fixed/sticky`,msg:`Focus must be FULLY visible`,fix:`scroll-padding+margin`});return r}},
+{id:"2.4.12",n:"Focus Obscured (AAA)",l:"AAA",pr:"Operable",c(d){const r=[];const ct=d.querySelectorAll('[style*="position: fixed"],[style*="position:fixed"],[style*="position: sticky"],[style*="position:sticky"]').length;if(ct)r.push({s:SV.m,el:`${ct} fixed/sticky`,msg:`Focus must be FULLY visible`,fix:`scroll-padding+margin`});return r}},
 {id:"2.5.3",n:"Label in Name",l:"A",pr:"Operable",c(d){const r=[];d.querySelectorAll("button[aria-label],a[aria-label]").forEach(e=>{const al=(e.getAttribute("aria-label")||"").toLowerCase();const vt=(e.textContent||"").trim().toLowerCase();if(vt&&al&&!al.includes(vt))r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`aria-label≠visible`,fix:`Include visible`})});return r}},
 {id:"2.5.5",n:"Target Size (44×44)",l:"AAA",pr:"Operable",c(d){const r=[];d.querySelectorAll("a,button,[role='button'],input[type='checkbox'],input[type='radio']").forEach(e=>{const st=e.getAttribute("style")||"";const wm=st.match(/width\s*:\s*(\d+)px/i);const hm=st.match(/height\s*:\s*(\d+)px/i);const pm=st.match(/padding\s*:\s*(\d+)/i);if(wm&&hm){const W=+wm[1]+(pm?+pm[1]*2:0);const H=+hm[1]+(pm?+pm[1]*2:0);if(W<44||H<44)r.push({s:SV.M,el:e.outerHTML.substring(0,120),msg:`~${W}×${H}<44×44`,fix:`padding trick`})}});return r}},
 {id:"2.5.8",n:"Target Size (24×24)",l:"AA",pr:"Operable",c(d){const r=[];d.querySelectorAll("a,button,[role='button']").forEach(e=>{const st=e.getAttribute("style")||"";const w=st.match(/width\s*:\s*(\d+)px/i);const h=st.match(/height\s*:\s*(\d+)px/i);if(w&&h&&(+w[1]<24||+h[1]<24))r.push({s:SV.m,el:e.outerHTML.substring(0,100),msg:`<24×24`,fix:`Min 24`})});return r}},
@@ -157,295 +161,35 @@ const RULES=[
 function analyze(h){const p=new DOMParser();const d=p.parseFromString(h,"text/html");return RULES.map(r=>{const issues=r.c(d);return{...r,issues,ok:issues.filter(i=>i.s!==SV.I).length===0}})}
 function autoFix(h){let f=h;if(/<html(?![^>]*\slang\s*=)/i.test(f))f=f.replace(/<html/i,'<html lang="en"');f=f.replace(/user-scalable\s*=\s*no/gi,"user-scalable=yes");f=f.replace(/maximum-scale\s*=\s*1(?:\.0)?/gi,"maximum-scale=5.0");f=f.replace(/text-align\s*:\s*justify/gi,"text-align: left");return f}
 
-// ── Export Engine ──
-function dl(content,filename,type){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href)}
+/* ═══ EXPORTS ═══ */
+function dl(c,f,t){const b=new Blob([c],{type:t});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href)}
 function ts(){return new Date().toISOString().split('T')[0]}
+function exportCSV(results){const rows=[['ID','Criterion','Level','Principle','Status','Severity','Issue','Fix']];results.forEach(r=>{if(r.ok)rows.push([r.id,r.n,r.l,r.pr,'PASS','','','']);r.issues.filter(i=>i.s!==SV.I).forEach(i=>{rows.push([r.id,r.n,r.l,r.pr,'FAIL',i.s,`"${i.msg}"`,`"${i.fix}"`])})});dl(rows.map(r=>r.join(',')).join('\n'),`wcag-${ts()}.csv`,'text/csv')}
+function exportJSON(results,stats,u){dl(JSON.stringify({meta:{tool:"BrainPulse A11y",date:new Date().toISOString(),url:u||"manual"},summary:stats,results:results.map(r=>({id:r.id,name:r.n,level:r.l,principle:r.pr,status:r.ok?"PASS":"FAIL",issues:r.issues.filter(i=>i.s!==SV.I).map(i=>({severity:i.s,msg:i.msg,fix:i.fix}))}))},null,2),`wcag-${ts()}.json`,'application/json')}
+function exportMD(results,stats,u,issues){let md=`# WCAG 2.2 AAA Audit\n\n**URL:** ${u||'Manual'} | **Score:** ${stats.score}/100 | **Date:** ${new Date().toLocaleDateString()}\n\n## Summary\n| Metric | Value |\n|---|---|\n| Rules | ${stats.total} |\n| Passed | ${stats.passed} |\n| Issues | ${stats.issues} |\n\n## Results\n| ID | Criterion | Level | Status |\n|---|---|---|---|\n`;results.forEach(r=>{md+=`| ${r.id} | ${r.n} | ${r.l} | ${r.ok?'✅':'❌'} |\n`});if(issues.length){md+=`\n## Issues\n`;issues.forEach(i=>{md+=`- **${i.ruleId}** [${i.s}] ${i.msg} → ${i.fix}\n`})}md+=`\n---\n*BrainPulse A11y*\n`;dl(md,`wcag-${ts()}.md`,'text/markdown')}
+function emailReport(stats,u,issues){const s=encodeURIComponent(`WCAG Audit: ${u||'Page'} — ${stats.score}/100`);let b=`WCAG 2.2 AAA Report\nURL: ${u||'Manual'}\nScore: ${stats.score}/100\nPassed: ${stats.passed}/${stats.total}\nIssues: ${stats.issues}\n`;if(issues.length){b+='\nTop Issues:\n';issues.slice(0,6).forEach(i=>{b+=`• [${i.s}] ${i.ruleId}: ${i.msg}\n`})}b+='\nbrainpulseinc.com/wcag-tool.html';window.open(`mailto:?subject=${s}&body=${encodeURIComponent(b)}`)}
+function copyReport(results,stats,u,issues){let t=`WCAG 2.2 AAA AUDIT\n${'═'.repeat(35)}\nURL: ${u||'Manual'}\nScore: ${stats.score}/100 | Passed: ${stats.passed}/${stats.total} | Issues: ${stats.issues}\n`;if(issues.length){t+='\nISSUES:\n';issues.forEach(i=>{t+=`[${i.s.toUpperCase()}] ${i.ruleId} ${i.ruleName}: ${i.msg}\n  Fix: ${i.fix}\n\n`})}navigator.clipboard?.writeText(t);return true}
+function printReport(results,stats,u){const w=window.open('','_blank');if(!w)return;const clr=stats.score>=80?T.teal:T.rose;let h=`<!DOCTYPE html><html><head><title>WCAG Report</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;padding:32px;max-width:800px;margin:0 auto;color:#1C1917;font-size:12px;line-height:1.6}h1{font-size:22px;margin-bottom:4px}h2{font-size:16px;margin:24px 0 8px;border-bottom:1px solid #ddd;padding-bottom:6px}.meta{color:#57534E;font-size:11px;margin-bottom:16px}.score{display:inline-block;width:60px;height:60px;line-height:60px;border-radius:50%;border:4px solid ${clr};text-align:center;font-size:22px;font-weight:700;color:${clr};font-family:'JetBrains Mono',monospace;margin:12px 0}table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:6px 8px;text-align:left;border-bottom:1px solid #eee}th{background:#f5f5f5;font-weight:600;text-transform:uppercase;font-size:10px}.pass{color:#166534}.fail{color:#9F1239}@media print{@page{margin:1cm}}</style></head><body>`;h+=`<h1>WCAG 2.2 AAA Audit Report</h1><div class="meta">${u||'Manual'} · ${new Date().toLocaleDateString()} · ${results.length} criteria</div><div class="score">${stats.score}</div>`;h+=`<table><tr><th>ID</th><th>Criterion</th><th>Level</th><th>Status</th></tr>`;results.forEach(r=>{h+=`<tr><td style="font-family:monospace;color:#0D7377">${r.id}</td><td>${r.n}</td><td>${r.l}</td><td class="${r.ok?'pass':'fail'}">${r.ok?'✅':'❌'}</td></tr>`});h+=`</table><div style="margin-top:24px;text-align:center;color:#999;font-size:10px">BrainPulse A11y</div></body></html>`;w.document.write(h);w.document.close();setTimeout(()=>w.print(),500)}
 
-function exportCSV(results,scUrl){
-  const rows=[['WCAG ID','Criterion','Level','Principle','Status','Severity','Issue','Fix','Priority','Effort']];
-  results.forEach(r=>{
-    if(r.ok)rows.push([r.id,r.n,r.l,r.pr,'PASS','','','','','']);
-    r.issues.filter(i=>i.s!==SV.I).forEach(i=>{
-      const rec=getRec(r.id,i);
-      rows.push([r.id,r.n,r.l,r.pr,'FAIL',i.s,`"${i.msg.replace(/"/g,'""')}"`,`"${i.fix.replace(/"/g,'""')}"`,`P${rec.p}`,rec.e]);
-    });
-  });
-  dl(rows.map(r=>r.join(',')).join('\n'),`wcag-audit-${ts()}.csv`,'text/csv;charset=utf-8');
-}
-
-function exportJSON(results,stats,scUrl){
-  const report={
-    meta:{tool:"BrainPulse A11y",version:"2.2",standard:"WCAG 2.2 AAA",date:new Date().toISOString(),url:scUrl||"Manual HTML input"},
-    summary:{score:stats.score,totalRules:stats.total,passed:stats.passed,issues:stats.issues,critical:stats.crit,major:stats.maj,minor:stats.min},
-    results:results.map(r=>({
-      id:r.id,name:r.n,level:r.l,principle:r.pr,status:r.ok?"PASS":"FAIL",
-      issues:r.issues.filter(i=>i.s!==SV.I).map(i=>{const rec=getRec(r.id,i);return{severity:i.s,message:i.msg,element:i.el,fix:i.fix,priority:`P${rec.p}`,effort:rec.e,explanation:rec.x,designTip:rec.dt}})
-    }))
-  };
-  dl(JSON.stringify(report,null,2),`wcag-audit-${ts()}.json`,'application/json');
-}
-
-function exportMarkdown(results,stats,scUrl,allIssues){
-  let md=`# WCAG 2.2 AAA Audit Report\n\n`;
-  md+=`**Date:** ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}\n`;
-  md+=`**URL:** ${scUrl||'Manual HTML input'}\n`;
-  md+=`**Tool:** BrainPulse A11y — WCAG 2.2 AAA Compliance Engine\n\n`;
-  md+=`---\n\n## Summary\n\n`;
-  md+=`| Metric | Value |\n|--------|-------|\n`;
-  md+=`| Score | **${stats.score}/100** |\n`;
-  md+=`| Rules Checked | ${stats.total} |\n`;
-  md+=`| Passed | ${stats.passed} |\n`;
-  md+=`| Issues Found | ${stats.issues} |\n`;
-  md+=`| Critical | ${stats.crit} |\n`;
-  md+=`| Major | ${stats.maj} |\n`;
-  md+=`| Minor | ${stats.min} |\n\n`;
-  md+=`## POUR Principle Breakdown\n\n`;
-  ["Perceivable","Operable","Understandable","Robust"].forEach(p=>{
-    const R=results.filter(r=>r.pr===p);const pass=R.filter(r=>r.ok).length;
-    md+=`- **${p}:** ${pass}/${R.length} passed (${R.length?Math.round(pass/R.length*100):100}%)\n`;
-  });
-  md+=`\n## Level Breakdown\n\n`;
-  ["A","AA","AAA"].forEach(l=>{
-    const R=results.filter(r=>r.l===l);const pass=R.filter(r=>r.ok).length;
-    md+=`- **Level ${l}:** ${pass}/${R.length} passed (${R.length?Math.round(pass/R.length*100):100}%)\n`;
-  });
-  if(allIssues.length>0){
-    md+=`\n---\n\n## Issues Found\n\n`;
-    md+=`### Priority Roadmap\n\n`;
-    [1,2,3,4].forEach(p=>{
-      const items=allIssues.filter(i=>i.rec.p===p);
-      if(!items.length)return;
-      md+=`#### ${PLBL[p]}\n\n`;
-      items.forEach(i=>{
-        md+=`- **${i.ruleId} ${i.ruleName}** (${i.s}) — ${i.msg}\n`;
-        md+=`  - Fix: ${i.fix}\n`;
-        md+=`  - ${i.rec.x}\n`;
-        md+=`  - Design tip: ${i.rec.dt}\n\n`;
-      });
-    });
-  }
-  md+=`\n---\n\n## Detailed Results\n\n`;
-  md+=`| ID | Criterion | Level | Status | Issues |\n|-----|-----------|-------|--------|--------|\n`;
-  results.forEach(r=>{
-    const ic=r.issues.filter(i=>i.s!==SV.I).length;
-    md+=`| ${r.id} | ${r.n} | ${r.l} | ${r.ok?'✅ Pass':'❌ Fail'} | ${ic} |\n`;
-  });
-  md+=`\n---\n\n*Generated by [BrainPulse A11y](https://www.brainpulseinc.com/wcag-tool.html)*\n`;
-  dl(md,`wcag-audit-${ts()}.md`,'text/markdown;charset=utf-8');
-}
-
-function exportHTMLReport(results,stats,scUrl,allIssues){
-  const clr=stats.score>=80?T.teal:stats.score>=50?T.peach:T.rose;
-  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WCAG 2.2 AAA Audit Report — ${scUrl||'Manual'}</title>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:#FBF9F6;color:#1C1917;padding:40px;max-width:900px;margin:0 auto;line-height:1.6}
-h1{font-family:'Libre Baskerville',serif;font-size:28px;margin-bottom:8px}
-h2{font-family:'Libre Baskerville',serif;font-size:20px;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(28,25,23,.1)}
-h3{font-size:16px;margin:20px 0 8px}
-.meta{color:#57534E;font-size:13px;margin-bottom:24px}
-.score{display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;border:4px solid ${clr};font-size:28px;font-weight:700;color:${clr};font-family:'JetBrains Mono',monospace;margin:20px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:16px 0}
-.stat{text-align:center;padding:14px;background:#fff;border-radius:12px;border:1px solid rgba(28,25,23,.07)}
-.stat b{display:block;font-size:22px;font-family:'JetBrains Mono',monospace}
-.stat span{font-size:10px;text-transform:uppercase;color:#57534E;letter-spacing:.06em}
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(28,25,23,.07)}
-th{background:#F5F2ED;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-.pass{color:#166534}.fail{color:#9F1239}.sev{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase}
-.critical{background:rgba(159,18,57,.06);color:#9F1239}.major{background:rgba(146,64,14,.06);color:#92400E}.minor{background:rgba(30,58,95,.06);color:#1E3A5F}
-.issue{background:#fff;border-radius:12px;border:1px solid rgba(28,25,23,.07);padding:16px;margin:10px 0}
-.fix{color:#0D7377;font-size:12px;margin-top:6px}.tip{background:rgba(13,115,119,.06);padding:10px 14px;border-radius:8px;margin-top:8px;font-size:12px;border-left:3px solid #0D7377}
-footer{margin-top:40px;padding-top:16px;border-top:1px solid rgba(28,25,23,.1);font-size:12px;color:#57534E;text-align:center}
-@media print{body{padding:20px}h2{break-before:auto}.issue{break-inside:avoid}}
-</style></head><body>
-<h1>WCAG 2.2 AAA Audit Report</h1>
-<div class="meta">
-<strong>URL:</strong> ${scUrl||'Manual HTML input'}<br>
-<strong>Date:</strong> ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}<br>
-<strong>Standard:</strong> WCAG 2.2 AAA · ${results.length} criteria checked
-</div>
-<div class="score">${stats.score}</div>
-<div class="grid">
-<div class="stat"><b>${stats.total}</b><span>Rules</span></div>
-<div class="stat"><b style="color:#166534">${stats.passed}</b><span>Passed</span></div>
-<div class="stat"><b style="color:#9F1239">${stats.issues}</b><span>Issues</span></div>
-<div class="stat"><b style="color:#9F1239">${stats.crit}</b><span>Critical</span></div>
-<div class="stat"><b style="color:#92400E">${stats.maj}</b><span>Major</span></div>
-<div class="stat"><b style="color:#1E3A5F">${stats.min}</b><span>Minor</span></div>
-</div>
-<h2>POUR Principles</h2><div class="grid">`;
-  ["Perceivable","Operable","Understandable","Robust"].forEach(p=>{
-    const R=results.filter(r=>r.pr===p);const pass=R.filter(r=>r.ok).length;const pct=R.length?Math.round(pass/R.length*100):100;
-    h+=`<div class="stat"><b style="color:${pct>=80?'#0D7377':pct>=50?'#92400E':'#9F1239'}">${pct}%</b><span>${p}<br>${pass}/${R.length}</span></div>`;
-  });
-  h+=`</div><h2>Level Breakdown</h2><div class="grid">`;
-  ["A","AA","AAA"].forEach(l=>{
-    const R=results.filter(r=>r.l===l);const pass=R.filter(r=>r.ok).length;const pct=R.length?Math.round(pass/R.length*100):100;
-    h+=`<div class="stat"><b style="color:${pct>=80?'#0D7377':'#9F1239'}">${pct}%</b><span>Level ${l}<br>${pass}/${R.length}</span></div>`;
-  });
-  h+=`</div><h2>All Criteria</h2><table><thead><tr><th>ID</th><th>Criterion</th><th>Level</th><th>Principle</th><th>Status</th><th>Issues</th></tr></thead><tbody>`;
-  results.forEach(r=>{
-    const ic=r.issues.filter(i=>i.s!==SV.I).length;
-    h+=`<tr><td style="font-family:'JetBrains Mono',monospace;color:#0D7377">${r.id}</td><td>${r.n}</td><td>${r.l}</td><td>${r.pr}</td><td class="${r.ok?'pass':'fail'}">${r.ok?'✅ Pass':'❌ Fail'}</td><td>${ic||'—'}</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  if(allIssues.length>0){
-    h+=`<h2>Issues & Recommendations</h2>`;
-    [1,2,3,4].forEach(p=>{
-      const items=allIssues.filter(i=>i.rec.p===p);if(!items.length)return;
-      h+=`<h3 style="color:${PC[p]}">${PLBL[p]} (${items.length} issue${items.length>1?'s':''})</h3>`;
-      items.forEach(i=>{
-        h+=`<div class="issue"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="sev ${i.s}">${i.s}</span><strong style="font-family:'JetBrains Mono',monospace;color:#0D7377;font-size:12px">${i.ruleId}</strong><span>${i.ruleName}</span></div>`;
-        h+=`<p>${i.msg}</p>`;
-        if(i.el&&i.el!=='—')h+=`<code style="display:block;background:#F5F2ED;padding:8px 12px;border-radius:6px;margin:8px 0;font-size:11px;word-break:break-all;font-family:'JetBrains Mono',monospace">${i.el.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code>`;
-        h+=`<div class="fix">⮕ ${i.fix}</div>`;
-        h+=`<div class="tip"><strong>Why it matters:</strong> ${i.rec.x}<br><strong>Design tip:</strong> ${i.rec.dt}</div>`;
-        h+=`</div>`;
-      });
-    });
-  }
-  h+=`<footer>Generated by <strong>BrainPulse A11y</strong> — WCAG 2.2 AAA Compliance Engine<br><a href="https://www.brainpulseinc.com/wcag-tool.html" style="color:#0D7377">brainpulseinc.com</a></footer></body></html>`;
-  dl(h,`wcag-audit-${ts()}.html`,'text/html;charset=utf-8');
-}
-
-function exportPrint(results,stats,scUrl,allIssues){
-  const win=window.open('','_blank');
-  if(!win)return;
-  // Reuse the HTML report generator and write to new window
-  const clr=stats.score>=80?T.teal:stats.score>=50?T.peach:T.rose;
-  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>WCAG Report</title>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;color:#1C1917;padding:32px;max-width:800px;margin:0 auto;line-height:1.6;font-size:12px}
-h1{font-family:'Libre Baskerville',serif;font-size:22px;margin-bottom:4px}h2{font-family:'Libre Baskerville',serif;font-size:16px;margin:24px 0 8px;border-bottom:1px solid #ddd;padding-bottom:6px}
-h3{font-size:13px;margin:14px 0 6px}
-.meta{color:#666;font-size:11px;margin-bottom:16px}.score{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;border:3px solid ${clr};font-size:22px;font-weight:700;color:${clr};font-family:'JetBrains Mono',monospace;margin:12px 0}
-table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0}th,td{padding:6px 8px;text-align:left;border-bottom:1px solid #eee}th{background:#f5f5f5;font-weight:600;font-size:10px;text-transform:uppercase}
-.pass{color:#166534}.fail{color:#9F1239}
-.issue{border:1px solid #eee;border-radius:8px;padding:10px;margin:6px 0;page-break-inside:avoid}
-.sev{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase}
-.critical{background:#fde;color:#9F1239}.major{background:#fef3e0;color:#92400E}.minor{background:#e8f0fe;color:#1E3A5F}
-.fix{color:#0D7377;font-size:11px;margin-top:4px}.tip{background:#f5f5f5;padding:8px;border-radius:6px;margin-top:6px;font-size:11px;border-left:3px solid #0D7377}
-@media print{body{padding:16px}@page{margin:1cm}}
-</style></head><body>`;
-  h+=`<h1>WCAG 2.2 AAA Audit Report</h1><div class="meta"><b>URL:</b> ${scUrl||'Manual'} · <b>Date:</b> ${new Date().toLocaleDateString()} · <b>${results.length} criteria</b></div><div class="score">${stats.score}</div>`;
-  h+=`<table><tr><th>Passed</th><th>Issues</th><th>Critical</th><th>Major</th><th>Minor</th></tr><tr><td class="pass"><b>${stats.passed}</b></td><td class="fail"><b>${stats.issues}</b></td><td>${stats.crit}</td><td>${stats.maj}</td><td>${stats.min}</td></tr></table>`;
-  h+=`<h2>Results</h2><table><thead><tr><th>ID</th><th>Criterion</th><th>Level</th><th>Status</th></tr></thead><tbody>`;
-  results.forEach(r=>{h+=`<tr><td style="font-family:monospace;color:#0D7377">${r.id}</td><td>${r.n}</td><td>${r.l}</td><td class="${r.ok?'pass':'fail'}">${r.ok?'✅':'❌'}</td></tr>`});
-  h+=`</tbody></table>`;
-  if(allIssues.length){
-    h+=`<h2>Issues</h2>`;
-    allIssues.forEach(i=>{
-      h+=`<div class="issue"><span class="sev ${i.s}">${i.s}</span> <b style="font-family:monospace;color:#0D7377">${i.ruleId}</b> ${i.ruleName}<p style="margin:4px 0">${i.msg}</p><div class="fix">⮕ ${i.fix}</div><div class="tip">${i.rec.x}</div></div>`;
-    });
-  }
-  h+=`<div style="margin-top:24px;text-align:center;color:#999;font-size:10px">BrainPulse A11y · brainpulseinc.com</div></body></html>`;
-  win.document.write(h);
-  win.document.close();
-  setTimeout(()=>{win.print()},600);
-}
-
-function copyClipboard(results,stats,scUrl,allIssues){
-  let t=`WCAG 2.2 AAA AUDIT REPORT\n`;
-  t+=`${'═'.repeat(40)}\n`;
-  t+=`URL: ${scUrl||'Manual HTML'}\nDate: ${new Date().toLocaleDateString()}\n\n`;
-  t+=`SCORE: ${stats.score}/100\n`;
-  t+=`Passed: ${stats.passed}/${stats.total} | Issues: ${stats.issues} (${stats.crit} critical, ${stats.maj} major, ${stats.min} minor)\n\n`;
-  if(allIssues.length){
-    t+=`ISSUES:\n${'─'.repeat(40)}\n`;
-    allIssues.forEach(i=>{t+=`[${i.s.toUpperCase()}] ${i.ruleId} ${i.ruleName}: ${i.msg}\n  Fix: ${i.fix}\n\n`});
-  }
-  t+=`Generated by BrainPulse A11y — brainpulseinc.com\n`;
-  navigator.clipboard?.writeText(t);
-  return true;
-}
-
-function emailReport(stats,scUrl,allIssues){
-  const subj=encodeURIComponent(`WCAG 2.2 AAA Audit: ${scUrl||'Manual'} — Score ${stats.score}/100`);
-  let body=`WCAG 2.2 AAA Compliance Report\n\nURL: ${scUrl||'Manual HTML input'}\nDate: ${new Date().toLocaleDateString()}\nScore: ${stats.score}/100\n\nSummary:\n- Rules checked: ${stats.total}\n- Passed: ${stats.passed}\n- Issues: ${stats.issues} (${stats.crit} critical, ${stats.maj} major, ${stats.min} minor)\n`;
-  if(allIssues.length){body+=`\nTop Issues:\n`;allIssues.slice(0,8).forEach(i=>{body+=`• [${i.s}] ${i.ruleId} ${i.ruleName}: ${i.msg}\n`})}
-  body+=`\nFull report: https://www.brainpulseinc.com/wcag-tool.html\nGenerated by BrainPulse A11y`;
-  window.open(`mailto:?subject=${subj}&body=${encodeURIComponent(body)}`);
-}
-
-function shareNative(stats,scUrl){
-  if(navigator.share){
-    navigator.share({title:`WCAG Audit: ${stats.score}/100`,text:`WCAG 2.2 AAA audit of ${scUrl||'page'}: Score ${stats.score}/100 — ${stats.passed}/${stats.total} passed, ${stats.issues} issues found.`,url:'https://www.brainpulseinc.com/wcag-tool.html'}).catch(()=>{});
-  }
-}
-
-function ExportActionBar({results,stats,scUrl,allIssues,onTabSwitch}){
-  const[show,setShow]=useState(false);
-  const[copied,setCopied]=useState(false);
-  const hasShare=typeof navigator!=='undefined'&&!!navigator.share;
-  
-  const actions=[
-    {id:"pdf",label:"PDF",icon:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="3" y="1" width="11" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M6 6h5M6 9h5M6 12h3" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/></svg>,fn:()=>exportPrint(results,stats,scUrl,allIssues)},
-    {id:"html",label:"HTML",icon:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M3 4l3 12 4 2 4-2 3-12" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,fn:()=>exportHTMLReport(results,stats,scUrl,allIssues)},
-    {id:"csv",label:"CSV",icon:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M2 7h16M2 11h16M7 3v13M13 3v13" stroke="currentColor" strokeWidth=".8" opacity=".4"/></svg>,fn:()=>exportCSV(results,scUrl)},
-    {id:"json",label:"JSON",icon:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M7 3C5 3 4 4.5 4 6v2c0 1.5-1.5 2-1.5 2s1.5.5 1.5 2v2c0 1.5 1 3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M13 3c2 0 3 1.5 3 3v2c0 1.5 1.5 2 1.5 2s-1.5.5-1.5 2v2c0 1.5-1 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,fn:()=>exportJSON(results,stats,scUrl)},
-    {id:"md",label:"MD",icon:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 12V7l2 2.5L9 7v5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>,fn:()=>exportMarkdown(results,stats,scUrl,allIssues)},
-    {id:"email",label:"Email",icon:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M2 6l8 5 8-5" stroke="currentColor" strokeWidth="1.5"/></svg>,fn:()=>emailReport(stats,scUrl,allIssues)},
-    ...(hasShare?[{id:"share",label:"Share",icon:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><circle cx="14" cy="4" r="2.5" stroke="currentColor" strokeWidth="1.5"/><circle cx="14" cy="16" r="2.5" stroke="currentColor" strokeWidth="1.5"/><circle cx="5" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7 9l5-4M7 11l5 4" stroke="currentColor" strokeWidth="1.2"/></svg>,fn:()=>shareNative(stats,scUrl)}]:[]),
-    {id:"clip",label:copied?"Copied!":"Copy",icon:copied?<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>:<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><rect x="6" y="4" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="4" y="2" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill={T.w}/><path d="M7 7h4M7 10h6M7 13h3" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/></svg>,fn:()=>{if(copyClipboard(results,stats,scUrl,allIssues)){setCopied(true);setTimeout(()=>setCopied(false),2500)}}},
-  ];
-
-  return<div style={{background:T.w,borderBottom:`1px solid ${T.b1}`,padding:"0 30px"}}>
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 0",flexWrap:"wrap",gap:10}}>
-      <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>
-        <span style={{fontSize:13,fontWeight:600,color:T.ink}}>Audit complete</span>
-        <span style={{fontSize:12,color:T.dm}}>·</span>
-        <span style={{fontSize:13,fontFamily:T.mono,fontWeight:700,color:stats.score>=80?T.teal:stats.score>=50?T.peach:T.rose}}>{stats.score}/100</span>
-        <span style={{fontSize:12,color:T.dm}}>·</span>
-        <span style={{fontSize:12,color:T.dm}}>{stats.issues} issue{stats.issues!==1?"s":""}</span>
-      </div>
-
-      <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-        {show?<>
-          {actions.map(a=><button key={a.id} onClick={a.fn} title={a.label} aria-label={`Export ${a.label}`}
-            style={{display:"inline-flex",alignItems:"center",gap:5,padding:"7px 12px",fontSize:11,fontWeight:600,
-            borderRadius:10,border:`1px solid ${T.b1}`,background:T.bg,color:T.mt,cursor:"pointer",
-            transition:`all .15s ${T.ease}`,minHeight:36}}>
-            <span style={{color:T.teal,display:"flex",alignItems:"center"}}>{a.icon}</span>
-            {a.label}
-          </button>)}
-          <button onClick={()=>setShow(false)} style={{padding:"7px 10px",borderRadius:10,border:`1px solid ${T.b1}`,background:T.bg,color:T.dm,cursor:"pointer",fontSize:12,minHeight:36}} aria-label="Close export options">✕</button>
-        </>:<>
-          <button onClick={()=>setShow(true)} style={{display:"inline-flex",alignItems:"center",gap:7,padding:"8px 18px",fontSize:12.5,fontWeight:700,borderRadius:10,border:`2px solid ${T.teal}`,background:T.teal,color:T.w,cursor:"pointer",minHeight:36,boxShadow:"0 2px 8px rgba(13,115,119,.2)"}}>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M8 2v9M4 7l4 4 4-4"/><path d="M2 12v2h12v-2"/></svg>
-            Export Report
-          </button>
-          <button onClick={()=>onTabSwitch("export")} style={{padding:"8px 14px",fontSize:12,borderRadius:10,border:`1px solid ${T.b1}`,background:T.bg,color:T.dm,cursor:"pointer",minHeight:36}} aria-label="All export options">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke={T.dm} strokeWidth="1.5"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>
-          </button>
-        </>}
-      </div>
-    </div>
-  </div>;
-}
-
-// ── Rec Card ──
+/* ═══ REC CARD ═══ */
 function RecCard({rec}){
   if(!rec)return null;
-  return<div style={{marginTop:12,borderRadius:16,border:`1px solid ${T.b1}`,overflow:"hidden",boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 28px rgba(28,25,23,.05)"}}>
-    <div style={{background:T.ts,padding:"18px 22px",position:"relative",overflow:"hidden"}}>
-      <DotGrid w={160} h={80}/>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6,marginBottom:10,position:"relative"}}>
-        <div style={{display:"flex",alignItems:"center",gap:6}}><HexIcon size={24}><circle cx="13" cy="13" r="3" fill={T.teal}/></HexIcon><span style={{fontSize:11,fontWeight:700,color:T.teal,letterSpacing:".05em",textTransform:"uppercase"}}>Recommendation</span></div>
-        <div style={{display:"flex",gap:5}}><span style={{fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:20,background:`${PC[rec.p]}08`,color:PC[rec.p],border:`1px solid ${PC[rec.p]}20`}}>{PLBL[rec.p]?.split("—")[0]}</span><span style={{fontSize:10,fontWeight:600,padding:"4px 10px",borderRadius:20,background:T.gs,color:T.green,border:`1px solid rgba(22,101,52,.12)`}}>{rec.e}</span></div>
+  return<div style={{marginTop:14,borderRadius:18,border:`1px solid ${T.b1}`,overflow:"hidden",boxShadow:"0 2px 12px rgba(28,25,23,.04)"}}>
+    <div style={{background:T.ts,padding:"20px 24px",position:"relative",overflow:"hidden"}}>
+      <DotBg w={180} h={90} opacity={.15}/>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:12,position:"relative"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}><IllustratedIcon type="check" size={20}/><span style={{fontSize:12,fontWeight:700,color:T.teal,letterSpacing:".05em",textTransform:"uppercase"}}>Recommendation</span></div>
+        <div style={{display:"flex",gap:6}}><span style={{fontSize:10,fontWeight:700,padding:"4px 12px",borderRadius:20,background:`${PC[rec.p]}08`,color:PC[rec.p],border:`1px solid ${PC[rec.p]}20`}}>{PLBL[rec.p]?.split("—")[0]}</span><span style={{fontSize:10,fontWeight:600,padding:"4px 12px",borderRadius:20,background:T.gs,color:T.green}}>{rec.e}</span></div>
       </div>
-      <p style={{fontSize:14,color:T.ink,margin:"0 0 12px",lineHeight:1.7,position:"relative"}}>{rec.x}</p>
-      <div style={{background:T.w,borderRadius:14,padding:"14px 18px",borderLeft:`4px solid ${T.teal}`,boxShadow:"0 1px 4px rgba(28,25,23,.04)",position:"relative"}}>
-        <div style={{fontSize:9,textTransform:"uppercase",color:T.teal,fontWeight:700,letterSpacing:".06em",marginBottom:4,display:"flex",alignItems:"center",gap:5}}><svg width="12" height="12" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 11H7V7h2v4zm0-6H7V3h2v2z"/></svg>Design Suggestion</div>
-        <p style={{fontSize:13.5,color:T.mt,margin:0,lineHeight:1.65}}>{rec.dt}</p>
-      </div>
+      <p style={{fontSize:14,color:T.ink,margin:"0 0 14px",lineHeight:1.7,position:"relative"}}>{rec.x}</p>
+      <div style={{background:T.w,borderRadius:14,padding:"14px 18px",borderLeft:`4px solid ${T.teal}`,boxShadow:"0 1px 4px rgba(28,25,23,.03)",position:"relative"}}><div style={{fontSize:9,color:T.teal,fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",marginBottom:4}}>Design Tip</div><p style={{fontSize:13,color:T.mt,margin:0,lineHeight:1.65}}>{rec.dt}</p></div>
     </div>
-    {rec.bH&&rec.aH&&<div style={{borderTop:`1px solid ${T.b1}`,padding:"18px 22px",background:T.bg2}}>
-      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><div style={{height:1,flex:1,background:`linear-gradient(90deg,transparent,${T.b2},transparent)`}}/><span style={{fontSize:9,fontWeight:700,color:T.dm,textTransform:"uppercase",letterSpacing:".1em",padding:"0 8px",background:T.bg2}}>Before → After</span><div style={{height:1,flex:1,background:`linear-gradient(90deg,transparent,${T.b2},transparent)`}}/></div>
+    {rec.bH&&rec.aH&&<div style={{borderTop:`1px solid ${T.b1}`,padding:"20px 24px",background:T.bg2}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}><div style={{height:1,flex:1,background:`linear-gradient(90deg,transparent,${T.b2},transparent)`}}/><span style={{fontSize:9,fontWeight:700,color:T.dm,textTransform:"uppercase",letterSpacing:".12em"}}>Before → After</span><div style={{height:1,flex:1,background:`linear-gradient(90deg,transparent,${T.b2},transparent)`}}/></div>
       <div style={{display:"flex",gap:14,flexWrap:"wrap"}}>
         {[["Before",T.rose,rec.bH],["After",T.green,rec.aH]].map(([l,c,h])=><div key={l} style={{flex:1,minWidth:180}}>
-          <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:c,marginBottom:6,display:"flex",alignItems:"center",gap:5}}><span style={{width:8,height:8,borderRadius:"50%",background:c,display:"inline-block",boxShadow:`0 0 0 3px ${c}20`}}/>{l}</div>
-          <div style={{border:`1px solid ${T.b1}`,borderRadius:14,background:T.w,padding:14,boxShadow:"0 1px 4px rgba(28,25,23,.03)"}} dangerouslySetInnerHTML={{__html:h}}/>
+          <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:".1em",fontWeight:700,color:c,marginBottom:6,display:"flex",alignItems:"center",gap:6}}><span style={{width:8,height:8,borderRadius:"50%",background:c,boxShadow:`0 0 0 3px ${c}18`}}/>{l}</div>
+          <div style={{border:`1px solid ${T.b1}`,borderRadius:14,background:T.w,padding:14}} dangerouslySetInnerHTML={{__html:h}}/>
         </div>)}
       </div>
     </div>}
@@ -455,87 +199,32 @@ function RecCard({rec}){
   </div>;
 }
 
-// ── Contrast Checker ──
+/* ═══ CONTRAST CHECKER ═══ */
 function ContrastChecker(){
   const[fg,setFg]=useState("#57534E");const[bg,setBg]=useState("#FBF9F6");
   const fr=pC(fg),br=pC(bg);const r=fr&&br?CR(fr,br):null;
-  const ts=r?[["AA",r>=4.5,"≥4.5:1"],["AA Large",r>=3,"≥3:1"],["AAA",r>=7,"≥7:1"],["AAA Large",r>=4.5,"≥4.5:1"]]:[];
-  return<div style={{background:T.w,borderRadius:22,border:`1px solid ${T.b1}`,padding:"28px 28px",boxShadow:"0 4px 16px rgba(28,25,23,.04),0 12px 40px rgba(28,25,23,.04)",position:"relative",overflow:"hidden"}}>
-    <HexGrid w={400} h={200}/>
-    <h2 style={{margin:"0 0 22px",fontFamily:T.serif,fontSize:24,color:T.ink,fontWeight:700,position:"relative"}}>Contrast Checker</h2>
-    <div style={{display:"flex",gap:18,flexWrap:"wrap",marginBottom:22,position:"relative"}}>{[["Foreground",fg,setFg],["Background",bg,setBg]].map(([l,v,s])=><label key={l} style={{display:"flex",flexDirection:"column",gap:6,flex:1,minWidth:150}}>
-      <span style={{fontSize:11,color:T.dm,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span>
-      <div style={{display:"flex",gap:8,alignItems:"center"}}><input type="color" value={v} onChange={e=>s(e.target.value)} aria-label={l} style={{width:48,height:48,border:`2px solid ${T.b2}`,cursor:"pointer",borderRadius:12,padding:2}}/><input type="text" value={v} onChange={e=>s(e.target.value)} aria-label={`${l} hex`} style={{flex:1,padding:"12px 14px",background:T.bg,border:`1px solid ${T.b1}`,borderRadius:12,color:T.ink,fontFamily:T.mono,fontSize:14}}/></div>
-    </label>)}</div>
-    <div style={{background:br?bg:T.w,color:fr?fg:T.ink,padding:"24px 28px",borderRadius:16,marginBottom:20,border:`1px solid ${T.b1}`,boxShadow:"inset 0 2px 8px rgba(28,25,23,.03)",position:"relative"}}>
-      <div style={{fontSize:22,marginBottom:6,fontWeight:500,fontFamily:T.serif}}>The quick brown fox jumps</div>
-      <div style={{fontSize:14}}>Body text — 14px regular weight</div>
-    </div>
-    {r!==null&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(105px,1fr))",gap:10,position:"relative"}}>
-      <div style={{textAlign:"center",padding:16,background:T.bg,borderRadius:14}}>
-        <div style={{fontSize:36,fontFamily:T.mono,fontWeight:700,color:r>=7?T.teal:r>=4.5?T.peach:T.rose,lineHeight:1}}>{r.toFixed(2)}</div>
-        <div style={{fontSize:10,color:T.dm,marginTop:5,textTransform:"uppercase",letterSpacing:".06em"}}>Ratio</div>
-      </div>
-      {ts.map(([l,pass,req])=><div key={l} style={{textAlign:"center",padding:16,background:pass?T.ts:T.rs,borderRadius:14,border:`1.5px solid ${pass?T.tm:T.rm}`}}>
-        <div style={{fontSize:18,fontWeight:700,color:pass?T.teal:T.rose}}>{pass?"PASS":"FAIL"}</div>
-        <div style={{fontSize:10,color:T.dm,marginTop:3}}>{l}</div>
-        <div style={{fontSize:10,color:T.dm,fontFamily:T.mono}}>{req}</div>
-      </div>)}
-    </div>}
-  </div>;
-}
-
-// ── Export Tab Component ──
-function ExportTab({results,stats,scUrl,allIssues}){
-  const[copied,setCopied]=useState(false);
-  const formats=[
-    {id:"pdf",name:"PDF Report",desc:"Print-optimized report with full details, recommendations, and code fixes. Opens print dialog.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="2" width="16" height="22" rx="2" stroke={T.rose} strokeWidth="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke={T.rose} strokeWidth="1.5" strokeLinecap="round"/><rect x="18" y="10" width="6" height="8" rx="1" fill={T.rose} opacity=".15"/><path d="M20 13h2M20 15h2" stroke={T.rose} strokeWidth="1" strokeLinecap="round"/></svg>,color:T.rose,fn:()=>exportPrint(results,stats,scUrl,allIssues)},
-    {id:"html",name:"HTML Report",desc:"Standalone styled HTML file. Share with stakeholders — opens in any browser, no tools needed.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M5 6l3 16 6 3 6-3 3-16" stroke={T.teal} strokeWidth="2" strokeLinejoin="round"/><path d="M9 10l2 8 3 1.5 3-1.5 2-8" stroke={T.teal} strokeWidth="1.5" strokeLinejoin="round" opacity=".4"/><circle cx="14" cy="14" r="2" fill={T.teal} opacity=".3"/></svg>,color:T.teal,fn:()=>exportHTMLReport(results,stats,scUrl,allIssues)},
-    {id:"csv",name:"CSV Spreadsheet",desc:"Every issue as a row with ID, severity, message, fix, priority, and effort. Import into Excel or Google Sheets.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="4" width="22" height="18" rx="2" stroke={T.green} strokeWidth="2"/><path d="M3 10h22M3 16h22M10 4v18M17 4v18" stroke={T.green} strokeWidth="1" opacity=".3"/><rect x="11" y="11" width="5" height="4" fill={T.green} opacity=".15" rx="1"/></svg>,color:T.green,fn:()=>exportCSV(results,scUrl)},
-    {id:"json",name:"JSON Data",desc:"Machine-readable structured data. Feed into CI/CD pipelines, dashboards, or tracking systems.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M10 4C7 4 6 6 6 8v3c0 2-2 3-2 3s2 1 2 3v3c0 2 1 4 4 4" stroke={T.peach} strokeWidth="2" strokeLinecap="round"/><path d="M18 4c3 0 4 2 4 4v3c0 2 2 3 2 3s-2 1-2 3v3c0 2-1 4-4 4" stroke={T.peach} strokeWidth="2" strokeLinecap="round"/><circle cx="11" cy="14" r="1.5" fill={T.peach}/><circle cx="17" cy="14" r="1.5" fill={T.peach}/></svg>,color:T.peach,fn:()=>exportJSON(results,stats,scUrl)},
-    {id:"md",name:"Markdown",desc:"GitHub/Confluence-ready report with tables, priority roadmap, and full recommendations.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="5" width="22" height="16" rx="2" stroke={T.navy} strokeWidth="2"/><path d="M7 16V10l3 3.5L13 10v6M17 13h2.5l-2.5 3-2.5-3H17V10" stroke={T.navy} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,color:T.navy,fn:()=>exportMarkdown(results,stats,scUrl,allIssues)},
-    {id:"clip",name:"Copy to Clipboard",desc:"Plain text summary copied to clipboard. Paste into Slack, email, or Jira tickets.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="8" y="6" width="14" height="18" rx="2" stroke={T.dm} strokeWidth="2"/><rect x="6" y="4" width="14" height="18" rx="2" stroke={T.dm} strokeWidth="2" fill={T.w}/><path d="M10 10h6M10 14h8M10 18h4" stroke={T.dm} strokeWidth="1.5" strokeLinecap="round"/></svg>,color:T.dm,fn:()=>{if(copyClipboard(results,stats,scUrl,allIssues)){setCopied(true);setTimeout(()=>setCopied(false),2500)}}},
-    {id:"email",name:"Email Report",desc:"Opens your default email client with the audit summary pre-filled as the body. Add recipients and send.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="6" width="22" height="16" rx="3" stroke={T.teal} strokeWidth="2"/><path d="M3 9l11 7 11-7" stroke={T.teal} strokeWidth="2" strokeLinejoin="round"/></svg>,color:T.teal,fn:()=>emailReport(stats,scUrl,allIssues)},
-    ...(typeof navigator!=='undefined'&&navigator.share?[{id:"share",name:"Share via Device",desc:"Use your device's native share menu to send via any installed app — Slack, Teams, WhatsApp, AirDrop, etc.",icon:<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="19" cy="6" r="3.5" stroke={T.navy} strokeWidth="2"/><circle cx="19" cy="22" r="3.5" stroke={T.navy} strokeWidth="2"/><circle cx="8" cy="14" r="3.5" stroke={T.navy} strokeWidth="2"/><path d="M11 13l5-5.5M11 15l5 5.5" stroke={T.navy} strokeWidth="1.5"/></svg>,color:T.navy,fn:()=>shareNative(stats,scUrl)}]:[]),
-  ];
-  return<div>
-    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}><HexIcon size={36}/><h2 style={{margin:0,fontFamily:T.serif,fontSize:24,color:T.ink}}>Export Report</h2></div>
-    <p style={{fontSize:14,color:T.dm,lineHeight:1.6,marginBottom:20,maxWidth:560}}>Download your WCAG 2.2 AAA compliance report in multiple formats. Each export includes the full audit results, recommendations, and prioritized implementation roadmap.</p>
-    
-    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:14}}>
-      {formats.map(f=><button key={f.id} onClick={f.fn} aria-label={`Export as ${f.name}`} style={{background:T.w,borderRadius:18,border:`1px solid ${T.b1}`,padding:"22px 24px",textAlign:"left",cursor:"pointer",boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 24px rgba(28,25,23,.04)",transition:`all .25s ${T.ease}`,display:"flex",gap:16,alignItems:"flex-start"}}>
-        <div style={{width:52,height:52,borderRadius:14,background:`${f.color}08`,border:`1px solid ${f.color}15`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{f.icon}</div>
-        <div style={{flex:1}}>
-          <div style={{fontSize:15,fontWeight:700,color:T.ink,marginBottom:3,display:"flex",alignItems:"center",gap:6}}>
-            {f.name}
-            {f.id==="clip"&&copied&&<span style={{fontSize:10,color:T.green,fontWeight:600,padding:"2px 8px",borderRadius:20,background:T.gs}}>✓ Copied!</span>}
-          </div>
-          <div style={{fontSize:12.5,color:T.dm,lineHeight:1.55}}>{f.desc}</div>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{flexShrink:0,marginTop:4}}><path d="M8 2v9M4 7l4 4 4-4" stroke={f.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 12v2h12v-2" stroke={f.color} strokeWidth="2" strokeLinecap="round"/></svg>
-      </button>)}
-    </div>
-
-    <div style={{marginTop:20,background:T.ts,borderRadius:14,padding:"16px 20px",border:`1px solid ${T.tm}`}}>
-      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 11H7V7h2v4zm0-6H7V3h2v2z"/></svg>
-        <span style={{fontSize:12,fontWeight:700,color:T.teal}}>Export Guide</span>
-      </div>
-      <div style={{fontSize:12.5,color:T.mt,lineHeight:1.65}}>
-        <strong>PDF</strong> — Best for sharing with leadership and compliance teams. Print to PDF or paper.<br/>
-        <strong>HTML</strong> — Self-contained styled report. Email as attachment or host on your site.<br/>
-        <strong>CSV</strong> — Import into Excel, Google Sheets, or project trackers for sprint planning.<br/>
-        <strong>JSON</strong> — Integrate into CI/CD pipelines, automated dashboards, or JIRA via API.<br/>
-        <strong>Markdown</strong> — Paste into GitHub Issues, Confluence pages, or README files.<br/>
-        <strong>Clipboard</strong> — Quick paste into Slack messages, emails, or meeting notes.
-      </div>
+  const ts_=r?[["AA",r>=4.5,"≥4.5:1"],["AA Large",r>=3,"≥3:1"],["AAA",r>=7,"≥7:1"],["AAA Large",r>=4.5,"≥4.5:1"]]:[];
+  return<div style={{background:T.w,borderRadius:22,border:`1px solid ${T.b1}`,padding:"32px 28px",boxShadow:"0 4px 20px rgba(28,25,23,.05)",position:"relative",overflow:"hidden"}}>
+    <HexBg w={400} h={250} opacity={.03}/>
+    <div style={{position:"relative"}}>
+      <h2 style={{margin:"0 0 24px",fontFamily:T.serif,fontSize:24,color:T.ink}}>Contrast Checker</h2>
+      <div style={{display:"flex",gap:18,flexWrap:"wrap",marginBottom:24}}>{[["Foreground",fg,setFg],["Background",bg,setBg]].map(([l,v,s])=><label key={l} style={{display:"flex",flexDirection:"column",gap:6,flex:1,minWidth:150}}>
+        <span style={{fontSize:11,color:T.dm,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</span>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}><input type="color" value={v} onChange={e=>s(e.target.value)} style={{width:48,height:48,border:`2px solid ${T.b2}`,cursor:"pointer",borderRadius:12,padding:2}}/><input type="text" value={v} onChange={e=>s(e.target.value)} style={{flex:1,padding:"12px 14px",background:T.bg,border:`1px solid ${T.b1}`,borderRadius:12,color:T.ink,fontFamily:T.mono,fontSize:14}}/></div>
+      </label>)}</div>
+      <div style={{background:br?bg:T.w,color:fr?fg:T.ink,padding:"26px 30px",borderRadius:16,marginBottom:22,border:`1px solid ${T.b1}`,boxShadow:"inset 0 2px 8px rgba(28,25,23,.02)"}}><div style={{fontSize:22,marginBottom:6,fontFamily:T.serif}}>The quick brown fox jumps</div><div style={{fontSize:14}}>Body text — 14px regular</div></div>
+      {r!==null&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(105px,1fr))",gap:10}}>
+        <div style={{textAlign:"center",padding:18,background:T.bg,borderRadius:14}}><div style={{fontSize:36,fontFamily:T.mono,fontWeight:700,color:r>=7?T.teal:r>=4.5?T.peach:T.rose}}>{r.toFixed(2)}</div><div style={{fontSize:10,color:T.dm,marginTop:4,textTransform:"uppercase"}}>Ratio</div></div>
+        {ts_.map(([l,pass,req])=><div key={l} style={{textAlign:"center",padding:18,background:pass?T.ts:T.rs,borderRadius:14,border:`1.5px solid ${pass?T.tm:T.rm}`}}><div style={{fontSize:18,fontWeight:700,color:pass?T.teal:T.rose}}>{pass?"PASS":"FAIL"}</div><div style={{fontSize:10,color:T.dm,marginTop:3}}>{l}</div><div style={{fontSize:10,color:T.dm,fontFamily:T.mono}}>{req}</div></div>)}
+      </div>}
     </div>
   </div>;
 }
 
 const SAMPLE=`<!DOCTYPE html>\n<html>\n<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">\n  <title></title>\n</head>\n<body>\n  <div onclick="nav('/')" style="cursor:pointer">Home</div>\n  <h1>Welcome</h1><h3>Quick Start</h3>\n  <p style="text-align:justify;line-height:1.1;color:#999;background-color:#fff">Poor contrast.</p>\n  <img src="hero.jpg"><a href="/about">Click here</a><a href="/contact"></a>\n  <form><input type="text" name="email"><input type="password" autocomplete="off" onpaste="return false">\n  <select onchange="window.location=this.value"><option>Go</option></select>\n  <fieldset><input type="checkbox"> I agree</fieldset></form>\n  <div id="sid" aria-hidden="true"><a href="/p">Privacy</a><button>Contact</button></div>\n  <div id="sid">Dup</div>\n  <table><tr><td>Product</td><td>Price</td></tr></table>\n  <button style="width:18px;height:18px" aria-label="Close">×</button>\n  <svg width="80" height="80"><circle cx="40" cy="40" r="30" fill="blue"/></svg>\n  <footer><a href="/about">About</a></footer>\n</body></html>`;
 
-const TABS=[{k:"dashboard",l:"Dashboard",i:"◎"},{k:"audit",l:"Audit",i:"◉"},{k:"priority",l:"Priority",i:"⚡"},{k:"contrast",l:"Contrast",i:"◑"},{k:"preview",l:"Preview",i:"◫"},{k:"export",l:"Export",i:"⬇"}];
+/* ═══ APP ═══ */
+const TABS=[{k:"dashboard",l:"Dashboard",i:"◎"},{k:"audit",l:"Audit",i:"◉"},{k:"priority",l:"Priority",i:"⚡"},{k:"contrast",l:"Contrast",i:"◑"},{k:"preview",l:"Preview",i:"◫"}];
 
 function App(){
   const[mode,setMode]=useState("url");const[url,setUrl]=useState("");const[html,setHtml]=useState("");
@@ -543,6 +232,7 @@ function App(){
   const[results,setResults]=useState(null);const[tab,setTab]=useState("dashboard");
   const[fL,setFL]=useState("ALL");const[fS,setFS]=useState("ALL");const[fP,setFP]=useState("ALL");
   const[exp,setExp]=useState(null);const[rem,setRem]=useState("");
+  const[showExp,setShowExp]=useState(false);const[copied,setCopied]=useState(false);
 
   const doAudit=useCallback((h,u)=>{if(!h?.trim())return;setHtml(h);setResults(analyze(h));setRem(autoFix(h));setTab("dashboard");if(u)setScUrl(u)},[]);
   const scanUrl=useCallback(async()=>{if(!url.trim())return;setFSt("loading");setFErr("");setResults(null);const r=await fetchURL(url.trim());if(r.ok){setFSt("done");setScUrl(r.url);setFErr(r.via||'');doAudit(r.html,r.url)}else{setFSt("error");setFErr(r)}},[url,doAudit]);
@@ -551,243 +241,236 @@ function App(){
   const filtered=useMemo(()=>{if(!results)return[];return results.filter(r=>{if(fL!=="ALL"&&r.l!==fL)return false;if(fP!=="ALL"&&r.pr!==fP)return false;if(fS==="ISSUES"&&r.ok)return false;if(fS==="PASSED"&&!r.ok)return false;return true})},[results,fL,fS,fP]);
   const stats=useMemo(()=>{if(!results)return null;const t=results.length,p=results.filter(r=>r.ok).length;const a=results.flatMap(r=>r.issues).filter(i=>i.s!==SV.I);return{total:t,passed:p,crit:a.filter(i=>i.s===SV.C).length,maj:a.filter(i=>i.s===SV.M).length,min:a.filter(i=>i.s===SV.m).length,score:t>0?Math.round((p/t)*100):0,issues:a.length}},[results]);
   const princ=useMemo(()=>{if(!results)return{};const p={};["Perceivable","Operable","Understandable","Robust"].forEach(pr=>{const R=results.filter(r=>r.pr===pr);p[pr]={t:R.length,p:R.filter(r=>r.ok).length,s:R.length?Math.round(R.filter(r=>r.ok).length/R.length*100):100}});return p},[results]);
-
-  const pill=(c,b)=>({fontSize:9.5,fontWeight:700,letterSpacing:".05em",textTransform:"uppercase",padding:"3px 9px",borderRadius:20,color:c,background:b,display:"inline-block"});
+  const pourIcons={Perceivable:"eye",Operable:"keyboard",Understandable:"brain",Robust:"shield"};
   const pRef=useRef(null);const rRef=useRef(null);
-  useEffect(()=>{[[pRef,html],[rRef,rem]].forEach(([ref,h])=>{if(ref.current&&h){const d=ref.current.contentDocument;if(d){d.open();d.write(h);d.close()}}});},[html,rem,tab]);
+  useEffect(()=>{[[pRef,html],[rRef,rem]].forEach(([ref,h])=>{if(ref.current&&h){const d=ref.current.contentDocument;if(d){d.open();d.write(h);d.close()}}})},[html,rem,tab]);
 
-  return<div role="main" style={{fontFamily:T.sans,background:T.bg,color:T.ink,minHeight:"100vh",maxWidth:1160,margin:"0 auto",padding:0,WebkitFontSmoothing:"antialiased"}}>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-    <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .fade{animation:fadeUp .4s ${T.ease}}
-    .spin{width:16px;height:16px;border:2.5px solid ${T.tm};border-top-color:${T.teal};border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
-    .pulse-dot{animation:pulse 2s ease-in-out infinite}
-    .row-b{width:100%;display:flex;align-items:center;gap:10px;padding:16px 22px;border:none;background:transparent;cursor:pointer;color:${T.ink};text-align:left;font-size:14px;transition:all .2s ${T.ease};border-radius:0;min-height:52px}
-    .row-b:hover{background:${T.bg2}}
-    .tab-b{position:relative;padding:14px 20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:${T.dm};display:flex;align-items:center;gap:7px;white-space:nowrap;border-bottom:2.5px solid transparent;transition:all .2s ${T.ease};min-height:52px}
-    .tab-b:hover{color:${T.mt}}.tab-b.on{color:${T.teal};border-bottom-color:${T.teal}}
-    .card{background:${T.w};border-radius:18px;border:1px solid ${T.b1};box-shadow:0 2px 8px rgba(28,25,23,.03),0 8px 24px rgba(28,25,23,.04);transition:all .25s ${T.ease};overflow:hidden}
-    .card:hover{box-shadow:0 4px 12px rgba(28,25,23,.06),0 16px 40px rgba(28,25,23,.06);transform:translateY(-1px)}
-    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid ${T.teal};outline-offset:2px;border-radius:6px}
-    `}</style>
+  return<div style={{fontFamily:T.sans,background:T.bg,color:T.ink,minHeight:"100vh",maxWidth:1160,margin:"0 auto",WebkitFontSmoothing:"antialiased"}}>
 
-    {/* ── HEADER ── */}
-    <header style={{borderBottom:`1px solid ${T.b1}`,padding:"16px 30px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16,background:`rgba(251,249,246,.95)`,backdropFilter:"blur(16px)",position:"sticky",top:0,zIndex:10}}>
-      <div style={{display:"flex",alignItems:"center",gap:14}}>
-        <HexIcon size={38}><circle cx="26" cy="23" r="5" fill="none" stroke={T.teal} strokeWidth="1.8"/><circle cx="26" cy="23" r="2" fill={T.teal}/></HexIcon>
+    {/* ════ HEADER ════ */}
+    <header style={{borderBottom:`1px solid ${T.b1}`,padding:"14px 28px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:14,background:"rgba(251,249,246,.95)",backdropFilter:"blur(12px)",position:"sticky",top:0,zIndex:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:12}}>
+        <div style={{width:38,height:38,borderRadius:10,background:T.teal,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px rgba(13,115,119,.2)"}}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 2L20 7V17L12 22L4 17V7Z" strokeLinejoin="round"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
         <div>
-          <h1 style={{margin:0,fontSize:18,fontWeight:700,lineHeight:1.2,letterSpacing:"-.02em",fontFamily:T.serif}}>BrainPulse <span style={{color:T.teal}}>A11y</span></h1>
-          <p style={{margin:"4px 0 0",fontSize:11,color:T.dm,display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-            <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`}}><span style={{width:6,height:6,borderRadius:"50%",background:T.teal}} className="pulse-dot"/>WCAG 2.2 AAA</span>
+          <div style={{fontSize:17,fontWeight:700,fontFamily:T.serif,lineHeight:1.2}}>BrainPulse <span style={{color:T.teal}}>A11y</span></div>
+          <div style={{fontSize:10.5,color:T.dm,marginTop:2,display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+            <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 10px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`}}><span style={{width:5,height:5,borderRadius:"50%",background:T.teal}} className="pulse-dot"/>AAA</span>
             <span>{RULES.length} Criteria</span>
-          </p>
+          </div>
         </div>
       </div>
-      {stats&&<div style={{display:"flex",alignItems:"center",gap:12,flexShrink:0}}>
-        <Donut value={stats.score} size={46} sublabel=""/>
-        <div style={{padding:"5px 12px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`,display:"flex",alignItems:"center",gap:5}}>
-          <svg width="12" height="12" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>
-          <span style={{fontSize:10,fontWeight:700,color:T.teal}}>AAA</span>
-        </div>
-      </div>}
+      {stats&&<Donut value={stats.score} size={44} strokeW={4}/>}
     </header>
 
-    {/* ── INPUT ── */}
-    <section style={{padding:"22px 30px",borderBottom:`1px solid ${T.b1}`,background:T.w,position:"relative",overflow:"hidden"}} aria-label="Input">
-      <HexGrid w={600} h={100}/>
-      <div style={{display:"flex",gap:0,marginBottom:16,position:"relative"}} role="tablist">
-        {[["url","🔗  Scan URL"],["html","</>  Paste HTML"]].map(([m,l])=><button key={m} role="tab" aria-selected={mode===m} onClick={()=>{setMode(m);setResults(null);setFSt(null)}} style={{padding:"12px 24px",fontSize:13.5,fontWeight:mode===m?700:500,cursor:"pointer",border:`1px solid ${T.b1}`,borderBottom:mode===m?`3px solid ${T.teal}`:`1px solid ${T.b1}`,background:mode===m?T.bg:"transparent",color:mode===m?T.teal:T.dm,borderRadius:m==="url"?"14px 0 0 0":"0 14px 0 0",minHeight:52,transition:`all .2s ${T.ease}`}}>{l}</button>)}
-      </div>
-      {mode==="url"&&<div style={{position:"relative"}}><div style={{display:"flex",gap:10,marginBottom:8}}><input type="url" value={url} onChange={e=>{setUrl(e.target.value);setFSt(null)}} onKeyDown={e=>{if(e.key==="Enter")scanUrl()}} placeholder="https://example.com" aria-label="URL" style={{flex:1,padding:"14px 18px",background:T.bg,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:14,minHeight:52}}/><button onClick={scanUrl} disabled={!url.trim()||fSt==="loading"} style={{padding:"14px 30px",fontSize:14,borderRadius:14,border:`2px solid ${T.teal}`,background:url.trim()?T.teal:"transparent",color:url.trim()?T.w:T.teal,cursor:url.trim()?"pointer":"default",fontWeight:700,minHeight:52,boxShadow:url.trim()?`0 4px 14px rgba(13,115,119,.25)`:"none"}}>{fSt==="loading"?<><span className="spin" style={{marginRight:8}}/>Scanning…</>:"◉ Scan"}</button></div>
-        {fSt==="error"&&<div role="alert" className="fade" style={{borderRadius:16,border:`1px solid ${T.rm}`,overflow:"hidden",marginTop:4}}>
-          <div style={{padding:"16px 20px",background:T.rs}}>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill={T.rose}><circle cx="10" cy="10" r="9"/><path d="M10 6v5M10 13v1" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
-              <span style={{fontSize:14,fontWeight:700,color:T.rose}}>{fErr?.inSandbox?"Preview Sandbox Restriction":"Could not reach the URL"}</span>
+    {/* ════ HERO INPUT ════ */}
+    <section style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${T.b1}`,background:`linear-gradient(180deg,${T.w},${T.bg})`}}>
+      <HexBg w={800} h={250} opacity={.03}/>
+      <FloatingHex size={50} x="85%" y="10px" delay={0}/>
+      <FloatingHex size={35} x="5%" y="60px" delay={1.5}/>
+      <FloatingHex size={28} x="75%" y="100px" delay={0.8}/>
+      <div style={{position:"relative",padding:"28px 28px 24px"}}>
+        <div style={{display:"flex",gap:0,marginBottom:16}} role="tablist">
+          {[["url","🔗  Scan URL"],["html","</>  Paste HTML"]].map(([m,l])=><button key={m} onClick={()=>{setMode(m);setResults(null);setFSt(null)}} style={{padding:"11px 24px",fontSize:13,fontWeight:mode===m?700:500,cursor:"pointer",border:`1px solid ${T.b1}`,borderBottom:mode===m?`3px solid ${T.teal}`:`1px solid ${T.b1}`,background:mode===m?T.w:"transparent",color:mode===m?T.teal:T.dm,borderRadius:m==="url"?"14px 0 0 0":"0 14px 0 0",minHeight:48}}>{l}</button>)}
+        </div>
+        {mode==="url"&&<div><div style={{display:"flex",gap:10,marginBottom:8}}><input type="url" value={url} onChange={e=>{setUrl(e.target.value);setFSt(null)}} onKeyDown={e=>{if(e.key==="Enter")scanUrl()}} placeholder="https://example.com" style={{flex:1,padding:"14px 18px",background:T.w,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:14,minHeight:52,boxShadow:"0 2px 8px rgba(28,25,23,.03)"}}/><button onClick={scanUrl} disabled={!url.trim()||fSt==="loading"} style={{padding:"14px 30px",fontSize:14,borderRadius:14,border:"none",background:url.trim()?T.teal:"#ccc",color:T.w,cursor:url.trim()?"pointer":"default",fontWeight:700,minHeight:52,boxShadow:url.trim()?"0 4px 14px rgba(13,115,119,.25)":"none"}}>{fSt==="loading"?<><span className="spin" style={{marginRight:8}}/>Scanning…</>:"◉ Scan"}</button></div>
+          {fSt==="error"&&<div className="fade" style={{borderRadius:16,border:`1px solid ${T.rm}`,overflow:"hidden",marginTop:4}}>
+            <div style={{padding:"14px 18px",background:T.rs,display:"flex",alignItems:"center",gap:8}}><IllustratedIcon type="warn" size={22}/><span style={{fontSize:14,fontWeight:700,color:T.rose}}>{fErr?.inSandbox?"Preview Sandbox":"Could not reach URL"}</span></div>
+            <div style={{padding:"14px 18px",background:T.w}}><p style={{fontSize:13,color:T.mt,lineHeight:1.6,margin:"0 0 10px"}}>{fErr?.inSandbox?"The tool works when deployed to your website. This preview sandbox blocks network requests.":"Retried 3 rounds. Try pasting HTML directly."}</p>
+              <div style={{display:"flex",gap:8}}><button onClick={scanUrl} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:"none",background:T.teal,color:T.w,cursor:"pointer",fontWeight:700}}>↻ Retry</button><button onClick={()=>{setMode("html");setFSt(null)}} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.bg,color:T.mt,cursor:"pointer"}}>Paste HTML</button></div>
             </div>
-            <p style={{fontSize:13,color:T.mt,lineHeight:1.65,margin:0}}>
-              {fErr?.inSandbox
-                ?"This preview runs inside a sandboxed environment that blocks network requests. The tool works correctly when deployed to your website."
-                :`Attempted 3 retry rounds across 5 proxies. The site may block automated requests.`}
-            </p>
-          </div>
-          <div style={{padding:"16px 20px",background:T.w,borderTop:`1px solid ${T.b1}`}}>
-            <div style={{fontSize:12,fontWeight:700,color:T.ink,marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm1 11H7V7h2v4zm0-6H7V3h2v2z"/></svg>
-              Quick Fix — Paste the HTML source
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              {[
-                ["1","Open the URL in a new tab",`Navigate to ${url} in your browser`],
-                ["2","View Page Source","Right-click anywhere → View Page Source (or Ctrl+U / ⌘+U)"],
-                ["3","Copy all","Press Ctrl+A then Ctrl+C (or ⌘+A then ⌘+C)"],
-                ["4","Paste here","Switch to the </> HTML tab above and paste"]
-              ].map(([n,title,desc])=><div key={n} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
-                <span style={{width:24,height:24,borderRadius:8,background:T.ts,border:`1px solid ${T.tm}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:T.teal,flexShrink:0}}>{n}</span>
-                <div><div style={{fontSize:13,fontWeight:600,color:T.ink}}>{title}</div><div style={{fontSize:12,color:T.dm}}>{desc}</div></div>
-              </div>)}
-            </div>
-            <div style={{display:"flex",gap:8,marginTop:14}}>
-              <button onClick={scanUrl} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:`2px solid ${T.teal}`,background:T.teal,color:T.w,cursor:"pointer",fontWeight:700}}>↻ Retry Scan</button>
-              <button onClick={()=>{setMode("html");setFSt(null)}} style={{padding:"10px 20px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.bg,color:T.mt,cursor:"pointer",fontWeight:600}}>Switch to HTML tab</button>
-            </div>
-          </div>
+          </div>}
+          {fSt==="done"&&<div style={{fontSize:13,color:T.teal,fontWeight:600,display:"flex",alignItems:"center",gap:6}}><IllustratedIcon type="check" size={18}/>Fetched {scUrl} via {fErr} — {html.length.toLocaleString()} chars</div>}
         </div>}
-        {fSt==="done"&&<div role="status" style={{fontSize:13,color:T.teal,padding:"6px 0",fontWeight:600,display:"flex",alignItems:"center",gap:6}}><svg width="16" height="16" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>Fetched {scUrl} via {fErr} — {html.length.toLocaleString()} characters</div>}
-      </div>}
-      {mode==="html"&&<div style={{position:"relative"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:6}}><span style={{fontSize:11,textTransform:"uppercase",letterSpacing:".07em",color:T.dm,fontWeight:700}}>Source</span><div style={{display:"flex",gap:8}}><button onClick={()=>{setHtml(SAMPLE);setResults(null)}} style={{padding:"10px 18px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.bg,color:T.mt,cursor:"pointer",fontWeight:500}}>Load Sample</button><button onClick={()=>doAudit(html,"")} disabled={!html.trim()} style={{padding:"10px 24px",fontSize:12,borderRadius:10,border:`2px solid ${T.teal}`,background:html.trim()?T.teal:"transparent",color:html.trim()?T.w:T.teal,cursor:html.trim()?"pointer":"default",fontWeight:700,boxShadow:html.trim()?`0 4px 14px rgba(13,115,119,.25)`:"none"}}>▶ Audit</button></div></div><textarea value={html} onChange={e=>{setHtml(e.target.value);setResults(null)}} placeholder="Paste HTML…" aria-label="HTML source" style={{width:"100%",minHeight:130,maxHeight:250,padding:"16px 18px",background:T.bg,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:13,lineHeight:1.65,resize:"vertical",boxSizing:"border-box"}}/></div>}
+        {mode==="html"&&<div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:6}}><span style={{fontSize:11,color:T.dm,fontWeight:700,textTransform:"uppercase",letterSpacing:".07em"}}>Source</span><div style={{display:"flex",gap:8}}><button onClick={()=>{setHtml(SAMPLE);setResults(null)}} style={{padding:"10px 18px",fontSize:12,borderRadius:10,border:`1px solid ${T.b2}`,background:T.w,color:T.mt,cursor:"pointer"}}>Load Sample</button><button onClick={()=>doAudit(html,"")} disabled={!html.trim()} style={{padding:"10px 24px",fontSize:12,borderRadius:10,border:"none",background:html.trim()?T.teal:"#ccc",color:T.w,cursor:html.trim()?"pointer":"default",fontWeight:700}}>▶ Audit</button></div></div><textarea value={html} onChange={e=>{setHtml(e.target.value);setResults(null)}} placeholder="Paste HTML…" style={{width:"100%",minHeight:130,maxHeight:250,padding:"14px 16px",background:T.w,border:`1.5px solid ${T.b1}`,borderRadius:14,color:T.ink,fontFamily:T.mono,fontSize:13,lineHeight:1.65,resize:"vertical",boxSizing:"border-box",boxShadow:"0 2px 8px rgba(28,25,23,.03)"}}/></div>}
+      </div>
+      <WaveSvg/>
     </section>
-    <WaveDecor/>
 
-    {/* ── RESULTS ── */}
-    {results&&<><nav style={{display:"flex",borderBottom:`1px solid ${T.b1}`,padding:"0 22px",overflowX:"auto",background:T.w}} role="tablist">{TABS.map(t=><button key={t.k} role="tab" aria-selected={tab===t.k} className={`tab-b${tab===t.k?" on":""}`} onClick={()=>setTab(t.k)}><span style={{fontSize:14}}>{t.i}</span>{t.l}</button>)}</nav>
-    <ExportActionBar results={results} stats={stats} scUrl={scUrl} allIssues={allIssues} onTabSwitch={setTab}/>
-    <div style={{padding:"28px 30px",minHeight:300}} className="fade">
-
-    {/* DASHBOARD */}
-    {tab==="dashboard"&&<div>
-      {/* Hero score */}
-      <div style={{background:T.w,borderRadius:22,border:`1px solid ${T.b1}`,padding:"40px 30px 36px",marginBottom:24,boxShadow:"0 4px 16px rgba(28,25,23,.04),0 16px 48px rgba(28,25,23,.04)",position:"relative",overflow:"hidden",textAlign:"center"}}>
-        <HexGrid w={800} h={300}/>
-        <div style={{position:"relative",zIndex:1}}>
-          <Donut value={stats.score} size={130} strokeW={8} sublabel="score"/>
-          <p style={{fontSize:14,color:T.dm,marginTop:16,lineHeight:1.5}}>Scanned <strong style={{color:T.ink}}>{stats.total}</strong> WCAG 2.2 criteria across A, AA, and AAA levels</p>
+    {/* ════ RESULTS ════ */}
+    {results&&<>
+      {/* Export Bar */}
+      <div style={{background:T.w,borderBottom:`1px solid ${T.b1}`,padding:"12px 28px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+          <IllustratedIcon type="check" size={18}/>
+          <span style={{fontSize:13,fontWeight:600}}>Audit complete</span>
+          <span style={{fontSize:13,fontFamily:T.mono,fontWeight:700,color:stats.score>=80?T.teal:T.rose}}>{stats.score}/100</span>
+          <span style={{fontSize:12,color:T.dm}}>{stats.issues} issue{stats.issues!==1?"s":""}</span>
+        </div>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+          {showExp?<>{[["PDF",()=>printReport(results,stats,scUrl)],["CSV",()=>exportCSV(results)],["JSON",()=>exportJSON(results,stats,scUrl)],["MD",()=>exportMD(results,stats,scUrl,allIssues)],["Email",()=>emailReport(stats,scUrl,allIssues)],[copied?"Copied!":"Copy",()=>{if(copyReport(results,stats,scUrl,allIssues)){setCopied(true);setTimeout(()=>setCopied(false),2500)}}]].map(([l,fn])=><button key={l} onClick={fn} style={{padding:"8px 14px",fontSize:11,fontWeight:600,borderRadius:10,border:`1px solid ${T.b1}`,background:T.bg,color:T.mt,cursor:"pointer",minHeight:36}}>{l}</button>)}<button onClick={()=>setShowExp(false)} style={{padding:"8px 10px",borderRadius:10,border:`1px solid ${T.b1}`,background:T.bg,color:T.dm,cursor:"pointer",fontSize:12,minHeight:36}}>✕</button></>:
+          <button onClick={()=>setShowExp(true)} style={{display:"flex",alignItems:"center",gap:7,padding:"8px 20px",fontSize:12,fontWeight:700,borderRadius:10,border:"none",background:T.teal,color:T.w,cursor:"pointer",minHeight:36,boxShadow:"0 2px 8px rgba(13,115,119,.2)"}}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M8 2v9M4 7l4 4 4-4"/><path d="M2 12v2h12v-2"/></svg>Export
+          </button>}
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(110px,1fr))",gap:14,marginBottom:28}}>
-        {[[stats.total,T.ink,"Rules",<HexIcon size={18}/>],[stats.passed,T.teal,"Passed",<svg width="14" height="14" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>],[stats.issues,T.rose,"Issues",<svg width="14" height="14" viewBox="0 0 16 16" fill={T.rose}><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 011 1v3a1 1 0 01-2 0V5a1 1 0 011-1zm0 7a1 1 0 100-2 1 1 0 000 2z"/></svg>],[stats.crit,T.rose,"Critical"],[stats.maj,T.peach,"Major"],[stats.min,T.navy,"Minor"]].map(([v,c,l,icon],i)=><AnimStat key={l} value={v} color={c} label={l} icon={icon}/>)}
-      </div>
+      {/* Tabs */}
+      <nav style={{display:"flex",borderBottom:`1px solid ${T.b1}`,padding:"0 20px",overflowX:"auto",background:T.w}} role="tablist">{TABS.map(t=><button key={t.k} onClick={()=>setTab(t.k)} style={{padding:"13px 18px",fontSize:13,fontWeight:tab===t.k?700:500,cursor:"pointer",border:"none",background:"transparent",color:tab===t.k?T.teal:T.dm,display:"flex",alignItems:"center",gap:6,borderBottom:tab===t.k?`2.5px solid ${T.teal}`:"2.5px solid transparent",minHeight:48}}><span style={{fontSize:14}}>{t.i}</span>{t.l}</button>)}</nav>
 
-      {/* POUR Cards */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:16,marginBottom:24}}>
-        {["Perceivable","Operable","Understandable","Robust"].map(p=>{const d=princ[p]||{};const c=d.s>=80?T.teal:d.s>=50?T.peach:T.rose;return<div key={p} className="card" style={{padding:"24px 24px 20px"}}>
-          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14}}>
-            <div style={{flexShrink:0}}><POURIcon principle={p} size={34}/></div>
-            <div><div style={{fontSize:15,fontWeight:700,lineHeight:1.2}}>{p}</div><div style={{fontSize:11.5,color:T.dm,marginTop:2}}>{d.p}/{d.t} passed</div></div>
+      <div style={{padding:"28px 28px",minHeight:300}} className="fade">
+
+      {/* ═══ DASHBOARD ═══ */}
+      {tab==="dashboard"&&<div>
+        {/* Hero Score */}
+        <div style={{background:T.w,borderRadius:24,border:`1px solid ${T.b1}`,padding:"44px 30px 40px",marginBottom:28,boxShadow:"0 4px 20px rgba(28,25,23,.04),0 16px 48px rgba(28,25,23,.04)",position:"relative",overflow:"hidden",textAlign:"center"}}>
+          <HexBg w={900} h={350} opacity={.025}/>
+          <FloatingHex size={45} x="8%" y="20px" delay={0.5}/>
+          <FloatingHex size={30} x="88%" y="60px" delay={1.2}/>
+          <FloatingHex size={25} x="15%" y="120px" delay={2}/>
+          <div style={{position:"relative",zIndex:1}}>
+            <Donut value={stats.score} size={140} strokeW={9} sublabel="COMPLIANCE SCORE"/>
+            <p style={{fontSize:15,color:T.dm,marginTop:18,lineHeight:1.5}}>Scanned <strong style={{color:T.ink}}>{stats.total}</strong> WCAG 2.2 criteria across <span style={{padding:"2px 10px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`,fontWeight:600,color:T.teal,fontSize:13}}>A</span> <span style={{padding:"2px 10px",borderRadius:20,background:T.ns,border:`1px solid rgba(30,58,95,.12)`,fontWeight:600,color:T.navy,fontSize:13}}>AA</span> <span style={{padding:"2px 10px",borderRadius:20,background:"rgba(109,40,217,.05)",border:"1px solid rgba(109,40,217,.1)",fontWeight:600,color:"#6d28d9",fontSize:13}}>AAA</span> levels</p>
           </div>
-          <GlowBar value={d.s} color={c} label="" detail=""/>
-        </div>})}
-      </div>
-
-      {/* Level Donuts */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
-        {["A","AA","AAA"].map(lv=>{const R=results.filter(r=>r.l===lv);const p=R.filter(r=>r.ok).length;const pct=R.length?Math.round(p/R.length*100):100;return<div key={lv} className="card" style={{textAlign:"center",padding:"28px 20px"}}>
-          <Donut value={pct} size={64} strokeW={5}/>
-          <div style={{fontSize:13,color:T.ink,marginTop:12,fontWeight:700}}>Level {lv}</div>
-          <div style={{fontSize:12,color:T.dm,fontFamily:T.mono,marginTop:2}}>{p} / {R.length}</div>
-        </div>})}
-      </div>
-    </div>}
-
-    {/* AUDIT */}
-    {tab==="audit"&&<div>
-      <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap"}} role="group" aria-label="Filters">{[["Level",fL,setFL,["ALL","A","AA","AAA"]],["Status",fS,setFS,["ALL","ISSUES","PASSED"]],["Principle",fP,setFP,["ALL","Perceivable","Operable","Understandable","Robust"]]].map(([l,v,s,o])=><div key={l} style={{display:"flex",alignItems:"center",gap:5}}><label style={{fontSize:10,color:T.dm,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</label><select value={v} onChange={e=>s(e.target.value)} style={{padding:"8px 12px",fontSize:12,borderRadius:10,border:`1px solid ${T.b1}`,background:T.bg,color:T.ink,cursor:"pointer",minHeight:40}}>{o.map(x=><option key={x}>{x}</option>)}</select></div>)}</div>
-      <div style={{display:"flex",flexDirection:"column",gap:6}} role="list">{filtered.map(rule=>{const isO=exp===rule.id;const ic=rule.issues.filter(i=>i.s!==SV.I).length;return<div key={rule.id} className="card" role="listitem">
-        <button className="row-b" onClick={()=>setExp(isO?null:rule.id)} aria-expanded={isO}>
-          <span style={{width:10,height:10,borderRadius:"50%",background:rule.ok?T.teal:T.rose,flexShrink:0,boxShadow:`0 0 0 3px ${rule.ok?T.ts:T.rs}`}} aria-hidden="true"/>
-          <span style={{fontFamily:T.mono,fontSize:12,color:T.teal,fontWeight:600,minWidth:44}}>{rule.id}</span>
-          <span style={{fontWeight:500,flex:1}}>{rule.n}</span>
-          <span style={pill(rule.l==="AAA"?"#6d28d9":rule.l==="AA"?T.navy:T.teal,rule.l==="AAA"?"rgba(109,40,217,.06)":rule.l==="AA"?T.ns:T.ts)}>{rule.l}</span>
-          {ic>0&&<span style={{fontFamily:T.mono,fontSize:11,color:T.w,fontWeight:700,background:T.rose,padding:"3px 9px",borderRadius:20,minWidth:20,textAlign:"center"}}>{ic}</span>}
-          <svg width="12" height="12" viewBox="0 0 12 12" fill={T.dm} style={{transform:isO?"rotate(90deg)":"none",transition:`transform .2s ${T.ease}`}} aria-hidden="true"><path d="M4 2l4 4-4 4" strokeWidth="1"/></svg>
-        </button>
-        {isO&&<div className="fade" style={{borderTop:`1px solid ${T.b1}`,padding:"18px 22px",background:T.bg}}>
-          {rule.issues.length===0?<div style={{display:"flex",alignItems:"center",gap:8,fontSize:14,color:T.teal,fontWeight:600}}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke={T.teal} strokeWidth="2"/><path d="M6 10l3 3 5-5" stroke={T.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            No issues — this criterion passes
-          </div>:
-          <div style={{display:"flex",flexDirection:"column",gap:14}}>{rule.issues.map((issue,idx)=>{const isI=issue.s===SV.I;const rec=!isI?getRec(rule.id,issue):null;return<div key={idx} style={{background:SB[issue.s],borderRadius:16,padding:"18px 22px",borderLeft:`4px solid ${SC[issue.s]}`}}>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8,flexWrap:"wrap"}}>
-              <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:24,height:24,borderRadius:8,background:SC[issue.s]+"15",color:SC[issue.s],fontSize:12,fontWeight:800,fontFamily:T.mono}}>{issue.s==="critical"?"✕":issue.s==="major"?"!":"–"}</span>
-              <span style={pill(SC[issue.s],"transparent")}>{issue.s}</span>
-              {rec&&<span style={{fontSize:9,fontWeight:700,padding:"3px 10px",borderRadius:20,background:`${PC[rec.p]}08`,color:PC[rec.p],border:`1px solid ${PC[rec.p]}18`}}>{PLBL[rec.p]?.split("—")[0]}</span>}
-              {rec&&<span style={{fontSize:9,fontWeight:600,padding:"3px 10px",borderRadius:20,background:T.gs,color:T.green}}>{rec.e}</span>}
-            </div>
-            <p style={{fontSize:14.5,margin:"0 0 6px",lineHeight:1.65}}>{issue.msg}</p>
-            {issue.el&&issue.el!=="—"&&<code style={{display:"block",fontSize:12,color:T.mt,background:T.bg2,padding:"10px 16px",borderRadius:12,marginBottom:6,wordBreak:"break-all",fontFamily:T.mono,lineHeight:1.55}}>{issue.el}</code>}
-            <div style={{fontSize:13,color:T.teal,display:"flex",alignItems:"flex-start",gap:6,fontWeight:600}}><span style={{fontSize:16}}>⮕</span><span style={{lineHeight:1.55}}>{issue.fix}</span></div>
-            {rec&&<RecCard rec={rec}/>}
-          </div>})}</div>}
-        </div>}
-      </div>})}</div>
-    </div>}
-
-    {/* PRIORITY */}
-    {tab==="priority"&&<div>
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}><HexIcon size={36}/><h2 style={{margin:0,fontFamily:T.serif,fontSize:24}}>Implementation Roadmap</h2></div>
-      {allIssues.length===0?<div className="card" style={{padding:32,textAlign:"center"}}><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke={T.teal} strokeWidth="3"/><path d="M15 24l6 6 12-12" stroke={T.teal} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg><p style={{fontSize:18,color:T.teal,fontWeight:600,marginTop:12}}>All criteria passed!</p></div>:
-      <div style={{display:"flex",flexDirection:"column",gap:14}}>{[1,2,3,4].map(p=>{const items=allIssues.filter(i=>i.rec.p===p);if(!items.length)return null;return<div key={p} className="card">
-        <div style={{padding:"16px 22px",borderBottom:`1px solid ${T.b1}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{width:10,height:10,borderRadius:"50%",background:PC[p],boxShadow:`0 0 0 3px ${PC[p]}15`}}/><span style={{fontSize:15,fontWeight:700,color:PC[p]}}>{PLBL[p]}</span></div>
-          <span style={{fontSize:12,color:T.dm,fontFamily:T.mono,fontWeight:600,padding:"4px 12px",borderRadius:20,background:T.bg2}}>{items.length}</span>
         </div>
-        <div style={{padding:"10px 22px"}}>{items.map((i,j)=><div key={j} style={{display:"flex",gap:10,padding:"12px 0",borderBottom:j<items.length-1?`1px solid ${T.b1}`:"none"}}>
-          <span style={{fontFamily:T.mono,fontSize:11,color:T.teal,fontWeight:600,minWidth:42,paddingTop:3}}>{i.ruleId}</span>
-          <div style={{flex:1}}>
-            <p style={{fontSize:14,margin:"0 0 5px",lineHeight:1.55}}>{i.msg}</p>
-            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-              <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:22,height:22,borderRadius:6,background:SC[i.s]+"15",color:SC[i.s],fontSize:10,fontWeight:800,fontFamily:T.mono}}>{i.s==="critical"?"✕":"!"}</span>
-              <span style={{fontSize:9,fontWeight:600,padding:"4px 10px",borderRadius:20,background:T.gs,color:T.green}}>{i.rec.e}</span>
-            </div>
+
+        <GradientBar height={3}/>
+        <div style={{height:20}}/>
+
+        {/* Stats Grid */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:14,marginBottom:30}}>
+          {[[stats.total,T.ink,"Rules Checked"],[stats.passed,T.teal,"Passed"],[stats.issues,T.rose,"Issues Found"],[stats.crit,T.rose,"Critical"],[stats.maj,T.peach,"Major"],[stats.min,T.navy,"Minor"]].map(([v,c,l])=><StatCard key={l} value={v} color={c} label={l}/>)}
+        </div>
+
+        {/* POUR Section */}
+        <div style={{marginBottom:30}}>
+          <h2 style={{fontFamily:T.serif,fontSize:22,marginBottom:18,display:"flex",alignItems:"center",gap:10}}>
+            <IllustratedIcon type="shield" size={28}/>
+            POUR Principles
+          </h2>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",gap:16}}>
+            {["Perceivable","Operable","Understandable","Robust"].map(p=>{const d=princ[p]||{};const c=d.s>=80?T.teal:d.s>=50?T.peach:T.rose;return<div key={p} style={{background:T.w,borderRadius:20,border:`1px solid ${T.b1}`,padding:"26px 26px 22px",boxShadow:"0 2px 12px rgba(28,25,23,.04)",position:"relative",overflow:"hidden"}}>
+              <DotBg w={120} h={60} opacity={.12}/>
+              <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:16,position:"relative"}}>
+                <div style={{width:52,height:52,borderRadius:14,background:T.ts,border:`1px solid ${T.tm}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><IllustratedIcon type={pourIcons[p]} size={30}/></div>
+                <div><div style={{fontSize:16,fontWeight:700,lineHeight:1.2}}>{p}</div><div style={{fontSize:12,color:T.dm,marginTop:3}}>{d.p}/{d.t} passed</div></div>
+              </div>
+              <GlowBar value={d.s} color={c}/>
+            </div>})}
           </div>
+        </div>
+
+        {/* Level Breakdown */}
+        <div style={{marginBottom:10}}>
+          <h2 style={{fontFamily:T.serif,fontSize:22,marginBottom:18}}>Level Breakdown</h2>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
+            {["A","AA","AAA"].map(lv=>{const R=results.filter(r=>r.l===lv);const p=R.filter(r=>r.ok).length;const pct=R.length?Math.round(p/R.length*100):100;const clr=lv==="A"?T.teal:lv==="AA"?T.navy:"#6d28d9";return<div key={lv} style={{background:T.w,borderRadius:20,border:`1px solid ${T.b1}`,padding:"30px 20px",textAlign:"center",boxShadow:"0 2px 12px rgba(28,25,23,.04)",position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",top:0,left:0,right:0,height:4,background:`linear-gradient(90deg,transparent,${clr}30,transparent)`}}/>
+              <Donut value={pct} size={70} strokeW={5} color={clr}/>
+              <div style={{fontSize:15,fontWeight:700,marginTop:14}}>Level {lv}</div>
+              <div style={{fontSize:12,color:T.dm,fontFamily:T.mono,marginTop:3}}>{p} / {R.length} passed</div>
+            </div>})}
+          </div>
+        </div>
+      </div>}
+
+      {/* ═══ AUDIT ═══ */}
+      {tab==="audit"&&<div>
+        <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap"}}>{[["Level",fL,setFL,["ALL","A","AA","AAA"]],["Status",fS,setFS,["ALL","ISSUES","PASSED"]],["Principle",fP,setFP,["ALL","Perceivable","Operable","Understandable","Robust"]]].map(([l,v,s,o])=><div key={l} style={{display:"flex",alignItems:"center",gap:5}}><label style={{fontSize:10,color:T.dm,textTransform:"uppercase",letterSpacing:".06em",fontWeight:600}}>{l}</label><select value={v} onChange={e=>s(e.target.value)} style={{padding:"8px 12px",fontSize:12,borderRadius:10,border:`1px solid ${T.b1}`,background:T.w,color:T.ink,cursor:"pointer",minHeight:40}}>{o.map(x=><option key={x}>{x}</option>)}</select></div>)}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {filtered.map(rule=>{const isO=exp===rule.id;const ic=rule.issues.filter(i=>i.s!==SV.I).length;return<div key={rule.id} style={{background:T.w,borderRadius:18,border:`1px solid ${T.b1}`,overflow:"hidden",boxShadow:"0 2px 8px rgba(28,25,23,.03)"}}>
+          <button onClick={()=>setExp(isO?null:rule.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"16px 22px",border:"none",background:"transparent",cursor:"pointer",color:T.ink,textAlign:"left",fontSize:14,minHeight:52}}>
+            <span style={{width:10,height:10,borderRadius:"50%",background:rule.ok?T.teal:T.rose,flexShrink:0,boxShadow:`0 0 0 3px ${rule.ok?T.ts:T.rs}`}}/>
+            <span style={{fontFamily:T.mono,fontSize:12,color:T.teal,fontWeight:600,minWidth:44}}>{rule.id}</span>
+            <span style={{fontWeight:500,flex:1}}>{rule.n}</span>
+            <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:20,color:rule.l==="AAA"?"#6d28d9":rule.l==="AA"?T.navy:T.teal,background:rule.l==="AAA"?"rgba(109,40,217,.06)":rule.l==="AA"?T.ns:T.ts}}>{rule.l}</span>
+            {ic>0&&<span style={{fontFamily:T.mono,fontSize:11,color:T.w,fontWeight:700,background:T.rose,padding:"3px 10px",borderRadius:20}}>{ic}</span>}
+            <svg width="12" height="12" viewBox="0 0 12 12" fill={T.dm} style={{transform:isO?"rotate(90deg)":"none",transition:"transform .2s"}}><path d="M4 2l4 4-4 4"/></svg>
+          </button>
+          {isO&&<div className="fade" style={{borderTop:`1px solid ${T.b1}`,padding:"20px 22px",background:T.bg}}>
+            {rule.issues.length===0?<div style={{display:"flex",alignItems:"center",gap:8,fontSize:14,color:T.teal,fontWeight:600}}><IllustratedIcon type="check" size={22}/>No issues — passes</div>:
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>{rule.issues.map((issue,idx)=>{const isI=issue.s===SV.I;const rec=!isI?getRec(rule.id,issue):null;return<div key={idx} style={{background:SB[issue.s],borderRadius:16,padding:"18px 22px",borderLeft:`4px solid ${SC[issue.s]}`}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8,flexWrap:"wrap"}}>
+                <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:20,color:SC[issue.s],background:"transparent",border:`1px solid ${SC[issue.s]}30`,textTransform:"uppercase"}}>{issue.s}</span>
+                {rec&&<span style={{fontSize:9,fontWeight:700,padding:"3px 10px",borderRadius:20,background:`${PC[rec.p]}08`,color:PC[rec.p]}}>{PLBL[rec.p]?.split("—")[0]}</span>}
+                {rec&&<span style={{fontSize:9,fontWeight:600,padding:"3px 10px",borderRadius:20,background:T.gs,color:T.green}}>{rec.e}</span>}
+              </div>
+              <p style={{fontSize:15,margin:"0 0 6px",lineHeight:1.65}}>{issue.msg}</p>
+              {issue.el&&issue.el!=="—"&&<code style={{display:"block",fontSize:12,color:T.mt,background:T.bg2,padding:"10px 16px",borderRadius:12,marginBottom:6,wordBreak:"break-all",fontFamily:T.mono,lineHeight:1.55}}>{issue.el}</code>}
+              <div style={{fontSize:13,color:T.teal,display:"flex",alignItems:"flex-start",gap:6,fontWeight:600}}><span style={{fontSize:16}}>⮕</span><span style={{lineHeight:1.55}}>{issue.fix}</span></div>
+              {rec&&<RecCard rec={rec}/>}
+            </div>})}</div>}
+          </div>}
+        </div>})}</div>
+      </div>}
+
+      {/* ═══ PRIORITY ═══ */}
+      {tab==="priority"&&<div>
+        <h2 style={{fontFamily:T.serif,fontSize:24,marginBottom:20,display:"flex",alignItems:"center",gap:10}}><IllustratedIcon type="warn" size={28}/>Implementation Roadmap</h2>
+        {allIssues.length===0?<div style={{background:T.w,borderRadius:20,border:`1px solid ${T.b1}`,padding:40,textAlign:"center",boxShadow:"0 4px 20px rgba(28,25,23,.04)"}}><IllustratedIcon type="check" size={56}/><p style={{fontSize:18,color:T.teal,fontWeight:600,marginTop:14}}>All criteria passed!</p></div>:
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>{[1,2,3,4].map(p=>{const items=allIssues.filter(i=>i.rec.p===p);if(!items.length)return null;return<div key={p} style={{background:T.w,borderRadius:20,border:`1px solid ${T.b1}`,overflow:"hidden",boxShadow:"0 2px 12px rgba(28,25,23,.04)"}}>
+          <div style={{padding:"14px 22px",borderBottom:`1px solid ${T.b1}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:T.bg}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{width:10,height:10,borderRadius:"50%",background:PC[p],boxShadow:`0 0 0 3px ${PC[p]}15`}}/><span style={{fontSize:15,fontWeight:700,color:PC[p]}}>{PLBL[p]}</span></div>
+            <span style={{fontSize:12,fontFamily:T.mono,fontWeight:600,color:T.dm,padding:"4px 12px",borderRadius:20,background:T.w}}>{items.length}</span>
+          </div>
+          <div style={{padding:"10px 22px"}}>{items.map((i,j)=><div key={j} style={{display:"flex",gap:10,padding:"12px 0",borderBottom:j<items.length-1?`1px solid ${T.b1}`:"none"}}>
+            <span style={{fontFamily:T.mono,fontSize:11,color:T.teal,fontWeight:600,minWidth:44,paddingTop:3}}>{i.ruleId}</span>
+            <div style={{flex:1}}><p style={{fontSize:14,margin:"0 0 5px",lineHeight:1.55}}>{i.msg}</p><div style={{display:"flex",gap:6}}><span style={{fontSize:9,fontWeight:600,padding:"3px 10px",borderRadius:20,background:SB[i.s],color:SC[i.s],border:`1px solid ${SC[i.s]}20`}}>{i.s}</span><span style={{fontSize:9,fontWeight:600,padding:"3px 10px",borderRadius:20,background:T.gs,color:T.green}}>{i.rec.e}</span></div></div>
+          </div>)}</div>
+        </div>})}</div>}
+      </div>}
+
+      {tab==="contrast"&&<ContrastChecker/>}
+
+      {tab==="preview"&&<div>
+        <h2 style={{fontFamily:T.serif,fontSize:24,marginBottom:18}}>Side-by-Side Preview</h2>
+        <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>{[["Original",T.rose,pRef],["Remediated",T.green,rRef]].map(([l,c,ref])=><div key={l} style={{flex:1,minWidth:250}}>
+          <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:".1em",fontWeight:700,color:c,marginBottom:8,display:"flex",alignItems:"center",gap:6}}><span style={{width:8,height:8,borderRadius:"50%",background:c,boxShadow:`0 0 0 3px ${c}20`}}/>{l}</div>
+          <iframe ref={ref} sandbox="allow-same-origin" style={{width:"100%",height:340,border:`1px solid ${T.b1}`,borderRadius:18,background:T.w,boxShadow:"0 2px 12px rgba(28,25,23,.04)"}} title={l}/>
         </div>)}</div>
-      </div>})}</div>}
-    </div>}
+      </div>}
 
-    {tab==="contrast"&&<ContrastChecker/>}
-
-    {tab==="preview"&&<div>
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}><HexIcon size={36}/><h2 style={{margin:0,fontFamily:T.serif,fontSize:24}}>Side-by-Side Preview</h2></div>
-      <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>{[["Original",T.rose,pRef],["Remediated",T.green,rRef]].map(([l,c,ref])=><div key={l} style={{flex:1,minWidth:250}}>
-        <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:".08em",fontWeight:700,color:c,marginBottom:8,display:"flex",alignItems:"center",gap:6}}><span style={{width:8,height:8,borderRadius:"50%",background:c,boxShadow:`0 0 0 3px ${c}20`}}/>{l}</div>
-        <iframe ref={ref} sandbox="allow-same-origin" style={{width:"100%",height:320,border:`1px solid ${T.b1}`,borderRadius:16,background:T.w,boxShadow:"0 2px 8px rgba(28,25,23,.03),0 8px 28px rgba(28,25,23,.05)"}} title={l}/>
-      </div>)}</div>
-    </div>}
-
-    {tab==="export"&&<ExportTab results={results} stats={stats} scUrl={scUrl} allIssues={allIssues}/>}
-
-    </div></>}
-
-    {/* ── EMPTY STATE ── */}
-    {!results&&fSt!=="loading"&&<div style={{padding:"80px 30px",textAlign:"center",position:"relative"}}>
-      <div style={{marginBottom:24,position:"relative",display:"inline-block"}}>
-        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-          <circle cx="60" cy="60" r="54" stroke={T.b3} strokeWidth="1.5" strokeDasharray="6 4"/>
-          <circle cx="60" cy="60" r="40" stroke={T.teal} strokeWidth="1.5" opacity=".2"/>
-          <circle cx="60" cy="60" r="26" stroke={T.teal} strokeWidth="1" opacity=".1"/>
-          <path d="M45 60l10 10 20-20" stroke={T.teal} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity=".3"/>
-          <path d="M60 6L72 13V25L60 32L48 25V13Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".15"/>
-          <path d="M92 30L100 35V43L92 48L84 43V35Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".1"/>
-          <path d="M28 80L36 85V93L28 98L20 93V85Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".1"/>
-        </svg>
       </div>
-      <h2 style={{fontSize:28,color:T.ink2,marginBottom:8,fontFamily:T.serif,fontWeight:700}}>Enter a URL or paste HTML</h2>
-      <p style={{fontSize:15,color:T.dm,lineHeight:1.7,maxWidth:460,margin:"0 auto 20px"}}>{RULES.length} WCAG 2.2 criteria across A, AA, and AAA conformance levels with visual before/after examples, code fixes, and prioritized roadmap.</p>
-      <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>
-        {["Perceivable","Operable","Understandable","Robust"].map(p=><div key={p} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`}}>
-          <POURIcon principle={p} size={18}/>
-          <span style={{fontSize:12,fontWeight:600,color:T.teal}}>{p}</span>
-        </div>)}
+    </>}
+
+    {/* ════ EMPTY STATE ════ */}
+    {!results&&fSt!=="loading"&&<div style={{padding:"80px 28px 60px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+      <HexBg w={700} h={400} opacity={.025}/>
+      <FloatingHex size={60} x="10%" y="30px" delay={0}/>
+      <FloatingHex size={45} x="82%" y="80px" delay={1}/>
+      <FloatingHex size={35} x="25%" y="200px" delay={2}/>
+      <FloatingHex size={50} x="70%" y="250px" delay={0.5}/>
+      <div style={{position:"relative",zIndex:1}}>
+        <div style={{marginBottom:28}}>
+          <svg width="140" height="140" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+            <circle cx="70" cy="70" r="64" stroke={T.bg3} strokeWidth="2" strokeDasharray="8 5"/>
+            <circle cx="70" cy="70" r="48" stroke={T.teal} strokeWidth="2" opacity=".15"/>
+            <circle cx="70" cy="70" r="32" stroke={T.teal} strokeWidth="1.5" opacity=".08"/>
+            <path d="M50 70l14 14 26-26" stroke={T.teal} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" opacity=".25"/>
+            <path d="M70 10L82 17V31L70 38L58 31V17Z" fill="none" stroke={T.teal} strokeWidth="1.5" opacity=".12"/>
+            <path d="M110 40L118 45V53L110 58L102 53V45Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".08"/>
+            <path d="M30 95L38 100V108L30 113L22 108V100Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".08"/>
+            <path d="M100 90L106 94V100L100 104L94 100V94Z" fill="none" stroke={T.teal} strokeWidth="1" opacity=".06"/>
+          </svg>
+        </div>
+        <h2 style={{fontSize:30,color:T.ink2,marginBottom:10,fontFamily:T.serif,fontWeight:700}}>Enter a URL or paste HTML</h2>
+        <p style={{fontSize:16,color:T.dm,lineHeight:1.7,maxWidth:500,margin:"0 auto 28px"}}>{RULES.length} WCAG 2.2 criteria across A, AA, and AAA with visual code fixes, before/after examples, and prioritized roadmap.</p>
+        <GradientBar height={2}/>
+        <div style={{display:"flex",justifyContent:"center",gap:12,flexWrap:"wrap",marginTop:24}}>
+          {["Perceivable","Operable","Understandable","Robust"].map(p=><div key={p} style={{display:"flex",alignItems:"center",gap:8,padding:"10px 18px",borderRadius:20,background:T.w,border:`1px solid ${T.b1}`,boxShadow:"0 2px 8px rgba(28,25,23,.03)"}}>
+            <IllustratedIcon type={({Perceivable:"eye",Operable:"keyboard",Understandable:"brain",Robust:"shield"})[p]} size={22}/>
+            <span style={{fontSize:13,fontWeight:600,color:T.teal}}>{p}</span>
+          </div>)}
+        </div>
       </div>
     </div>}
 
-    {/* ── FOOTER ── */}
-    <footer style={{borderTop:`1px solid ${T.b1}`,padding:"20px 30px",marginTop:40,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+    {/* ════ FOOTER ════ */}
+    <WaveSvg color={T.teal} h={40}/>
+    <footer style={{padding:"20px 28px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
-        <HexIcon size={28}/>
-        <div style={{fontSize:12,color:T.dm}}>Built by <a href="https://www.brainpulseinc.com" style={{color:T.teal,textDecoration:"none",fontWeight:600}}>BrainPulse Inc</a></div>
+        <div style={{width:28,height:28,borderRadius:8,background:T.teal,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 2L20 7V17L12 22L4 17V7Z" strokeLinejoin="round"/></svg></div>
+        <span style={{fontSize:12,color:T.dm}}>Built by <a href="https://www.brainpulseinc.com" style={{color:T.teal,textDecoration:"none",fontWeight:600}}>BrainPulse Inc</a></span>
       </div>
       <div style={{display:"flex",alignItems:"center",gap:6,padding:"5px 14px",borderRadius:20,background:T.ts,border:`1px solid ${T.tm}`}}>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill={T.teal}><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 5.3l-4 5a.75.75 0 01-1.1.1L4.5 8.5a.75.75 0 011-1.1l1.4 1.2 3.5-4.4a.75.75 0 011.1 1.1z"/></svg>
-        <span style={{fontSize:11,fontWeight:600,color:T.teal}}>This tool is WCAG 2.2 AAA compliant</span>
+        <IllustratedIcon type="check" size={14}/>
+        <span style={{fontSize:11,fontWeight:600,color:T.teal}}>WCAG 2.2 AAA Compliant</span>
       </div>
     </footer>
   </div>;
 }
+
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
 </body>
