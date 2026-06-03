@@ -32,6 +32,19 @@ textarea:focus,input:focus{outline:none;border-color:rgba(13,115,119,.25)!import
 <script type="text/babel">
 const {useState,useCallback,useMemo,useRef,useEffect}=React;
 
+/* ═══ DIALOGFLOW CX CONFIG ═══
+   To connect your Dialogflow CX agent, fill in projectId + agentId below.
+   Leave them blank to use the built-in offline assistant (works immediately).
+   See dialogflow-cx/SETUP_GUIDE.md for how to create the agent. */
+const DF_CX={
+  projectId:"",                    // e.g. "brainpulse-a11y"
+  agentId:"",                      // e.g. "a1b2c3d4-1234-5678-90ab-cdef12345678"
+  location:"us-central1",          // your agent's region (or "global")
+  languageCode:"en",
+  title:"A11y Assistant",
+};
+const DF_ENABLED=!!(DF_CX.projectId&&DF_CX.agentId);
+
 /* ═══ TOKENS ═══ */
 const T={bg:"#FBF9F6",bg2:"#F5F2ED",bg3:"#ECEAE4",w:"#fff",ink:"#1C1917",ink2:"#292524",mt:"#44403C",dm:"#57534E",teal:"#0D7377",tealLt:"#11959A",ts:"rgba(13,115,119,.06)",tm:"rgba(13,115,119,.14)",peach:"#92400E",ps:"rgba(146,64,14,.06)",rose:"#9F1239",rs:"rgba(159,18,57,.06)",rm:"rgba(159,18,57,.12)",green:"#166534",gs:"rgba(22,101,52,.06)",navy:"#1E3A5F",ns:"rgba(30,58,95,.06)",b1:"rgba(28,25,23,.07)",b2:"rgba(28,25,23,.12)",serif:"'Libre Baskerville',Georgia,serif",sans:"'DM Sans',sans-serif",mono:"'JetBrains Mono',monospace"};
 const SC={critical:T.rose,major:T.peach,minor:T.navy,info:T.dm};
@@ -225,6 +238,244 @@ const SAMPLE=`<!DOCTYPE html>\n<html>\n<head>\n  <meta name="viewport" content="
 
 /* ═══ APP ═══ */
 const TABS=[{k:"dashboard",l:"Dashboard",i:"◎"},{k:"audit",l:"Audit",i:"◉"},{k:"priority",l:"Priority",i:"⚡"},{k:"contrast",l:"Contrast",i:"◑"},{k:"preview",l:"Preview",i:"◫"}];
+
+/* ═══ HELP ASSISTANT — Dialogflow CX-style conversational aide ═══
+   Mirrors the DCX agent design (intents → training phrases → fulfillment).
+   Swap with <df-messenger> once the GCP agent is live (see DIALOGFLOW-CX-SETUP.md). */
+
+const HELP_KB=[
+  {intent:"welcome",kw:[],
+   answer:"Hi! I'm the BrainPulse accessibility assistant. I can help you scan pages, understand your results, and fix WCAG 2.2 AAA issues. What would you like help with?",
+   chips:["How do I scan a site?","What does my score mean?","How do I fix contrast?","What is WCAG AAA?"]},
+
+  {intent:"scan.url",kw:["scan","url","website","web site","address","link","audit a site","check a page","check a site","check a url","scan a page"],
+   answer:"To scan a live website:\n\n1. Click the **🔗 Scan URL** tab at the top\n2. Type the full address (e.g. https://example.com)\n3. Press **◉ Scan** or hit Enter\n\nThe tool fetches the page through a proxy and audits all 28 WCAG 2.2 criteria. Results appear in the Dashboard within a few seconds.",
+   chips:["Scan isn't working","Paste HTML instead","What does my score mean?"]},
+
+  {intent:"paste.html",kw:["paste","html","my own","source code","my code","local","localhost","copy html","markup"],
+   answer:"To check your own HTML:\n\n1. Click the **</> Paste HTML** tab\n2. Paste your full HTML source (or click **Load Sample** to try it)\n3. Click **▶ Audit**\n\nThis is the best option for local files, password-protected pages, or work-in-progress code that isn't live yet.",
+   chips:["How do I view page source?","Scan a URL instead","Understand my results"]},
+
+  {intent:"view.source",kw:["view source","page source","get html","copy the html","where is the html","find html"],
+   answer:"To grab a page's HTML:\n\n1. Open the page in your browser\n2. Right-click anywhere → **View Page Source** (or press Ctrl+U / ⌘+U)\n3. Select all (Ctrl+A / ⌘+A) and copy (Ctrl+C / ⌘+C)\n4. Come back here, open the **</> Paste HTML** tab, and paste\n\nThen click **▶ Audit**.",
+   chips:["Paste HTML help","Scan a URL instead"]},
+
+  {intent:"understand.score",kw:["score","what does my score","number","percent","percentage","rating","grade","100","mean"],
+   answer:"Your **compliance score** (0–100) is the percentage of the 28 WCAG 2.2 criteria your page passes.\n\n• **80–100** (teal) — Strong compliance, minor polish needed\n• **50–79** (amber) — Moderate; several barriers to address\n• **0–49** (rose) — Significant accessibility gaps\n\nThe score weights all checked criteria equally. Open the **Priority** tab to see what to fix first.",
+   chips:["What is POUR?","Show me priority fixes","What are A/AA/AAA?"]},
+
+  {intent:"understand.pour",kw:["pour","perceivable","operable","understandable","robust","principle","principles","categories","four"],
+   answer:"**POUR** is the four foundational principles of WCAG:\n\n• **Perceivable** — Users can perceive the content (alt text, contrast, captions)\n• **Operable** — Users can operate the interface (keyboard, focus, target size)\n• **Understandable** — Content is clear (labels, language, consistent help)\n• **Robust** — Works with assistive tech (valid ARIA, unique IDs)\n\nThe Dashboard shows your pass rate for each principle.",
+   chips:["How do I fix Perceivable?","How do I fix Operable?","What does my score mean?"]},
+
+  {intent:"fix.contrast",kw:["contrast","color","colour","ratio","readable","faint","light text","7:1","4.5"],
+   answer:"**Color contrast** (SC 1.4.3 / 1.4.6) is the most common failure.\n\n• AA requires **4.5:1** for normal text, 3:1 for large\n• AAA requires **7:1** for normal text, 4.5:1 for large\n\n**Fix:** darken your text or lighten the background until the ratio passes. Use the **◑ Contrast** tab to test exact color pairs live with the picker — it shows pass/fail for every level instantly.",
+   chips:["Open the Contrast checker","Fix alt text","What is AAA?"]},
+
+  {intent:"fix.alt",kw:["alt","image","images","picture","photo","alt text","describe image","missing alt","screen reader image"],
+   answer:"**Missing alt text** (SC 1.1.1) blocks screen-reader users.\n\n**Fix:** add an `alt` attribute describing the image's *purpose*:\n• Informative: `alt=\"Bar chart showing 40% revenue growth\"`\n• Functional (a link/button): `alt=\"Search\"`\n• Decorative: `alt=\"\"` (empty, so it's skipped)\n\nDon't write \"image of…\" — screen readers already announce it's an image.",
+   chips:["Fix contrast","Fix form labels","See all my issues"]},
+
+  {intent:"fix.keyboard",kw:["keyboard","tab","focus","navigate","onclick","mouse","clickable","tabindex","interactive"],
+   answer:"**Keyboard access** (SC 2.1.1) means everything works without a mouse.\n\n**Fix:**\n• Use real `<button>` and `<a>` elements instead of `<div onclick>`\n• If you must use a div, add `tabindex=\"0\"` and a keydown handler\n• Never remove focus outlines — use `:focus-visible` for custom styles\n\nThe Chrome extension's **Tab Order** tool visualizes your keyboard path with numbered badges.",
+   chips:["Fix focus indicators","Get the Chrome extension","See all my issues"]},
+
+  {intent:"fix.headings",kw:["heading","headings","h1","h2","structure","outline","hierarchy","skip level"],
+   answer:"**Heading structure** (SC 2.4.6) helps screen-reader users navigate.\n\n**Fix:**\n• Use exactly one `<h1>` per page\n• Don't skip levels (h2 → h4 is wrong; go h2 → h3)\n• Use headings for structure, not for visual size — style with CSS\n\nThe Chrome extension's **Outline** tab shows your full heading tree with skip-level warnings flagged in red.",
+   chips:["Fix form labels","Get the Chrome extension","What is POUR?"]},
+
+  {intent:"fix.labels",kw:["label","labels","form","input","field","placeholder","unlabeled","form control"],
+   answer:"**Form labels** (SC 3.3.2) are required for every input.\n\n**Fix:** connect a visible `<label>` to each field:\n```\n<label for=\"email\">Email</label>\n<input id=\"email\" type=\"email\">\n```\nPlaceholders are **not** labels — they vanish on typing and often fail contrast. If you can't show a visible label, use `aria-label=\"Email\"`.",
+   chips:["Fix alt text","Fix keyboard access","See all my issues"]},
+
+  {intent:"fix.target",kw:["target size","button size","tap","touch","44","small button","clickable area","too small"],
+   answer:"**Target Size** (SC 2.5.5, AAA) requires interactive elements to be at least **44×44 px** so they're easy to tap.\n\n**Fix without changing visual size** — add padding and pull it back with margin:\n```\n.icon-btn {\n  padding: 12px;\n  margin: -12px;\n  box-sizing: content-box;\n}\n```\nThis expands the clickable area while keeping the icon the same size.",
+   chips:["Fix keyboard access","What is AAA?","See all my issues"]},
+
+  {intent:"fix.lang",kw:["lang","language","html lang","document language","locale"],
+   answer:"**Language of Page** (SC 3.1.1) tells screen readers which pronunciation to use.\n\n**Fix:** add a `lang` attribute to your `<html>` tag:\n```\n<html lang=\"en\">\n```\nUse the correct BCP-47 code (`en`, `es`, `fr`, `de`, etc.). For sections in another language, add `lang` on that element too.",
+   chips:["Fix alt text","See all my issues","What is AAA?"]},
+
+  {intent:"wcag.levels",kw:["level","levels","a aa aaa","conformance","what is aa","what is a","difference between"],
+   answer:"WCAG has three **conformance levels**:\n\n• **A** — Minimum. Essential barriers (alt text, keyboard, labels)\n• **AA** — Standard. The legal target for most laws (ADA, Section 508, EN 301 549). Includes 4.5:1 contrast\n• **AAA** — Enhanced. The highest bar (7:1 contrast, 44px targets, accessible auth)\n\nThis tool checks all three so you can aim beyond the legal minimum.",
+   chips:["What is WCAG 2.2 AAA?","What does my score mean?","Is this legally required?"]},
+
+  {intent:"what.is.aaa",kw:["wcag 2.2","aaa","2.2 aaa","what is wcag","newest","latest standard","what does aaa"],
+   answer:"**WCAG 2.2 AAA** is the most recent and most rigorous accessibility standard (published 2023).\n\nAAA goes beyond the AA legal minimum with criteria like:\n• 7:1 contrast (vs 4.5:1 for AA)\n• 44×44 px touch targets\n• Accessible authentication (no memory tests/CAPTCHAs)\n• Consistent help mechanisms\n\nFew tools check AAA — this one does, across all 28 criteria.",
+   chips:["What are A/AA/AAA?","Is this legally required?","How do I scan a site?"]},
+
+  {intent:"what.is.ada",kw:["ada","americans with disabilities","508","section 508","law","compliance law","what is ada"],
+   answer:"**ADA** (Americans with Disabilities Act) requires that digital services be accessible to people with disabilities. Courts generally interpret **WCAG 2.1/2.2 Level AA** as the compliance benchmark.\n\nRelated standards: **Section 508** (US federal), **EN 301 549** (EU), **AODA** (Ontario). Meeting WCAG 2.2 AA satisfies most of them — and AAA exceeds them all.",
+   chips:["Is this legally required?","What are A/AA/AAA?","How do I scan a site?"]},
+
+  {intent:"legal",kw:["legal","lawsuit","required","sue","penalty","fine","mandatory","do i need","risk"],
+   answer:"I'm not a lawyer, so this isn't legal advice — but in general:\n\nMany jurisdictions require digital accessibility (ADA in the US, EAA in the EU, AODA in Canada). Web accessibility lawsuits have risen sharply, and **WCAG 2.1/2.2 AA** is the common standard courts reference.\n\nRunning this audit and fixing **Critical** and **Major** issues first substantially reduces risk. For formal compliance (e.g. a VPAT), consult an accessibility specialist.",
+   chips:["Show me priority fixes","What are A/AA/AAA?","What does my score mean?"]},
+
+  {intent:"export",kw:["export","download","report","pdf","csv","json","markdown","email","share","save report"],
+   answer:"After a scan, click **⬇ Export** (in the bar above the tabs or the Export tab). Six formats:\n\n• **PDF** — print-ready report for stakeholders\n• **HTML** — self-contained styled report\n• **CSV** — import into Excel/Sheets/JIRA\n• **JSON** — for CI/CD pipelines\n• **Markdown** — GitHub/Confluence\n• **Email / Clipboard** — quick sharing\n\nEvery format includes all issues and fixes.",
+   chips:["How do I read the report?","Scan another page","See priority fixes"]},
+
+  {intent:"scan.error",kw:["error","not working","failed","can't scan","proxy","tried 5","sandbox","won't load","doesn't work","broken"],
+   answer:"If a URL scan fails, it's usually one of these:\n\n• **Preview sandbox** — if you're testing inside a preview frame, network requests are blocked. The tool works once deployed to your site.\n• **Site blocks proxies** — some sites refuse automated fetches. Use **Paste HTML** instead.\n• **Temporary** — click **↻ Retry**; the tool auto-retries 3 times.\n\nPasting the HTML source directly always works.",
+   chips:["How do I paste HTML?","How do I view page source?","Scan a URL"]},
+
+  {intent:"extension",kw:["extension","chrome","plugin","browser","add-on","addon","install extension","dynamic"],
+   answer:"The **BrainPulse A11y Chrome extension** scans live pages right in your browser — including dynamic content, logged-in pages, and computed styles this web tool can't reach.\n\nExtra features: visual issue overlays on the page, tab-order visualization, color-blindness simulation, and an element locator. It also supports Google sign-in and team usage tracking.",
+   chips:["What does my score mean?","How do I scan here instead?","See priority fixes"]},
+
+  {intent:"priority",kw:["priority","first","what to fix","roadmap","where to start","most important","prioritize"],
+   answer:"Open the **⚡ Priority** tab for a ranked roadmap:\n\n• **P1 — Fix Now** — Critical blockers (missing alt, no labels, keyboard traps)\n• **P2 — High** — Major barriers\n• **P3 — Medium** — Important improvements\n• **P4 — Low** — Polish\n\nStart at P1 and work down. Each item includes the exact fix and a before/after example.",
+   chips:["What does my score mean?","How do I export?","How do I fix contrast?"]},
+
+  {intent:"thanks",kw:["thank","thanks","helpful","great","awesome","perfect","cheers","appreciate"],
+   answer:"You're welcome! Happy to help make the web more accessible. Anything else?",
+   chips:["How do I scan a site?","See priority fixes","How do I export?"]},
+];
+
+function matchIntent(text){
+  const t=text.toLowerCase();
+  let best=null,bestScore=0;
+  HELP_KB.forEach(intent=>{
+    if(!intent.kw.length)return;
+    let score=0;
+    intent.kw.forEach(k=>{if(t.includes(k))score+=k.split(" ").length});
+    if(score>bestScore){bestScore=score;best=intent}
+  });
+  return best||{intent:"fallback",answer:"I'm not sure about that one, but I can help with scanning pages, understanding your score, fixing specific WCAG issues (contrast, alt text, keyboard, labels, headings, target size), exporting reports, or the Chrome extension. What would you like to know?",chips:["How do I scan a site?","What does my score mean?","How do I fix contrast?","What is WCAG AAA?"]};
+}
+
+/* ═══ DIALOGFLOW CX MESSENGER (loads when configured) ═══ */
+function DialogflowMessenger(){
+  useEffect(()=>{
+    // Inject the official Dialogflow Messenger script + stylesheet once
+    if(!document.getElementById("df-messenger-css")){
+      const link=document.createElement("link");link.id="df-messenger-css";link.rel="stylesheet";
+      link.href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css";
+      document.head.appendChild(link);
+    }
+    if(!document.getElementById("df-messenger-js")){
+      const s=document.createElement("script");s.id="df-messenger-js";
+      s.src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js";
+      document.body.appendChild(s);
+    }
+    // Brand-matched theming via CSS custom properties
+    if(!document.getElementById("df-brand-style")){
+      const st=document.createElement("style");st.id="df-brand-style";
+      st.textContent=`df-messenger{
+        --df-messenger-font-family:'DM Sans',system-ui,sans-serif;
+        --df-messenger-primary-color:${T.teal};
+        --df-messenger-titlebar-background:linear-gradient(135deg,${T.teal},${T.tealLt});
+        --df-messenger-titlebar-font-color:#fff;
+        --df-messenger-chat-background:${T.bg};
+        --df-messenger-message-user-background:${T.teal};
+        --df-messenger-message-user-font-color:#fff;
+        --df-messenger-message-bot-background:#fff;
+        --df-messenger-message-bot-font-color:${T.ink};
+        --df-messenger-send-icon-color:${T.teal};
+        --df-messenger-button-titlebar-color:transparent;
+        --df-messenger-chat-bubble-background:${T.teal};
+        --df-messenger-chat-bubble-icon-color:#fff;
+        --df-messenger-chat-border-radius:22px;
+        --df-messenger-message-border-radius:16px;
+        position:fixed;bottom:0;right:0;z-index:1000;
+      }`;
+      document.head.appendChild(st);
+    }
+  },[]);
+  // The custom element is created declaratively; React renders the host tags
+  return React.createElement("df-messenger",{
+    "project-id":DF_CX.projectId,
+    "agent-id":DF_CX.agentId,
+    "location":DF_CX.location,
+    "language-code":DF_CX.languageCode,
+    "max-query-length":"-1",
+  },React.createElement("df-messenger-chat-bubble",{"chat-title":DF_CX.title}));
+}
+
+/* ═══ ASSISTANT WIDGET — chooses Dialogflow CX or built-in bot ═══ */
+function AssistantWidget(){
+  return DF_ENABLED?<DialogflowMessenger/>:<HelpBot/>;
+}
+
+function HelpBot(){
+  const[open,setOpen]=useState(false);
+  const[msgs,setMsgs]=useState([]);
+  const[input,setInput]=useState("");
+  const[typing,setTyping]=useState(false);
+  const endRef=useRef(null);
+  const inputRef=useRef(null);
+
+  useEffect(()=>{if(open&&msgs.length===0){const w=HELP_KB[0];setMsgs([{from:"bot",text:w.answer,chips:w.chips}])}},[open]);
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"})},[msgs,typing]);
+  useEffect(()=>{if(open)setTimeout(()=>inputRef.current?.focus(),300)},[open]);
+
+  const send=(text)=>{
+    const q=(text||input).trim();if(!q)return;
+    setMsgs(m=>[...m,{from:"user",text:q}]);setInput("");setTyping(true);
+    setTimeout(()=>{
+      const m=matchIntent(q);
+      setTyping(false);
+      setMsgs(ms=>[...ms,{from:"bot",text:m.answer,chips:m.chips}]);
+    },550+Math.random()*400);
+  };
+
+  // markdown-lite renderer: **bold**, `code`, ```blocks```, \n
+  const fmt=(s)=>{
+    const parts=s.split(/(```[\s\S]*?```)/g);
+    return parts.map((p,i)=>{
+      if(p.startsWith("```")){const code=p.replace(/```/g,"").trim();return<pre key={i} style={{background:T.bg2,border:`1px solid ${T.b1}`,borderRadius:10,padding:"10px 12px",margin:"8px 0",fontSize:11.5,fontFamily:T.mono,whiteSpace:"pre-wrap",lineHeight:1.55,color:T.mt,overflowX:"auto"}}>{code}</pre>}
+      return<span key={i}>{p.split("\n").map((line,j)=><React.Fragment key={j}>{j>0&&<br/>}{line.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((seg,k)=>{if(seg.startsWith("**")&&seg.endsWith("**"))return<strong key={k} style={{color:T.ink,fontWeight:700}}>{seg.slice(2,-2)}</strong>;if(seg.startsWith("`")&&seg.endsWith("`"))return<code key={k} style={{background:T.bg2,padding:"1px 6px",borderRadius:5,fontFamily:T.mono,fontSize:12,color:T.teal}}>{seg.slice(1,-1)}</code>;return seg})}</React.Fragment>)}</span>;
+    });
+  };
+
+  return<>
+    {/* Launcher */}
+    <button onClick={()=>setOpen(o=>!o)} aria-label={open?"Close help assistant":"Open help assistant"} style={{position:"fixed",bottom:24,right:24,width:60,height:60,borderRadius:"50%",border:"none",background:T.teal,cursor:"pointer",boxShadow:"0 6px 24px rgba(13,115,119,.4)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",transition:"transform .25s cubic-bezier(.22,1,.36,1)",transform:open?"scale(.9) rotate(90deg)":"scale(1)"}}>
+      {open?<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      :<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 3L24 8.5V19L14 24.5L4 19V8.5Z" stroke="white" strokeWidth="2" strokeLinejoin="round"/><circle cx="9.5" cy="13" r="1.6" fill="white"/><circle cx="14" cy="13" r="1.6" fill="white"/><circle cx="18.5" cy="13" r="1.6" fill="white"/></svg>}
+    </button>
+
+    {/* Window */}
+    {open&&<div className="fade" style={{position:"fixed",bottom:96,right:24,width:380,maxWidth:"calc(100vw - 32px)",height:560,maxHeight:"calc(100vh - 130px)",background:T.w,borderRadius:22,boxShadow:"0 12px 48px rgba(28,25,23,.18),0 4px 16px rgba(28,25,23,.08)",zIndex:1000,display:"flex",flexDirection:"column",overflow:"hidden",border:`1px solid ${T.b1}`}}>
+      {/* Header */}
+      <div style={{padding:"16px 20px",background:`linear-gradient(135deg,${T.teal},${T.tealLt})`,position:"relative",overflow:"hidden",flexShrink:0}}>
+        <svg width="160" height="90" style={{position:"absolute",top:-10,right:-10,opacity:.12}} aria-hidden="true">{Array.from({length:6}).flatMap((_,x)=>Array.from({length:4}).map((_,y)=>{const cx=x*30+(y%2?15:0),cy=y*22;return<path key={`${x}-${y}`} d={`M${cx} ${cy-9}L${cx+7.8} ${cy-4.5}L${cx+7.8} ${cy+4.5}L${cx} ${cy+9}L${cx-7.8} ${cy+4.5}L${cx-7.8} ${cy-4.5}Z`} fill="none" stroke="white" strokeWidth=".8"/>}))}</svg>
+        <div style={{display:"flex",alignItems:"center",gap:12,position:"relative"}}>
+          <div style={{width:40,height:40,borderRadius:12,background:"rgba(255,255,255,.18)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M12 2L20 7V17L12 22L4 17V7Z" strokeLinejoin="round"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:15,fontWeight:700,color:"#fff",fontFamily:T.serif}}>A11y Assistant</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.85)",display:"flex",alignItems:"center",gap:5,marginTop:1}}><span style={{width:7,height:7,borderRadius:"50%",background:"#6ee7b7"}} className="pulse-dot"/>Online · WCAG 2.2 AAA expert</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div style={{flex:1,overflowY:"auto",padding:"16px",background:T.bg,display:"flex",flexDirection:"column",gap:12}}>
+        {msgs.map((m,i)=><div key={i} style={{display:"flex",flexDirection:"column",alignItems:m.from==="user"?"flex-end":"flex-start"}}>
+          <div style={{maxWidth:"88%",padding:"11px 15px",borderRadius:m.from==="user"?"16px 16px 4px 16px":"16px 16px 16px 4px",background:m.from==="user"?T.teal:T.w,color:m.from==="user"?"#fff":T.ink,fontSize:13.5,lineHeight:1.6,border:m.from==="user"?"none":`1px solid ${T.b1}`,boxShadow:m.from==="user"?"0 2px 8px rgba(13,115,119,.2)":"0 1px 4px rgba(28,25,23,.04)",whiteSpace:"normal"}}>{m.from==="user"?m.text:fmt(m.text)}</div>
+          {m.chips&&<div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8,maxWidth:"92%"}}>{m.chips.map((c,j)=><button key={j} onClick={()=>send(c)} style={{padding:"7px 13px",fontSize:12,fontWeight:600,borderRadius:18,border:`1px solid ${T.tm}`,background:T.ts,color:T.teal,cursor:"pointer",transition:"all .15s",lineHeight:1.3}} onMouseEnter={e=>{e.target.style.background=T.teal;e.target.style.color="#fff"}} onMouseLeave={e=>{e.target.style.background=T.ts;e.target.style.color=T.teal}}>{c}</button>)}</div>}
+        </div>)}
+        {typing&&<div style={{display:"flex",alignItems:"center",gap:5,padding:"12px 16px",background:T.w,borderRadius:"16px 16px 16px 4px",border:`1px solid ${T.b1}`,alignSelf:"flex-start"}}>{[0,1,2].map(i=><span key={i} style={{width:7,height:7,borderRadius:"50%",background:T.dm,animation:`pulse 1s ease-in-out ${i*.2}s infinite`}}/>)}</div>}
+        <div ref={endRef}/>
+      </div>
+
+      {/* Input */}
+      <div style={{padding:"12px 16px",borderTop:`1px solid ${T.b1}`,background:T.w,flexShrink:0}}>
+        <div style={{display:"flex",gap:8,alignItems:"flex-end"}}>
+          <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Ask about scanning, fixes, exports…" aria-label="Ask the assistant" style={{flex:1,padding:"11px 16px",borderRadius:22,border:`1.5px solid ${T.b1}`,background:T.bg,fontSize:13.5,color:T.ink,minHeight:44}}/>
+          <button onClick={()=>send()} disabled={!input.trim()} aria-label="Send" style={{width:44,height:44,borderRadius:"50%",border:"none",background:input.trim()?T.teal:T.bg3,cursor:input.trim()?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background .15s"}}>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke={input.trim()?"#fff":T.dm} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 2L8 16l-2-6-6-2 16-6z"/></svg>
+          </button>
+        </div>
+        <div style={{textAlign:"center",fontSize:9.5,color:T.dm,marginTop:8}}>Powered by BrainPulse · <span style={{color:T.teal}}>WCAG 2.2 AAA</span></div>
+      </div>
+    </div>}
+  </>;
+}
+
 
 function App(){
   const[mode,setMode]=useState("url");const[url,setUrl]=useState("");const[html,setHtml]=useState("");
@@ -468,6 +719,7 @@ function App(){
         <span style={{fontSize:11,fontWeight:600,color:T.teal}}>WCAG 2.2 AAA Compliant</span>
       </div>
     </footer>
+    <AssistantWidget/>
   </div>;
 }
 
