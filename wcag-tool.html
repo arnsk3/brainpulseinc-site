@@ -403,15 +403,33 @@ function HelpBot(){
   const[msgs,setMsgs]=useState([]);
   const[input,setInput]=useState("");
   const[typing,setTyping]=useState(false);
+  const[nudge,setNudge]=useState(false);
   const endRef=useRef(null);
   const inputRef=useRef(null);
 
   useEffect(()=>{if(open&&msgs.length===0){const w=HELP_KB[0];setMsgs([{from:"bot",text:w.answer,chips:w.chips}])}},[open]);
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"})},[msgs,typing]);
   useEffect(()=>{if(open)setTimeout(()=>inputRef.current?.focus(),300)},[open]);
+  // Proactive nudge on first visit (once per session)
+  useEffect(()=>{
+    let seen=false;try{seen=!!sessionStorage.getItem("bpNudged")}catch(e){}
+    if(seen)return;
+    const t=setTimeout(()=>{if(!open){setNudge(true);try{sessionStorage.setItem("bpNudged","1")}catch(e){}}},3500);
+    return()=>clearTimeout(t);
+  },[]);
 
   const send=(text)=>{
     const q=(text||input).trim();if(!q)return;
+    // Action bridge: certain requests drive the tool directly
+    const ql=q.toLowerCase();
+    const act=window.__bpGo;
+    if(act){
+      if(/open the contrast|contrast checker|contrast tab/.test(ql))act("contrast");
+      else if(/priority fixes|show me priority|priority tab|fix first/.test(ql))act("priority");
+      else if(/see all my issues|all my issues|audit tab/.test(ql))act("audit");
+      else if(/paste html|paste my html|paste instead/.test(ql))act("paste");
+      else if(/load (the )?sample|try the sample/.test(ql))act("sample");
+    }
     setMsgs(m=>[...m,{from:"user",text:q}]);setInput("");setTyping(true);
     setTimeout(()=>{
       const m=matchIntent(q);
@@ -430,8 +448,15 @@ function HelpBot(){
   };
 
   return<>
+    {/* Proactive nudge */}
+    {nudge&&!open&&<div className="fade" style={{position:"fixed",bottom:96,right:24,maxWidth:260,background:T.w,borderRadius:"16px 16px 4px 16px",boxShadow:"0 8px 32px rgba(28,25,23,.16)",border:`1px solid ${T.b1}`,padding:"14px 16px 14px",zIndex:1000}}>
+      <button onClick={()=>setNudge(false)} aria-label="Dismiss" style={{position:"absolute",top:6,right:6,width:22,height:22,borderRadius:"50%",border:"none",background:T.bg2,color:T.dm,cursor:"pointer",fontSize:12,lineHeight:1,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
+      <div style={{fontSize:13,color:T.ink,lineHeight:1.55,paddingRight:14}}>👋 Need a hand? I can help you <strong>scan a page</strong>, read your score, or fix issues.</div>
+      <button onClick={()=>{setNudge(false);setOpen(true)}} style={{marginTop:10,padding:"7px 14px",fontSize:12,fontWeight:700,borderRadius:18,border:"none",background:T.teal,color:"#fff",cursor:"pointer"}}>Ask the assistant →</button>
+    </div>}
+
     {/* Launcher */}
-    <button onClick={()=>setOpen(o=>!o)} aria-label={open?"Close help assistant":"Open help assistant"} style={{position:"fixed",bottom:24,right:24,width:60,height:60,borderRadius:"50%",border:"none",background:T.teal,cursor:"pointer",boxShadow:"0 6px 24px rgba(13,115,119,.4)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",transition:"transform .25s cubic-bezier(.22,1,.36,1)",transform:open?"scale(.9) rotate(90deg)":"scale(1)"}}>
+    <button onClick={()=>{setOpen(o=>!o);setNudge(false)}} aria-label={open?"Close help assistant":"Open help assistant"} style={{position:"fixed",bottom:24,right:24,width:60,height:60,borderRadius:"50%",border:"none",background:T.teal,cursor:"pointer",boxShadow:"0 6px 24px rgba(13,115,119,.4)",zIndex:1001,display:"flex",alignItems:"center",justifyContent:"center",transition:"transform .25s cubic-bezier(.22,1,.36,1)",transform:open?"scale(.9) rotate(90deg)":"scale(1)"}}>
       {open?<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       :<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 3L24 8.5V19L14 24.5L4 19V8.5Z" stroke="white" strokeWidth="2" strokeLinejoin="round"/><circle cx="9.5" cy="13" r="1.6" fill="white"/><circle cx="14" cy="13" r="1.6" fill="white"/><circle cx="18.5" cy="13" r="1.6" fill="white"/></svg>}
     </button>
@@ -495,6 +520,23 @@ function App(){
   const pourIcons={Perceivable:"eye",Operable:"keyboard",Understandable:"brain",Robust:"shield"};
   const pRef=useRef(null);const rRef=useRef(null);
   useEffect(()=>{[[pRef,html],[rRef,rem]].forEach(([ref,h])=>{if(ref.current&&h){const d=ref.current.contentDocument;if(d){d.open();d.write(h);d.close()}}})},[html,rem,tab]);
+
+  // Action bridge — lets the help assistant drive the tool
+  useEffect(()=>{
+    window.__bpGo=(action)=>{
+      switch(action){
+        case "contrast":setTab("contrast");break;
+        case "priority":if(results)setTab("priority");break;
+        case "audit":if(results)setTab("audit");break;
+        case "export":if(results)setTab("export");break;
+        case "paste":setMode("html");setFSt(null);break;
+        case "url":setMode("url");setFSt(null);break;
+        case "sample":setMode("html");setHtml(SAMPLE);setResults(null);break;
+      }
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+    return()=>{delete window.__bpGo};
+  },[results]);
 
   return<div style={{fontFamily:T.sans,background:T.bg,color:T.ink,minHeight:"100vh",maxWidth:1160,margin:"0 auto",WebkitFontSmoothing:"antialiased"}}>
 
