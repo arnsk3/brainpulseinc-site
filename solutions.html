@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solutions — Productized AI Governance & Accessibility Services | BrainPulse Inc</title>
+<meta name="description" content="Productized solutions for AI governance, accessibility compliance, human factors engineering, and safety-critical interfaces. Subscription services, assessments, and specialized engagements.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FBF9F6;--bg2:#F5F2ED;--bg3:#ECEAE4;--w:#fff;
+  --ink:#1C1917;--ink2:#292524;--mt:#44403C;--dm:#57534E;
+  --teal:#0D7377;--ts:rgba(13,115,119,.06);--tm:rgba(13,115,119,.14);
+  --peach:#92400E;--ps:rgba(146,64,14,.05);
+  --rose:#9F1239;--rs:rgba(159,18,57,.05);--rm:rgba(159,18,57,.12);
+  --green:#166534;--navy:#1E3A5F;
+  --on-d:#F5F2ED;--on-dm:#C7C2BA;
+  --serif:'Libre Baskerville',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --b1:rgba(28,25,23,.07);--b2:rgba(28,25,23,.12);--b3:rgba(28,25,23,.18);
+  --r:16px;--rl:22px;
+  --ss:0 1px 2px rgba(28,25,23,.03),0 4px 16px rgba(28,25,23,.04);
+  --sl:0 4px 12px rgba(28,25,23,.06),0 12px 32px rgba(28,25,23,.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:var(--teal);text-decoration:none;transition:color .25s}
+a:hover{color:#0A5F62}
+a:focus-visible,button:focus-visible{outline:3px solid var(--teal);outline-offset:3px;border-radius:6px}
+
+.skip{position:absolute;top:-100px;left:0;background:var(--ink);color:#fff;padding:.85rem 1.25rem;z-index:9999;font-weight:600}
+.skip:focus{top:0}
+
+/* NAV */
+.nav{background:rgba(251,249,246,.85);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1280px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--ink)}
+.brand-mark{width:40px;height:40px;flex-shrink:0}
+.brand-text{font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+.brand-text em{font-style:normal;color:var(--teal)}
+.nv{display:flex;align-items:center;gap:.4rem}
+.nv a{font-size:.78rem;color:var(--mt);font-weight:500;padding:.4rem .75rem;border-radius:8px;transition:all .25s}
+.nv a:hover{color:var(--teal);background:var(--ts)}
+.nv a.active{color:var(--teal);background:var(--ts);font-weight:600}
+.nav-cta{background:var(--ink);color:#fff;padding:.55rem 1rem;border-radius:100px;font-size:.74rem;font-weight:600;display:inline-flex;align-items:center;gap:.35rem;transition:all .3s}
+.nav-cta:hover{background:var(--teal);color:#fff;transform:translateY(-1px)}
+.mbtn{display:none;background:none;border:none;cursor:pointer;padding:8px;min-width:44px;min-height:44px;color:var(--ink)}
+
+/* CONTAINER */
+.w{max-width:1280px;margin:0 auto;padding:0 1.5rem}
+section{padding:4rem 0}
+
+/* SECTION HEADERS */
+.sl{font-family:var(--mono);font-size:.62rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.75rem;display:inline-flex;align-items:center;gap:.5rem}
+.sl::before{content:'';width:24px;height:1px;background:var(--teal)}
+.st{font-family:var(--serif);font-size:clamp(1.65rem,3.6vw,2.6rem);line-height:1.15;color:var(--ink);letter-spacing:-.02em;margin-bottom:.85rem;max-width:42ch}
+.st em{font-style:italic;color:var(--teal)}
+.ss{font-size:.92rem;color:var(--mt);line-height:1.7;max-width:60ch;margin-bottom:2.5rem}
+
+/* HERO */
+.hero{padding:4rem 0 3rem;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.hero-chip{display:inline-flex;align-items:center;gap:.45rem;background:var(--ts);border:1px solid var(--tm);color:var(--teal);padding:.4rem .85rem;border-radius:100px;font-size:.68rem;font-weight:600;margin-bottom:1.25rem;font-family:var(--mono);letter-spacing:.04em}
+.hero-chip .h-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:var(--serif);font-size:clamp(2rem,4.5vw,3.5rem);line-height:1.1;color:var(--ink);letter-spacing:-.02em;margin-bottom:1.25rem;max-width:24ch}
+.hero h1 em{font-style:italic;color:var(--teal)}
+.hero-lede{font-size:1.05rem;color:var(--mt);line-height:1.7;max-width:62ch;margin-bottom:1.5rem}
+
+/* TIER STRUCTURE */
+.tier{padding:3rem 0;border-top:1px solid var(--b1)}
+.tier-header{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.tier-header-l{flex:1;min-width:280px}
+.tier-num{font-family:var(--mono);font-size:.62rem;color:var(--peach);letter-spacing:.12em;font-weight:600;text-transform:uppercase;margin-bottom:.4rem}
+.tier-title{font-family:var(--serif);font-size:1.9rem;line-height:1.2;color:var(--ink);letter-spacing:-.015em;margin-bottom:.5rem}
+.tier-sub{font-size:.88rem;color:var(--mt);line-height:1.65;max-width:55ch}
+.tier-stat{background:var(--w);border:1px solid var(--b2);border-radius:var(--rl);padding:1.1rem 1.4rem;min-width:200px}
+.tier-stat-l{font-family:var(--mono);font-size:.55rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:.2rem}
+.tier-stat-v{font-family:var(--serif);font-size:1.35rem;color:var(--ink);font-weight:700;line-height:1.1}
+.tier-stat-d{font-size:.65rem;color:var(--mt);margin-top:.2rem}
+
+/* SOLUTION CARDS */
+.sol-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.sol{background:var(--w);border:1px solid var(--b1);border-radius:var(--rl);padding:1.75rem;transition:all .35s var(--ease);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.sol::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--peach));opacity:0;transition:opacity .3s}
+.sol:hover{transform:translateY(-3px);box-shadow:var(--sl);border-color:var(--b2)}
+.sol:hover::before{opacity:1}
+.sol-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.85rem;flex-wrap:wrap}
+.sol-num{font-family:var(--mono);font-size:.55rem;color:var(--mt);letter-spacing:.1em;font-weight:600;text-transform:uppercase;margin-bottom:.35rem}
+.sol-name{font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--ink);line-height:1.25}
+.sol-price{background:var(--ts);color:var(--teal);padding:.3rem .6rem;border-radius:8px;font-family:var(--mono);font-size:.62rem;font-weight:600;white-space:nowrap;border:1px solid var(--tm)}
+.sol-tag{display:inline-flex;align-items:center;gap:.3rem;background:var(--ps);color:var(--peach);padding:.25rem .55rem;border-radius:6px;font-family:var(--mono);font-size:.52rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.75rem}
+.sol p{font-size:.78rem;color:var(--mt);line-height:1.65;margin-bottom:.85rem}
+.sol-detail{margin-bottom:.85rem}
+.sol-detail-label{font-family:var(--mono);font-size:.52rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:.3rem;display:block}
+.sol-detail ul{list-style:none;padding:0}
+.sol-detail ul li{font-size:.72rem;color:var(--mt);padding:.18rem 0 .18rem .8rem;position:relative;line-height:1.5}
+.sol-detail ul li::before{content:'';position:absolute;left:0;top:.5rem;width:4px;height:4px;border-radius:50%;background:var(--teal);opacity:.5}
+.sol-detail ul li strong{color:var(--ink);font-weight:600}
+.sol-ideal{background:var(--bg);border:1px solid var(--b1);border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem}
+.sol-ideal-l{font-family:var(--mono);font-size:.52rem;color:var(--peach);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:.2rem}
+.sol-ideal-d{font-size:.7rem;color:var(--mt);line-height:1.5}
+.sol-cta{margin-top:auto;padding-top:1rem;border-top:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.sol-engagement{font-family:var(--mono);font-size:.58rem;color:var(--mt);letter-spacing:.04em}
+.sol-engagement strong{color:var(--ink);font-weight:600}
+.sol-btn{display:inline-flex;align-items:center;gap:.3rem;background:var(--ink);color:#fff;padding:.5rem .85rem;border-radius:100px;font-size:.68rem;font-weight:600;transition:all .3s;min-height:36px}
+.sol-btn:hover{background:var(--teal);color:#fff;transform:translateX(2px)}
+.sol-btn svg{transition:transform .3s}
+.sol-btn:hover svg{transform:translateX(2px)}
+
+/* MARKET SIGNALS */
+.signals{background:var(--w);padding:3rem 0;border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);margin-top:3rem}
+.signals-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+.signal{padding:1.25rem;border:1px solid var(--b1);border-radius:var(--rl);background:var(--bg)}
+.signal-v{font-family:var(--serif);font-size:1.6rem;color:var(--teal);font-weight:700;line-height:1.1;margin-bottom:.25rem}
+.signal-l{font-size:.72rem;color:var(--ink);font-weight:600;margin-bottom:.2rem}
+.signal-s{font-size:.62rem;color:var(--mt);line-height:1.5}
+
+/* ENGAGEMENT MODEL */
+.engage{background:var(--bg2);padding:4rem 0;border-top:1px solid var(--b1)}
+.engage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.eng{background:var(--w);border:1px solid var(--b1);border-radius:var(--rl);padding:1.75rem}
+.eng-num{font-family:var(--mono);font-size:.6rem;color:var(--teal);letter-spacing:.1em;font-weight:600;margin-bottom:.5rem}
+.eng h3{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem}
+.eng p{font-size:.76rem;color:var(--mt);line-height:1.65;margin-bottom:.75rem}
+.eng ul{list-style:none;padding:0}
+.eng ul li{font-size:.7rem;color:var(--mt);padding:.18rem 0 .18rem .75rem;position:relative;line-height:1.5}
+.eng ul li::before{content:'';position:absolute;left:0;top:.5rem;width:3px;height:3px;border-radius:50%;background:var(--teal)}
+
+/* CTA SECTION */
+.cta-final{background:var(--ink);color:var(--on-d);padding:4rem 0;text-align:center}
+.cta-final h2{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.3rem);line-height:1.2;color:#fff;letter-spacing:-.015em;margin-bottom:1rem;max-width:32ch;margin-left:auto;margin-right:auto}
+.cta-final h2 em{font-style:italic;color:#5EEAD4}
+.cta-final p{font-size:.88rem;color:var(--on-dm);max-width:55ch;margin:0 auto 1.75rem;line-height:1.7}
+.cta-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.btn-f{background:#fff;color:var(--ink);padding:.85rem 1.5rem;border-radius:100px;font-weight:700;font-size:.82rem;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem;min-height:44px}
+.btn-f:hover{background:#5EEAD4;color:var(--ink);transform:translateY(-2px)}
+.btn-o{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:.85rem 1.5rem;border-radius:100px;font-weight:700;font-size:.82rem;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem;min-height:44px}
+.btn-o:hover{border-color:#5EEAD4;color:#5EEAD4}
+
+/* FOOTER */
+.foot{background:var(--ink);color:var(--on-dm);padding:3rem 0 2rem;border-top:1px solid rgba(255,255,255,.05)}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.foot-brand{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;color:#fff;text-decoration:none}
+.foot-brand-text{font-family:var(--serif);font-size:1rem;font-weight:700}
+.foot-tag{font-size:.78rem;color:var(--on-dm);line-height:1.7;max-width:36ch;margin-bottom:1rem}
+.foot-col h4{color:#fff;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.85rem;font-family:var(--mono)}
+.foot-col a{display:block;color:var(--on-dm);font-size:.78rem;padding:.25rem 0;transition:color .25s}
+.foot-col a:hover{color:#5EEAD4}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;font-size:.72rem;color:var(--on-dm)}
+.foot-bottom a{color:var(--on-dm)}
+.foot-bottom a:hover{color:#5EEAD4}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.show{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.h-dot{animation:none}}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .sol-grid{grid-template-columns:1fr}
+  .signals-grid{grid-template-columns:1fr 1fr}
+  .engage-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  .nv{display:none;position:absolute;top:100%;left:0;right:0;background:var(--w);border-bottom:1px solid var(--b1);flex-direction:column;padding:1rem;gap:.2rem;box-shadow:var(--ss)}
+  .nv.open{display:flex}
+  .mbtn{display:flex;align-items:center;justify-content:center}
+  .signals-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .tier-header{flex-direction:column}
+  .sol-head{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+
+<!-- NAV -->
+<nav class="nav" aria-label="Main navigation">
+<div class="nav-inner">
+  <a href="/" class="brand" aria-label="BrainPulse Inc home">
+    <svg class="brand-mark" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke="#0D7377" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="26" cy="23" r="5" stroke="#0D7377" stroke-width="1.8" fill="none"/>
+      <circle cx="26" cy="23" r="2" fill="#0D7377"/>
+    </svg>
+    <span class="brand-text">Brain<em>Pulse</em></span>
+  </a>
+  <div class="nv">
+    <a href="/">Home</a>
+    <a href="/solutions.html" class="active">Solutions</a>
+    <a href="/practices.html">Practices</a>
+    <a href="/industries.html">Industries</a>
+    <a href="/insights.html">Insights</a>
+    <a href="/lab.html">Lab</a>
+    <a href="/#case-studies">Work</a>
+    <a href="/#about">About</a>
+  </div>
+  <a href="/#contact" class="nav-cta">Book a call <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  <button class="mbtn" aria-label="Toggle menu" onclick="document.querySelector('.nv').classList.toggle('open')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</div>
+</nav>
+
+<main id="main">
+
+<!-- HERO -->
+<section class="hero">
+<div class="w">
+  <div class="hero-chip rv"><span class="h-dot"></span>Productized solutions · Subscription · Assessments</div>
+  <h1 class="rv d1">Solutions for building <em>trustworthy AI systems</em></h1>
+  <p class="hero-lede rv d2">BrainPulse offers productized solutions across three tiers — from <strong>$5K assessments</strong> to <strong>$25K/month enterprise retainers</strong>. Whether you need EU AI Act compliance, accessibility remediation, FDA-ready medical device UX validation, or AI governance for federal deployments, every engagement has a clearly defined scope, deliverables, and pricing.</p>
+</div>
+</section>
+
+<!-- TIER 1: HIGH-MARGIN SUBSCRIPTIONS -->
+<section class="tier">
+<div class="w">
+  <div class="tier-header rv">
+    <div class="tier-header-l">
+      <div class="tier-num">Tier 01 · Subscriptions</div>
+      <h2 class="tier-title">Continuous compliance, not one-time audits</h2>
+      <p class="tier-sub">Recurring solutions for organizations where AI governance and accessibility are ongoing regulatory obligations — not project-bounded engagements. Monthly retainers with quarterly deliverables, dedicated specialist hours, and audit-ready evidence packages.</p>
+    </div>
+    <div class="tier-stat">
+      <div class="tier-stat-l">Market signal</div>
+      <div class="tier-stat-v">EU AI Act</div>
+      <div class="tier-stat-d">Enforcement begins August 2026 — every enterprise serving EU users is in scope</div>
+    </div>
+  </div>
+
+  <div class="sol-grid">
+
+    <article class="sol rv">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/001</div>
+          <h3 class="sol-name">AI Governance-as-a-Service</h3>
+        </div>
+        <div class="sol-price">$5K–25K/mo</div>
+      </div>
+      <span class="sol-tag">EU AI Act · NIST AI RMF · ISO/IEC 42001</span>
+      <p>Continuous AI governance support for organizations deploying AI in regulated environments. We function as your embedded AI governance team — monitoring regulatory developments, auditing model deployments, maintaining compliance evidence trails, and producing quarterly reports for executive and regulatory audiences.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Included monthly</span>
+        <ul>
+          <li><strong>Quarterly compliance reviews</strong> against NIST AI RMF, EU AI Act, and ISO/IEC 42001 frameworks</li>
+          <li><strong>Model card audits</strong> and updates for newly deployed or modified AI systems</li>
+          <li><strong>TEVV reporting</strong> with drift detection, bias monitoring, and performance degradation analysis</li>
+          <li><strong>Regulatory horizon scanning</strong> — monthly briefings on upcoming AI regulations affecting your markets</li>
+          <li><strong>Algorithmic impact assessments</strong> for new model deployments (up to 4 per quarter)</li>
+          <li><strong>Audit-ready evidence packages</strong> with full traceability documentation</li>
+          <li><strong>Dedicated Slack channel</strong> with same-day response for governance questions</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Mid-to-large enterprises (200+ employees) deploying 3+ AI models in EU markets, regulated industries, or federal contexts. Especially valuable for companies preparing for EU AI Act enforcement or expanding international AI deployments.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>12-month minimum</strong> · 30-day exit clause after Q1</div>
+        <a href="/#contact" class="sol-btn">Discuss your needs <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+    <article class="sol rv d1">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/002</div>
+          <h3 class="sol-name">Accessibility Compliance Subscription</h3>
+        </div>
+        <div class="sol-price">$3K–10K/mo</div>
+      </div>
+      <span class="sol-tag">WCAG 2.2 · Section 508 · ADA Title II · EAA</span>
+      <p>Continuous accessibility monitoring and remediation for organizations subject to ADA Title II (state and local government, effective 2026-2027), Section 508 (federal), or the European Accessibility Act. We maintain your accessibility posture as products evolve, regulations change, and new content launches.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Included monthly</span>
+        <ul>
+          <li><strong>Continuous automated scanning</strong> across all production digital products (axe-core, Pa11y)</li>
+          <li><strong>Quarterly manual audits</strong> with screen reader testing (JAWS, NVDA, VoiceOver)</li>
+          <li><strong>VPAT documentation updates</strong> for every release cycle</li>
+          <li><strong>Prioritized remediation roadmaps</strong> ranked by severity and user impact</li>
+          <li><strong>Design review</strong> for new features before they ship — preventing violations at source</li>
+          <li><strong>Accessibility champion mentoring</strong> for embedded team members</li>
+          <li><strong>Compliance reporting</strong> ready for legal review and regulatory submissions</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">State and local government agencies, federal contractors, financial services, healthcare, e-commerce, and any organization that has received ADA demand letters or wants to prevent them. Particularly urgent for organizations approaching the 2026-2027 ADA Title II compliance deadline.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>6-month minimum</strong> · 30-day exit clause</div>
+        <a href="/#contact" class="sol-btn">Discuss your needs <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+    <article class="sol rv d2">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/003</div>
+          <h3 class="sol-name">BrainPulse Compliance Pattern Library</h3>
+        </div>
+        <div class="sol-price">$500–2K/seat/mo</div>
+      </div>
+      <span class="sol-tag">SaaS · Component Library · Pre-built UI</span>
+      <p>Subscription access to BrainPulse's curated component library — pre-built, WCAG-compliant React and Angular components specifically designed for NIST AI RMF dashboards, model cards, audit trails, human-oversight controls, and regulatory reporting interfaces. Cut your AI governance dashboard time-to-market from months to weeks.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">What's included</span>
+        <ul>
+          <li><strong>120+ pre-built components</strong> for AI governance interfaces (model cards, risk tiers, audit trails, TEVV dashboards)</li>
+          <li><strong>WCAG 2.2 AAA compliance</strong> built into every component with documentation</li>
+          <li><strong>React and Angular versions</strong> with TypeScript definitions and Storybook documentation</li>
+          <li><strong>Figma library</strong> mirroring the code components for designer handoff</li>
+          <li><strong>Design tokens</strong> for color, typography, spacing, and accessibility attributes</li>
+          <li><strong>Quarterly component releases</strong> aligned with regulatory updates</li>
+          <li><strong>Implementation consultation</strong> — 4 hours per seat per quarter</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Engineering teams at AI-deploying enterprises, federal contractors building governance dashboards, and product teams who need to launch compliant AI interfaces in weeks rather than quarters. Volume discounts available for 10+ seats.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>Annual contracts</strong> · Volume tiers available</div>
+        <a href="/#contact" class="sol-btn">Request demo <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+    <article class="sol rv d3">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/004</div>
+          <h3 class="sol-name">AI Bill of Materials (AI BoM) Generator</h3>
+        </div>
+        <div class="sol-price">$15K–50K</div>
+      </div>
+      <span class="sol-tag">OMB M-24-10 · EU AI Act · Supply Chain Transparency</span>
+      <p>Productized service to generate, validate, and maintain AI Bill of Materials documentation — a new regulatory requirement under OMB Memo M-24-10 (federal) and EU AI Act (international). Almost no consultancy currently provides this; first-mover advantage available for organizations preparing for AI supply chain transparency requirements.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Deliverables</span>
+        <ul>
+          <li><strong>AI BoM inventory</strong> documenting all foundation models, datasets, dependencies, and third-party components</li>
+          <li><strong>Provenance documentation</strong> for training data sources, licensing, and data lineage</li>
+          <li><strong>Risk classification</strong> against EU AI Act tiers (Unacceptable, High, Limited, Minimal Risk)</li>
+          <li><strong>Compliance evidence package</strong> for regulatory submissions and audits</li>
+          <li><strong>Maintenance playbook</strong> for keeping AI BoM current as models evolve</li>
+          <li><strong>Annual update service</strong> available at $5K-15K per system</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Federal agencies subject to OMB M-24-10, federal contractors delivering AI systems, and enterprises preparing for EU AI Act compliance who need defensible documentation of their AI supply chain.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>4-8 week engagement</strong> · Per AI system</div>
+        <a href="/#contact" class="sol-btn">Discuss scope <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+  </div>
+</div>
+</section>
+
+<!-- MARKET SIGNALS -->
+<section class="signals">
+<div class="w">
+  <div class="signals-grid">
+    <div class="signal rv">
+      <div class="signal-v">$4.8B</div>
+      <div class="signal-l">AI governance market by 2028</div>
+      <div class="signal-s">Compound annual growth rate of 33.7% driven by EU AI Act enforcement and NIST AI RMF adoption</div>
+    </div>
+    <div class="signal rv d1">
+      <div class="signal-v">300%</div>
+      <div class="signal-l">Increase in ADA lawsuits</div>
+      <div class="signal-s">Web accessibility lawsuits over the past 5 years; 4,605 federal lawsuits filed in 2023 alone</div>
+    </div>
+    <div class="signal rv d2">
+      <div class="signal-v">1,200+</div>
+      <div class="signal-l">Federal AI use cases</div>
+      <div class="signal-s">Federal agency AI deployments requiring assessment under OMB Memo M-24-10 compliance</div>
+    </div>
+    <div class="signal rv d3">
+      <div class="signal-v">€35M</div>
+      <div class="signal-l">EU AI Act maximum penalty</div>
+      <div class="signal-s">Or 7% of global annual turnover — whichever is higher — for non-compliance with prohibited AI practices</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- TIER 2: VERTICAL-SPECIFIC -->
+<section class="tier">
+<div class="w">
+  <div class="tier-header rv">
+    <div class="tier-header-l">
+      <div class="tier-num">Tier 02 · Vertical Specializations</div>
+      <h2 class="tier-title">Deep expertise in regulated industries</h2>
+      <p class="tier-sub">Higher-value engagements for organizations operating in industries where domain expertise, regulatory knowledge, and credentials matter as much as design skill. These engagements draw on Senthil's 15+ years across healthcare, federal, and defense.</p>
+    </div>
+    <div class="tier-stat">
+      <div class="tier-stat-l">Differentiator</div>
+      <div class="tier-stat-v">15+ Years</div>
+      <div class="tier-stat-d">Federal · Defense · Healthcare · Enterprise experience with cited deliverables</div>
+    </div>
+  </div>
+
+  <div class="sol-grid">
+
+    <article class="sol rv">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/005</div>
+          <h3 class="sol-name">Medical Device UX Validation</h3>
+        </div>
+        <div class="sol-price">$25K–75K</div>
+      </div>
+      <span class="sol-tag">IEC 62366 · ISO 14971 · FDA 21 CFR 820.30</span>
+      <p>Full usability engineering process for medical device manufacturers preparing FDA premarket submissions (510(k), De Novo, PMA). We deliver the usability engineering file required by IEC 62366-1, conduct formative and summative validation, and produce all documentation regulators require — eliminating the most common cause of FDA submission delays.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Deliverables</span>
+        <ul>
+          <li><strong>Use specification</strong> defining intended users, use environments, and use scenarios</li>
+          <li><strong>User interface specification</strong> with hazard-related use cases identified</li>
+          <li><strong>Use-related risk analysis (URRA)</strong> integrated with ISO 14971 hazard analysis</li>
+          <li><strong>Formative evaluations</strong> with iterative refinement (typically 3-5 rounds)</li>
+          <li><strong>Summative validation testing</strong> with 15+ representative users per user group</li>
+          <li><strong>Complete usability engineering file</strong> ready for FDA submission</li>
+          <li><strong>Human factors engineering report</strong> following FDA guidance document</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Medical device manufacturers preparing FDA submissions, SaMD (Software as Medical Device) developers, digital therapeutics companies, and diagnostic device makers. Average client saves 6-12 months on FDA submission timelines.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>3-6 month engagement</strong> · Per device program</div>
+        <a href="/#contact" class="sol-btn">Discuss device <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+    <article class="sol rv d1">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/006</div>
+          <h3 class="sol-name">Defense Human-Machine Teaming Lab</h3>
+        </div>
+        <div class="sol-price">$100K–500K</div>
+      </div>
+      <span class="sol-tag">MIL-STD-1472H · DoDI 5000.95 · HSI</span>
+      <p>Specialized engagement for defense contractors and DoD programs developing unmanned systems, autonomous platforms, or human-machine teaming interfaces. Full Human Systems Integration (HSI) lifecycle support — from concept development through operational test and evaluation — applying MIL-STD-1472H human engineering criteria and DoDI 5000.95 HSI requirements.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Deliverables</span>
+        <ul>
+          <li><strong>HSI program plan</strong> covering all 7 HSI domains (Manpower, Personnel, Training, HFE, Safety, Health Hazards, Survivability)</li>
+          <li><strong>Cognitive task analysis</strong> for operator decision-making under varying workload conditions</li>
+          <li><strong>MIL-STD-1472H compliance assessment</strong> with remediation roadmap</li>
+          <li><strong>Function allocation analysis</strong> between humans and autonomous systems</li>
+          <li><strong>Operator interface design</strong> validated through human-in-the-loop simulation</li>
+          <li><strong>FMEA and human error analysis</strong> identifying critical failure modes</li>
+          <li><strong>Operational test and evaluation</strong> support with documented results</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Defense prime contractors (Leidos, Lockheed Martin, Raytheon, Northrop Grumman, BAE), DoD program offices, and emerging defense tech companies developing autonomous systems requiring HSI assessment for milestone reviews.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>6-18 month program</strong> · Cleared personnel available</div>
+        <a href="/#contact" class="sol-btn">Discuss program <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+    <article class="sol rv d2">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/007</div>
+          <h3 class="sol-name">Federal AI Risk Assessment Service</h3>
+        </div>
+        <div class="sol-price">$50K–200K</div>
+      </div>
+      <span class="sol-tag">OMB M-24-10 · NIST AI RMF · ATO Support</span>
+      <p>Comprehensive AI risk assessment service for federal agencies and contractors required to assess AI use cases under OMB Memo M-24-10. We conduct the full assessment, document risk classifications, design mitigation controls, and produce the evidence package required for ATO (Authority to Operate) approval and Congressional oversight.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Deliverables</span>
+        <ul>
+          <li><strong>AI use case inventory</strong> and classification per OMB M-24-10 categories</li>
+          <li><strong>Rights-impacting and safety-impacting AI</strong> identification and assessment</li>
+          <li><strong>NIST AI RMF profile</strong> documenting Govern, Map, Measure, Manage activities</li>
+          <li><strong>Algorithmic impact assessments</strong> for each rights/safety-impacting AI use</li>
+          <li><strong>Mitigation controls</strong> design and implementation guidance</li>
+          <li><strong>Public AI use case disclosure</strong> documentation per White House requirements</li>
+          <li><strong>ATO support package</strong> with security controls mapping</li>
+          <li><strong>Annual reassessment</strong> service available at $20-50K per agency</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Federal agency CIOs and Chief AI Officers, agency components deploying AI in citizen-facing services, federal contractors supporting AI initiatives, and inspector general offices needing independent AI risk assessments.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>3-6 month engagement</strong> · Cleared personnel available</div>
+        <a href="/#contact" class="sol-btn">Discuss agency <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+    <article class="sol rv d3">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/008</div>
+          <h3 class="sol-name">AI Governance Maturity Assessment</h3>
+        </div>
+        <div class="sol-price">$5K–15K</div>
+      </div>
+      <span class="sol-tag">2-Week Diagnostic · NIST AI RMF · Roadmap</span>
+      <p>A focused two-week diagnostic that scores your organization against NIST AI RMF categories (Govern, Map, Measure, Manage), benchmarks you against industry peers, identifies critical gaps, and produces a 12-month roadmap with prioritized investments. Designed as a gateway engagement that often leads to larger Tier 1 or Tier 2 retainers.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Deliverables</span>
+        <ul>
+          <li><strong>AI governance maturity scorecard</strong> with sub-scores across 18 categories</li>
+          <li><strong>Industry benchmarking</strong> against peer organizations of similar size and sector</li>
+          <li><strong>Gap analysis</strong> identifying critical compliance and risk exposure</li>
+          <li><strong>12-month maturity roadmap</strong> with prioritized investments and dependencies</li>
+          <li><strong>Executive readout</strong> deck for board and C-suite presentation</li>
+          <li><strong>Quick wins identification</strong> — initiatives deployable in under 90 days</li>
+          <li><strong>30-day follow-up</strong> consultation included</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Organizations new to AI governance, CIOs and Chief AI Officers building their governance function, boards seeking independent assessment of AI risk posture, and prospective Tier 1 subscription clients evaluating engagement.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>2-week engagement</strong> · Fast turnaround</div>
+        <a href="/#contact" class="sol-btn">Start assessment <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+  </div>
+</div>
+</section>
+
+<!-- TIER 3: THOUGHT LEADERSHIP -->
+<section class="tier" style="background:var(--bg2)">
+<div class="w">
+  <div class="tier-header rv">
+    <div class="tier-header-l">
+      <div class="tier-num">Tier 03 · Authority & Education</div>
+      <h2 class="tier-title">Productized expertise and intellectual leadership</h2>
+      <p class="tier-sub">Engagements that establish BrainPulse as the authoritative voice on AI governance and accessibility while delivering exceptional client value. These solutions build market authority and create inbound demand for Tier 1 and Tier 2 engagements.</p>
+    </div>
+    <div class="tier-stat">
+      <div class="tier-stat-l">Strategic value</div>
+      <div class="tier-stat-v">Authority</div>
+      <div class="tier-stat-d">Becoming the firm regulators, executives, and engineering teams cite</div>
+    </div>
+  </div>
+
+  <div class="sol-grid">
+
+    <article class="sol rv">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/009</div>
+          <h3 class="sol-name">Executive AI Governance Workshops</h3>
+        </div>
+        <div class="sol-price">$15K–40K</div>
+      </div>
+      <span class="sol-tag">Board · C-Suite · General Counsel</span>
+      <p>Half-day to two-day executive workshops on AI governance, regulatory landscape, organizational accountability, and board-level oversight responsibilities. Designed for C-suite executives, general counsels, board members, and senior leadership facing AI deployment decisions with significant business, legal, and reputational implications.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">Workshop options</span>
+        <ul>
+          <li><strong>Half-day executive briefing</strong> ($15K) — Current state, key regulations, board-level questions</li>
+          <li><strong>Full-day strategic workshop</strong> ($25K) — Deep dive into NIST AI RMF, EU AI Act, organizational accountability</li>
+          <li><strong>Two-day immersion</strong> ($40K) — Hands-on governance framework development with executive team</li>
+          <li><strong>Custom corporate program</strong> — Quarterly executive education series for AI-deploying enterprises</li>
+          <li><strong>Board observer service</strong> — Quarterly board-level AI governance updates</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Ideal client</div>
+        <div class="sol-ideal-d">Public and private company boards, executive teams, general counsels facing AI liability questions, and senior leadership teams at AI-deploying organizations. Modeled on IDEO U's executive education approach.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>4-6 week lead time</strong> · On-site or virtual</div>
+        <a href="/#contact" class="sol-btn">Schedule workshop <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+    <article class="sol rv d1">
+      <div class="sol-head">
+        <div>
+          <div class="sol-num">SOL/010</div>
+          <h3 class="sol-name">BrainPulse Trust Index</h3>
+        </div>
+        <div class="sol-price">Sponsorship</div>
+      </div>
+      <span class="sol-tag">Annual Report · Industry Benchmark · Lead Generation</span>
+      <p>Our annual industry report benchmarking the state of AI governance, accessibility, and human-centered design across 200+ surveyed organizations. Distributed free to drive inbound interest, establish BrainPulse as the authoritative voice in this space, and identify high-value prospects. Modeled on the Stack Overflow Developer Survey and The Gradient publication.</p>
+      <div class="sol-detail">
+        <span class="sol-detail-label">What it includes</span>
+        <ul>
+          <li><strong>Annual industry survey</strong> of 200+ organizations across sectors and sizes</li>
+          <li><strong>Governance maturity scoring</strong> against NIST AI RMF and emerging frameworks</li>
+          <li><strong>Sector benchmarking</strong> — how does your industry compare to peers</li>
+          <li><strong>Regulatory readiness assessment</strong> for upcoming compliance deadlines</li>
+          <li><strong>Trend analysis</strong> on emerging governance practices and tooling adoption</li>
+          <li><strong>Public release</strong> with extensive media outreach and conference presentations</li>
+          <li><strong>Sponsorship opportunities</strong> for partner organizations seeking visibility</li>
+        </ul>
+      </div>
+      <div class="sol-ideal">
+        <div class="sol-ideal-l">Audience & impact</div>
+        <div class="sol-ideal-d">Distributed to 10,000+ executives, regulators, and practitioners. Creates inbound demand for all other BrainPulse solutions while establishing market authority. Becomes the cited reference for AI governance maturity.</div>
+      </div>
+      <div class="sol-cta">
+        <div class="sol-engagement"><strong>Annual publication</strong> · 2026 inaugural edition</div>
+        <a href="/#contact" class="sol-btn">Learn about sponsorship <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </article>
+
+  </div>
+</div>
+</section>
+
+<!-- ENGAGEMENT MODEL -->
+<section class="engage">
+<div class="w">
+  <div class="sl rv">How we engage</div>
+  <h2 class="st rv d1">Three pathways to start working together</h2>
+  <p class="ss rv d2">Whether you're exploring AI governance for the first time or have a specific compliance deadline, there's a defined entry point.</p>
+
+  <div class="engage-grid">
+    <div class="eng rv">
+      <div class="eng-num">PATH 01</div>
+      <h3>Start with a diagnostic</h3>
+      <p>Most engagements begin with our AI Governance Maturity Assessment — a 2-week diagnostic that scores your current state and identifies the highest-leverage opportunities.</p>
+      <ul>
+        <li>$5K-15K investment</li>
+        <li>2 weeks duration</li>
+        <li>Executive-ready deliverables</li>
+        <li>Often leads to subscription or vertical engagement</li>
+      </ul>
+    </div>
+    <div class="eng rv d1">
+      <div class="eng-num">PATH 02</div>
+      <h3>Subscribe to continuous support</h3>
+      <p>For organizations with ongoing governance or accessibility obligations, our monthly subscriptions provide dedicated specialist hours, quarterly reviews, and audit-ready documentation.</p>
+      <ul>
+        <li>$3K-25K monthly</li>
+        <li>Multi-year value</li>
+        <li>Dedicated Slack channel</li>
+        <li>Same-day response on critical questions</li>
+      </ul>
+    </div>
+    <div class="eng rv d2">
+      <div class="eng-num">PATH 03</div>
+      <h3>Engage for a specific program</h3>
+      <p>For defined deliverables — medical device FDA submission, federal AI assessment, defense HSI program, or AI BoM documentation — our Tier 2 specialist engagements have fixed scope and timelines.</p>
+      <ul>
+        <li>$25K-500K per program</li>
+        <li>3-18 month duration</li>
+        <li>Defined deliverables</li>
+        <li>Audit-ready documentation</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="cta-final">
+<div class="w">
+  <h2>Ready to build AI systems<br/>that <em>humans can trust</em>?</h2>
+  <p>Every engagement starts with a free 30-minute discovery call. We'll discuss your specific situation, recommend the right solution tier, and provide a written proposal within 5 business days.</p>
+  <div class="cta-btns">
+    <a href="/#contact" class="btn-f">Schedule a free consultation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    <a href="mailto:senthil@brainpulseinc.com" class="btn-o">Email Senthil directly</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="foot">
+<div class="w">
+  <div class="foot-grid">
+    <div>
+      <a href="/" class="foot-brand">
+        <svg width="32" height="32" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+          <path d="M26 4L46 15V37L26 48L6 37V15Z" fill="rgba(94,234,212,.08)" stroke="#5EEAD4" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="26" cy="23" r="5" stroke="#5EEAD4" stroke-width="1.8" fill="none"/>
+          <circle cx="26" cy="23" r="2" fill="#5EEAD4"/>
+        </svg>
+        <span class="foot-brand-text">BrainPulse Inc</span>
+      </a>
+      <p class="foot-tag">UX engineering for AI systems that humans can trust. AI governance, accessibility, and human factors engineering for safety-critical digital products.</p>
+      <p style="font-size:.72rem;color:var(--on-dm)">© 2026 BrainPulse Inc. All rights reserved.</p>
+    </div>
+    <div class="foot-col">
+      <h4>Solutions</h4>
+      <a href="/solutions.html">AI Governance-as-a-Service</a>
+      <a href="/solutions.html">Accessibility Subscription</a>
+      <a href="/solutions.html">Pattern Library</a>
+      <a href="/solutions.html">Medical Device UX</a>
+      <a href="/solutions.html">Defense HSI</a>
+      <a href="/solutions.html">Executive Workshops</a>
+    </div>
+    <div class="foot-col">
+      <h4>Practices</h4>
+      <a href="/practices.html">AI Governance</a>
+      <a href="/practices.html">Accessibility</a>
+      <a href="/practices.html">Human Factors</a>
+      <a href="/practices.html">Emerging Tech</a>
+    </div>
+    <div class="foot-col">
+      <h4>Company</h4>
+      <a href="/#about">About</a>
+      <a href="/#case-studies">Work</a>
+      <a href="/insights.html">Insights</a>
+      <a href="/lab.html">Lab</a>
+      <a href="/#contact">Contact</a>
+      <a href="https://www.linkedin.com/in/senthil-nagappan" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <div>WCAG 2.2 AAA · Section 508 Compliant · This site practices what we preach</div>
+    <div><a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></div>
+  </div>
+</div>
+</footer>
+
+<script>
+const observer=new IntersectionObserver(e=>{e.forEach(t=>{t.isIntersecting&&t.target.classList.add('show')})},{threshold:.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.rv').forEach(e=>observer.observe(e));
+</script>
+</body>
+</html>
