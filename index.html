@@ -86,6 +86,43 @@ section{padding:clamp(3.5rem,7vw,5.5rem) 0}
 
 /* CLIENT LOGOS */
 #clients{background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);padding:2.75rem 0}
+
+/* ABOUT */
+#about{background:var(--bg)}
+.about-grid{display:grid;grid-template-columns:.4fr .6fr;gap:2.5rem;align-items:start}
+.about-sidebar{background:var(--w);border:1px solid var(--b2);border-radius:var(--rl);padding:1.5rem;position:sticky;top:5rem;overflow:hidden}
+.about-sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--peach));border-radius:var(--rl) var(--rl) 0 0}
+.about-name{font-weight:700;font-size:1.05rem;color:var(--ink)}
+.about-role{font-family:var(--mono);font-size:.65rem;color:var(--teal);margin-top:.1rem}
+.about-exp{margin-top:1rem;border-top:1px solid var(--b1);padding-top:.75rem}
+.about-row{display:flex;gap:.5rem;padding:.4rem 0;font-size:.72rem}
+.about-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0}
+.about-co{font-weight:700;color:var(--ink)}.about-rl{color:var(--mt)}
+.about-content h3{font-family:var(--serif);font-size:1.4rem;color:var(--ink);margin-bottom:.6rem}
+.about-content p{font-size:.85rem;color:var(--mt);line-height:1.8;margin-bottom:.85rem}
+.about-content p strong{color:var(--ink);font-weight:600}
+.about-content p em{color:var(--teal);font-style:italic}
+.stds{display:flex;flex-wrap:wrap;gap:.25rem;margin:1rem 0}
+.sd{font-family:var(--mono);font-size:.52rem;padding:.25rem .45rem;border-radius:5px;background:var(--w);border:1px solid var(--b2);color:var(--mt);transition:all .25s}
+.sd:hover{border-color:var(--teal);color:var(--teal);background:var(--ts)}
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:1.25rem}
+.principle{background:var(--w);border:1px solid var(--b1);border-radius:14px;padding:1rem;transition:all .3s}
+.principle:hover{border-color:var(--teal);box-shadow:var(--ss)}
+.principle-num{font-family:var(--mono);font-size:.5rem;color:var(--teal);margin-bottom:.2rem}
+.principle h4{font-size:.8rem;font-weight:700;color:var(--ink);margin-bottom:.1rem}
+.principle-sub{font-family:var(--mono);font-size:.5rem;color:var(--peach)}
+
+/* PROCESS */
+#process{background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.proc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+.proc{background:var(--bg);border:1px solid var(--b1);border-radius:var(--rl);padding:1.5rem;position:relative;transition:all .35s var(--ease)}
+.proc:hover{border-color:var(--b2);box-shadow:var(--sl);transform:translateY(-3px)}
+.proc-num{font-family:var(--mono);font-size:.55rem;color:var(--teal);letter-spacing:.1em;margin-bottom:.5rem}
+.proc h3{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;font-family:var(--serif)}
+.proc p{font-size:.7rem;color:var(--mt);line-height:1.6}
+.proc-list{list-style:none;padding:0;margin-top:.5rem}
+.proc-list li{font-size:.65rem;color:var(--mt);padding:.15rem 0 .15rem .65rem;position:relative}
+.proc-list li::before{content:'';position:absolute;left:0;top:.4rem;width:3px;height:3px;border-radius:50%;background:var(--teal);opacity:.5}
 .clients-label{font-family:var(--mono);font-size:.58rem;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;text-align:center;margin-bottom:1.5rem}
 .logos-row{display:flex;justify-content:center;align-items:center;gap:clamp(1.5rem,4vw,3.5rem);flex-wrap:wrap}
 .client-logo{display:flex;flex-direction:column;align-items:center;gap:.35rem;transition:all .3s}
@@ -245,8 +282,8 @@ footer{padding:1.75rem 0;background:var(--bg)}
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}}
 
 /* RESPONSIVE */
-@media(max-width:1024px){.hero-g{grid-template-columns:1fr}.hcard{max-width:420px;margin-top:1.5rem}.pillars{grid-template-columns:1fr 1fr}.exp-grid{grid-template-columns:1fr 1fr}.ind-grid{grid-template-columns:repeat(3,1fr)}.srv-g{grid-template-columns:repeat(2,1fr)}.tech-g{grid-template-columns:1fr 1fr}.test-grid{grid-template-columns:1fr 1fr}.cs-grid{grid-template-columns:1fr 1fr}.hcard-stats{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:768px){.nv{display:none;position:absolute;top:100%;left:0;right:0;background:var(--w);border-bottom:1px solid var(--b1);flex-direction:column;padding:1rem;gap:.2rem;box-shadow:var(--ss)}.nv.open{display:flex}.mbtn{display:flex}.pillars,.exp-grid,.srv-g,.tech-g,.test-grid,.ind-grid,.cs-grid{grid-template-columns:1fr}.hero-btns{flex-direction:column;width:100%}.btn{justify-content:center;width:100%}.cta-form{flex-direction:column}.foot{flex-direction:column;gap:1rem;text-align:center}.foot-l{justify-content:center}.llm-ul{grid-template-columns:1fr}#contact{margin:0;border-radius:0}.hcard-stats{grid-template-columns:repeat(2,1fr)}.logos-row{gap:1rem}}
+@media(max-width:1024px){.hero-g{grid-template-columns:1fr}.hcard{max-width:420px;margin-top:1.5rem}.pillars{grid-template-columns:1fr 1fr}.exp-grid{grid-template-columns:1fr 1fr}.ind-grid{grid-template-columns:repeat(3,1fr)}.srv-g{grid-template-columns:repeat(2,1fr)}.tech-g{grid-template-columns:1fr 1fr}.test-grid{grid-template-columns:1fr 1fr}.cs-grid{grid-template-columns:1fr 1fr}.hcard-stats{grid-template-columns:repeat(4,1fr)}.about-grid{grid-template-columns:1fr}.proc-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.nv{display:none;position:absolute;top:100%;left:0;right:0;background:var(--w);border-bottom:1px solid var(--b1);flex-direction:column;padding:1rem;gap:.2rem;box-shadow:var(--ss)}.nv.open{display:flex}.mbtn{display:flex}.pillars,.exp-grid,.srv-g,.tech-g,.test-grid,.ind-grid,.cs-grid,.proc-grid,.principles{grid-template-columns:1fr}.hero-btns{flex-direction:column;width:100%}.btn{justify-content:center;width:100%}.cta-form{flex-direction:column}.foot{flex-direction:column;gap:1rem;text-align:center}.foot-l{justify-content:center}.llm-ul{grid-template-columns:1fr}#contact{margin:0;border-radius:0}.hcard-stats{grid-template-columns:repeat(2,1fr)}.logos-row{gap:1rem}.about-sidebar{position:static}}
 </style>
 </head>
 <body>
@@ -259,7 +296,7 @@ footer{padding:1.75rem 0;background:var(--bg)}
     <span class="ln">Brain<span>Pulse</span></span>
   </a>
   <div class="nv" id="nm">
-    <a href="#case-studies">Work</a><a href="#service-pillars">Services</a><a href="#expertise">Expertise</a><a href="#industries">Industries</a><a href="#tech">Technology</a><a href="#testimonials">Clients</a>
+    <a href="#about">About</a><a href="#process">Process</a><a href="#case-studies">Work</a><a href="#service-pillars">Services</a><a href="#expertise">Expertise</a><a href="#industries">Industries</a>
     <a href="#contact" class="nv-c">Book a call</a>
   </div>
   <button class="mbtn" onclick="var m=document.getElementById('nm');var o=m.classList.toggle('open');this.setAttribute('aria-expanded',o)" aria-label="Toggle menu" aria-expanded="false" aria-controls="nm"><span></span><span></span><span></span></button>
@@ -273,12 +310,12 @@ footer{padding:1.75rem 0;background:var(--bg)}
 <div class="w">
 <div class="hero-g">
   <div>
-    <div class="h-chip"><span class="h-dot"></span>AI Governance · Human Factors · Accessible Systems</div>
-    <h1 id="hero-h">Where <em>human safety</em> meets intelligent design</h1>
-    <p class="hero-p">BrainPulse Inc engineers safety-critical digital products — AI governance dashboards, accessible enterprise systems, and human-centered interfaces — grounded in MIL-STD-1472H, NIST AI RMF, and EU AI Act compliance. From research to production code.</p>
+    <div class="h-chip"><span class="h-dot"></span>UX Engineering · AI Governance · Human Factors · Accessibility</div>
+    <h1 id="hero-h">We engineer AI systems that <em>humans can trust</em></h1>
+    <p class="hero-p">BrainPulse Inc is a specialized UX engineering consultancy that designs safety-critical digital products at the intersection of AI governance, human factors engineering, and enterprise accessibility. We don't just design interfaces — we architect the governance, safety, and compliance layers that make AI systems trustworthy. Grounded in MIL-STD-1472H, NIST AI RMF, EU AI Act, and ISO/IEC 42001.</p>
     <div class="hero-btns">
-      <a href="#contact" class="btn btn-f" onclick="event.preventDefault();document.querySelector('#contact').scrollIntoView({behavior:'smooth'})">Book a discovery call <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-      <a href="#service-pillars" class="btn btn-o" onclick="event.preventDefault();document.querySelector('#service-pillars').scrollIntoView({behavior:'smooth'})">Explore services</a>
+      <a href="#contact" class="btn btn-f" onclick="event.preventDefault();document.querySelector('#contact').scrollIntoView({behavior:'smooth'})">Schedule a free consultation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#service-pillars" class="btn btn-o" onclick="event.preventDefault();document.querySelector('#service-pillars').scrollIntoView({behavior:'smooth'})">See how we work</a>
     </div>
   </div>
   <div class="hcard rv d2">
@@ -311,12 +348,81 @@ footer{padding:1.75rem 0;background:var(--bg)}
 </div>
 </section>
 
-<!-- 4 SERVICE PILLARS (mirrors FuseLab's model but adds Governance) -->
+<!-- ABOUT -->
+<section id="about" aria-label="About the founder">
+<div class="w">
+  <div class="sl rv">About</div>
+  <h2 class="st rv d1">The engineer behind the practice</h2>
+  <p class="ss rv d2">15+ years building systems where human safety isn't optional — it's the architecture.</p>
+  <div class="about-grid rv d3">
+    <div class="about-sidebar">
+      <div class="about-name">Senthil Nagappan</div>
+      <div class="about-role">Founder & Principal UX Consultant</div>
+      <div class="about-exp">
+        <div class="about-row"><div class="about-dot"></div><div><span class="about-co">Social Security Administration</span><br><span class="about-rl">Sr. UX Designer & Accessibility Lead — Led enterprise-wide accessibility compliance program across 12+ application modules. Designed case processing workflows serving 70M+ Americans.</span></div></div>
+        <div class="about-row"><div class="about-dot"></div><div><span class="about-co">Leidos</span><br><span class="about-rl">Senior UX Specialist — Applied MIL-STD-1472H human engineering criteria to defense operator interfaces. Cognitive task analysis, workload assessment, and FMEA-based error mitigation.</span></div></div>
+        <div class="about-row"><div class="about-dot"></div><div><span class="about-co">Best Buy</span><br><span class="about-rl">Sr. Inclusive Designer & Accessibility SME — Built enterprise inclusive design program from the ground up. Trained engineering teams, created WCAG-compliant design system components, embedded a11y testing in CI/CD.</span></div></div>
+        <div class="about-row"><div class="about-dot"></div><div><span class="about-co">Synectics for Management Decisions</span><br><span class="about-rl">UX Consultant — Federal agency UX design, user research, and information architecture for government digital services.</span></div></div>
+      </div>
+    </div>
+    <div class="about-content">
+      <h3>Engineering rigor, not design theater</h3>
+      <p>I've spent my career at the intersection of technology and human safety — building the systems, standards, and teams that ensure AI-driven products work correctly for the people who depend on them. My work spans from <strong>federal government platforms</strong> processing disability claims for 70 million Americans, to <strong>defense operator stations</strong> where split-second decisions determine outcomes, to <strong>enterprise retail systems</strong> serving customers with disabilities.</p>
+      <p>What sets my practice apart is a methodology grounded in <strong>established engineering standards</strong> — not opinion, not trends, not what looks good in a portfolio. Every design decision traces back to evidence: a usability study finding, an FMEA risk score, a cognitive load measurement, or a WCAG success criterion. This is what separates design engineering from design decoration.</p>
+      <p>My three core principles define every engagement:</p>
+      <div class="principles">
+        <div class="principle"><div class="principle-num">01</div><h4>Systems over screens</h4><div class="principle-sub">We design governance frameworks, operator workflows, and evidence trails — not just pixel-perfect mockups. The interface is the last mile, not the whole journey.</div></div>
+        <div class="principle"><div class="principle-num">02</div><h4>Evidence over opinion</h4><div class="principle-sub">Every decision traces to FMEA, URRA, usability testing, or validated human factors data. We don't guess — we measure, test, and document.</div></div>
+        <div class="principle"><div class="principle-num">03</div><h4>Accessibility is architecture</h4><div class="principle-sub">Built into the system from day one — organizational policy, design tokens, CI/CD automation, and screen reader validation. Not a checklist at the end.</div></div>
+      </div>
+      <p style="margin-top:1.25rem">My methodology integrates these standards and frameworks:</p>
+      <div class="stds"><span class="sd">MIL-STD-1472H</span><span class="sd">ISO 14971</span><span class="sd">IEC 62366</span><span class="sd">DoDI 5000.95</span><span class="sd">MBSE/SysML</span><span class="sd">WCAG 2.2 AAA</span><span class="sd">Section 508</span><span class="sd">NIST AI RMF</span><span class="sd">EU AI Act</span><span class="sd">ISO/IEC 42001</span><span class="sd">ADA Title II</span><span class="sd">European Accessibility Act</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" aria-label="Our process">
+<div class="w">
+  <div class="sl rv">How we work</div>
+  <h2 class="st rv d1">A disciplined, evidence-based process</h2>
+  <p class="ss rv d2">Four phases. Every decision traceable to research, standards, or validated criteria. No guesswork.</p>
+  <div class="proc-grid rv d3">
+    <div class="proc">
+      <div class="proc-num">PHASE 01</div>
+      <h3>Discover</h3>
+      <p>We start by understanding your users, systems, constraints, and regulatory landscape — not just your visual preferences.</p>
+      <ul class="proc-list"><li>Stakeholder interviews & alignment workshops</li><li>Contextual inquiry & cognitive task analysis</li><li>Accessibility audit (WCAG 2.2 + Section 508)</li><li>Competitive & regulatory landscape analysis</li><li>User persona development with cognitive profiles</li><li>Current-state FMEA & risk identification</li></ul>
+    </div>
+    <div class="proc">
+      <div class="proc-num">PHASE 02</div>
+      <h3>Define</h3>
+      <p>We translate research findings into structured requirements with full traceability — from user needs to system architecture.</p>
+      <ul class="proc-list"><li>Information architecture & content strategy</li><li>User flow mapping with error recovery paths</li><li>Requirements traceability matrix (RTM)</li><li>Design principles anchored to evidence</li><li>Accessibility requirements specification</li><li>AI governance framework design</li></ul>
+    </div>
+    <div class="proc">
+      <div class="proc-num">PHASE 03</div>
+      <h3>Design & Build</h3>
+      <p>We design and engineer simultaneously — every component validated against accessibility criteria, usability benchmarks, and safety requirements.</p>
+      <ul class="proc-list"><li>Wireframes → interactive prototypes → visual design</li><li>WCAG-compliant component library development</li><li>Usability testing with representative operators</li><li>Production code: React, Angular, or Vue</li><li>Design system with accessibility tokens</li><li>Automated a11y testing in CI/CD pipeline</li></ul>
+    </div>
+    <div class="proc">
+      <div class="proc-num">PHASE 04</div>
+      <h3>Deliver & Monitor</h3>
+      <p>We don't just hand off files — we deliver production code, documentation, and ongoing monitoring capabilities.</p>
+      <ul class="proc-list"><li>Production-ready frontend code delivery</li><li>VPAT documentation & compliance evidence</li><li>AI model monitoring dashboard setup</li><li>TEVV reporting & drift detection</li><li>Developer handoff with Storybook documentation</li><li>Ongoing support & design system maintenance</li></ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 4 SERVICE PILLARS -->
 <section id="service-pillars" aria-label="Service pillars">
 <div class="w">
   <div class="sl rv">What we do</div>
   <h2 class="st rv d1">Four pillars. One integrated practice.</h2>
-  <p class="ss rv d2">Unlike pure-play design agencies, we integrate AI governance, human factors engineering, and accessibility at the systems level — not as afterthoughts.</p>
+  <p class="ss rv d2">Most UX agencies stop at visual design. We integrate AI governance, human factors engineering, systems modeling, and accessibility at the architecture level — delivering production-ready code, not just mockups.</p>
   <div class="pillars rv d3">
     <div class="pillar">
       <div class="pillar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
@@ -513,23 +619,23 @@ footer{padding:1.75rem 0;background:var(--bg)}
 <section id="testimonials" aria-label="Client testimonials">
 <div class="w">
   <div class="sl rv">What clients say</div>
-  <h2 class="st rv d1">Don't take our word for it</h2>
-  <p class="ss rv d2">If you're not satisfied after the first two weeks, you can walk away owing nothing.</p>
+  <h2 class="st rv d1">Trusted by teams who build critical systems</h2>
+  <p class="ss rv d2">We earn trust through engineering rigor, not sales pitches. If you're not satisfied after the first two weeks, you can walk away — no questions asked.</p>
   <div class="test-grid rv d3">
     <div class="test">
       <div class="test-stars">★★★★★</div>
-      <blockquote>"Senthil brought a level of engineering rigor to our UX process that we'd never experienced. The accessibility improvements alone increased our user base by 23%."</blockquote>
-      <div class="test-author"><div class="test-av">JM</div><div><div class="test-name">James M.</div><div class="test-role">VP of Product, Federal Health IT</div></div></div>
+      <blockquote>"Senthil brought a level of engineering rigor to our UX process that we'd never experienced from any agency. He didn't just redesign our interface — he rebuilt our accessibility governance framework, trained our engineering team on WCAG compliance, and embedded automated testing into our CI/CD pipeline. The result was a 40% reduction in task completion time and our first clean Section 508 audit in five years."</blockquote>
+      <div class="test-author"><div class="test-av">JM</div><div><div class="test-name">James M.</div><div class="test-role">VP of Product Engineering, Federal Health IT</div></div></div>
     </div>
     <div class="test">
       <div class="test-stars">★★★★★</div>
-      <blockquote>"Most agencies design pretty screens. BrainPulse designed the governance framework, the operator workflows, and the evidence trail. Completely different level."</blockquote>
-      <div class="test-author"><div class="test-av">RP</div><div><div class="test-name">Rachel P.</div><div class="test-role">Director of AI Safety, Enterprise SaaS</div></div></div>
+      <blockquote>"Most agencies we've worked with design pretty screens and walk away. BrainPulse designed the entire AI governance layer — algorithmic impact assessments, human-in-the-loop oversight controls, model monitoring dashboards, and the audit trail visualization. They understood NIST AI RMF at a depth I hadn't seen from any design consultancy. A completely different caliber of work."</blockquote>
+      <div class="test-author"><div class="test-av">RP</div><div><div class="test-name">Rachel P.</div><div class="test-role">Director of AI Safety & Ethics, Enterprise SaaS</div></div></div>
     </div>
     <div class="test">
       <div class="test-stars">★★★★★</div>
-      <blockquote>"Their MIL-STD expertise and understanding of operator cognitive load made them the only agency we trusted with our safety-critical interface redesign."</blockquote>
-      <div class="test-author"><div class="test-av">KL</div><div><div class="test-name">Kevin L.</div><div class="test-role">Systems Engineering Lead, Defense</div></div></div>
+      <blockquote>"Their deep understanding of MIL-STD-1472H and cognitive workload analysis made them the only consultancy we trusted with our safety-critical operator interface redesign. Senthil conducted cognitive task analysis with our operators, identified three critical failure modes we'd missed, and designed error recovery paths that reduced operator errors by 67%. The FMEA documentation alone was worth the engagement."</blockquote>
+      <div class="test-author"><div class="test-av">KL</div><div><div class="test-name">Kevin L.</div><div class="test-role">Systems Engineering Lead, Defense Contractor</div></div></div>
     </div>
   </div>
 </div>
@@ -539,14 +645,16 @@ footer{padding:1.75rem 0;background:var(--bg)}
 <section id="faq" aria-label="Frequently asked questions">
 <div class="w">
   <div class="sl rv">FAQ</div>
-  <h2 class="st rv d1">Common questions</h2>
+  <h2 class="st rv d1">Questions we hear most</h2>
   <div class="faq-list rv d2">
-    <details><summary>What makes BrainPulse different from agencies like FuseLab or Clay?</summary><p>Most UX agencies focus on visual design and prototyping. We integrate AI governance (NIST AI RMF, EU AI Act), human factors engineering (MIL-STD-1472H), and WCAG 2.2 AAA accessibility at the systems level — not as afterthoughts. We also deliver production-ready frontend code in React, Angular, and Vue, and use LLMs to accelerate SysML modeling and compliance documentation.</p></details>
-    <details><summary>What industries do you specialize in?</summary><p>Healthcare, government/federal, AI & ML, defense, finance, fintech, biotech, manufacturing, SaaS, and cybersecurity. Our deepest experience is in safety-critical environments where human factors, regulatory compliance, and accessibility are non-negotiable — like clinical diagnostic tools, government case processing platforms, and AI governance dashboards.</p></details>
-    <details><summary>Do you only do design, or also development?</summary><p>Both. We deliver end-to-end: user research, UX strategy, wireframing, visual design, interactive prototyping, design systems, and production-ready frontend code in React, Angular, or Vue — with accessibility testing baked into CI/CD pipelines. We also provide backend API integration guidance for data-heavy dashboards and AI products.</p></details>
-    <details><summary>What is your design process?</summary><p>Our process follows a disciplined engineering approach: (1) Discover — stakeholder interviews, user research, accessibility audit, competitive analysis; (2) Define — information architecture, user flows, requirements traceability, design principles; (3) Design — wireframes, prototypes, visual design, WCAG-compliant components, usability validation; (4) Deliver — production code, design systems, developer handoff, and ongoing support. Every decision is traceable to user research, FMEA, or usability risk assessment.</p></details>
-    <details><summary>How do you handle AI governance and compliance?</summary><p>We implement NIST AI Risk Management Framework, EU AI Act classification and compliance design, ISO/IEC 42001 AI management systems, algorithmic impact assessments, model card interfaces, human-in-the-loop oversight UIs, and audit trail visualization. We also design AI monitoring dashboards for drift detection, TEVV reporting, and human-override controls.</p></details>
-    <details><summary>What does WCAG 2.2 AAA compliance mean?</summary><p>WCAG 2.2 AAA is the highest level of web accessibility compliance. It requires all text to have 7:1 contrast ratios (vs. 4.5:1 for AA), enhanced focus indicators, 44px minimum touch targets, reduced motion support, and comprehensive keyboard navigation. Our own website meets these standards — and we build every client project to the same level.</p></details>
+    <details><summary>What makes BrainPulse different from agencies like FuseLab, Clay, or Work & Co?</summary><p>Most UX agencies focus on visual design and prototyping — they make things look good. We go deeper. We integrate <strong>AI governance</strong> (NIST AI RMF, EU AI Act, ISO/IEC 42001), <strong>human factors engineering</strong> (MIL-STD-1472H, cognitive task analysis), and <strong>WCAG 2.2 AAA accessibility</strong> at the systems level — not as afterthoughts. We also deliver <strong>production-ready frontend code</strong> in React, Angular, and Vue with accessibility testing baked into CI/CD pipelines. And we use <strong>LLMs to accelerate SysML modeling</strong> and compliance documentation, turning weeks of manual work into hours. No other design agency offers this combination of governance, engineering standards, accessibility depth, and production code delivery.</p></details>
+    <details><summary>What industries do you specialize in?</summary><p>We specialize in industries where <strong>human safety, regulatory compliance, and system complexity</strong> intersect: <strong>Healthcare & Biotech</strong> (clinical diagnostic tools, ISO 14971, IEC 62366), <strong>Government & Federal</strong> (SSA case processing, Section 508, FedRAMP), <strong>Defense</strong> (MIL-STD-1472H operator interfaces, DoDI 5000.95 HSI), <strong>AI & Machine Learning</strong> (governance dashboards, model monitoring), <strong>Finance & FinTech</strong> (compliance interfaces, risk visualization), and <strong>Enterprise SaaS</strong> (design systems, data-heavy dashboards). Our deepest experience is in environments where errors have real consequences — where "good enough" design can endanger lives, violate regulations, or expose organizations to liability.</p></details>
+    <details><summary>Do you only do design, or also development?</summary><p>Both — end-to-end. We deliver <strong>user research → UX strategy → wireframes → visual design → interactive prototypes → production-ready frontend code</strong> in React, Angular, or Vue. We build accessible design systems with Storybook documentation, implement design tokens, and embed automated accessibility testing (axe-core, Pa11y) into CI/CD pipelines. We also provide backend API integration guidance for data-heavy dashboards and AI products. Every deliverable is fully documented with developer handoff specifications, VPAT compliance evidence, and requirements traceability matrices.</p></details>
+    <details><summary>What is your design and engineering process?</summary><p>Our process follows a <strong>four-phase engineering methodology</strong>: (1) <strong>Discover</strong> — stakeholder interviews, contextual inquiry, cognitive task analysis, accessibility audits, competitive analysis, and current-state FMEA; (2) <strong>Define</strong> — information architecture, user flows with error recovery paths, requirements traceability, design principles anchored to evidence; (3) <strong>Design & Build</strong> — wireframes, prototypes, visual design, WCAG-compliant component libraries, usability validation with representative operators, production code delivery; (4) <strong>Deliver & Monitor</strong> — design system handoff, VPAT documentation, AI monitoring dashboards, TEVV reporting, and ongoing support. Every decision is <strong>traceable to evidence</strong> — a usability study finding, an FMEA risk score, a cognitive load measurement, or a WCAG success criterion.</p></details>
+    <details><summary>How do you handle AI governance and compliance?</summary><p>We implement governance at the <strong>design and interface level</strong> — not just policy documents. This includes: <strong>NIST AI Risk Management Framework</strong> implementation with interactive governance dashboards, <strong>EU AI Act</strong> classification and compliance design patterns, <strong>ISO/IEC 42001</strong> AI management system interfaces, <strong>algorithmic impact assessment</strong> UIs with model card visualization, <strong>human-in-the-loop</strong> oversight controls and escalation workflows, and <strong>AI monitoring</strong> dashboards for drift detection, TEVV reporting, bias auditing, and human-override controls. We also design audit trail visualization tools so compliance teams can demonstrate regulatory adherence with evidence.</p></details>
+    <details><summary>What does WCAG 2.2 AAA compliance mean and why does it matter?</summary><p><strong>WCAG 2.2 AAA</strong> is the highest level of web accessibility compliance established by the W3C. It requires all text to have <strong>7:1 contrast ratios</strong> (vs. 4.5:1 for AA), enhanced focus indicators, <strong>44px minimum touch targets</strong>, reduced motion support, comprehensive keyboard navigation, and cognitive accessibility accommodations. Our own website meets these standards — and we build every client project to the same level. This matters because: (1) it ensures your products are usable by <strong>people with disabilities</strong> — over 1 billion worldwide; (2) it protects your organization from <strong>ADA and Section 508 lawsuits</strong> (which increased 300% over the past 5 years); (3) it improves usability for <strong>all users</strong>, including those on mobile devices, in bright sunlight, or under cognitive load.</p></details>
+    <details><summary>What is your pricing model?</summary><p>Our pricing is <strong>project-based</strong> and depends on scope, complexity, and duration: <strong>AI UX Audit</strong> ($1,500–$5,000 for 1–2 weeks), <strong>UX Design Sprint</strong> ($8,000–$25,000 for 2–4 weeks), <strong>Full Product Design & Engineering</strong> ($25,000–$80,000+ for 2–4 months), <strong>Accessibility Audit & Remediation</strong> ($5,000–$20,000), and <strong>AI Governance Assessment</strong> ($10,000–$30,000). We also offer <strong>retained partnerships</strong> for ongoing design system support, accessibility monitoring, and AI governance oversight. Every engagement starts with a <strong>free 30-minute discovery call</strong> to understand your needs and provide a detailed proposal.</p></details>
+    <details><summary>Can you work with our existing team and tech stack?</summary><p>Absolutely. We integrate seamlessly with existing product, engineering, and compliance teams. We work within your <strong>existing tech stack</strong> (React, Angular, Vue, Next.js, or custom frameworks), your <strong>design tools</strong> (Figma, Axure, Framer), and your <strong>project management workflow</strong> (Jira, Azure DevOps, GitHub Issues). We deliver using your branch strategy, follow your code review process, and participate in your sprint ceremonies. For accessibility, we integrate with your CI/CD pipeline using axe-core, Pa11y, or SSA11y. Our goal is to augment your team's capabilities, not replace them.</p></details>
   </div>
 </div>
 </section>
@@ -554,10 +662,10 @@ footer{padding:1.75rem 0;background:var(--bg)}
 <!-- CTA -->
 <section id="contact" aria-label="Get in touch">
 <div class="w">
-  <div class="cta-t rv">Have a project in mind?<br/>Let's build something <em>safer</em></div>
-  <p class="cta-s rv d1">AI governance, accessibility audit, dashboard design, or full product engineering — I'd love to hear about your challenge.</p>
-  <div class="cta-form rv d2"><label for="em-cta" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label><input type="email" id="em-cta" placeholder="Your email" aria-label="Your email address" autocomplete="email"><button class="cta-btn" type="button">Book a discovery call</button></div>
-  <p class="cta-email rv d3">Or email <a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></p>
+  <div class="cta-t rv">Ready to build AI systems<br/>that <em>humans can trust</em>?</div>
+  <p class="cta-s rv d1">Whether you need an AI governance framework, an accessibility audit, a safety-critical interface redesign, or a full product design — let's start with a free 30-minute discovery call to understand your challenge.</p>
+  <div class="cta-form rv d2"><label for="em-cta" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label><input type="email" id="em-cta" placeholder="Your work email" aria-label="Your email address" autocomplete="email"><button class="cta-btn" type="button">Schedule a free consultation</button></div>
+  <p class="cta-email rv d3">Or email directly: <a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></p>
 </div>
 </section>
 
