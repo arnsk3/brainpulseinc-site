@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Industries â Healthcare, Federal, Defense, Financial Services | BrainPulse Inc</title>
-<meta name="description" content="BrainPulse Inc serves healthcare, federal government, defense, and financial services â industries where AI governance, accessibility, and human factors engineering are regulatory requirements, not optional features.">
+<title>Industries Ã¢ÂÂ Healthcare, Federal, Defense, Financial Services | BrainPulse Inc</title>
+<meta name="description" content="BrainPulse Inc serves healthcare, federal government, defense, and financial services Ã¢ÂÂ industries where AI governance, accessibility, and human factors engineering are regulatory requirements, not optional features.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -126,6 +126,33 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-GC10FF23VN');
 </script>
+<script>
+document.addEventListener('click', function(e) {
+  var link = e.target.closest('a');
+  if (!link) return;
+  var href = link.getAttribute('href') || '';
+  var text = (link.textContent || '').toLowerCase().trim();
+  var isConsultationCta = (
+    href === '#contact' ||
+    href === '/#contact' ||
+    href.indexOf('mailto:senthil@brainpulseinc.com') === 0 ||
+    text.indexOf('consultation') !== -1 ||
+    text.indexOf('discovery call') !== -1 ||
+    text.indexOf('book a call') !== -1 ||
+    text.indexOf('schedule') !== -1 ||
+    text.indexOf('discuss your') !== -1 ||
+    text.indexOf('start assessment') !== -1
+  );
+  if (isConsultationCta && typeof gtag !== 'undefined') {
+    gtag('event', 'generate_lead', {
+      'event_category': 'engagement',
+      'event_label': link.textContent.trim().substring(0, 100),
+      'page_path': window.location.pathname,
+      'cta_type': href.indexOf('mailto:') === 0 ? 'email' : 'contact_form'
+    });
+  }
+});
+</script>
 </head>
 <body>
 <a href="#main" class="skip">Skip to main content</a>
@@ -139,42 +166,42 @@ gtag('config', 'G-GC10FF23VN');
 <main id="main">
 
 <section class="hero"><div class="w">
-<div class="hero-chip rv"><span class="h-dot"></span>Four industries Â· One specialist team</div>
+<div class="hero-chip rv"><span class="h-dot"></span>Four industries ÃÂ· One specialist team</div>
 <h1 class="rv d1">Built for industries where <em>errors have consequences</em></h1>
 <p class="hero-lede rv d2">BrainPulse focuses on four verticals where the intersection of AI governance, accessibility, and human factors engineering creates regulatory, safety, and reputational stakes that pure-play design agencies are not equipped to handle. Each industry brings its own standards, its own enforcement regime, and its own engineering vocabulary. We speak all four fluently.</p>
 </div></section>
 
 <section class="ind-overview"><div class="w">
 <div class="sl rv">Verticals we serve</div>
-<h2 class="st rv d1" style="font-size:1.5rem;margin-bottom:0">Healthcare Â· Federal Â· Defense Â· Financial Services</h2>
+<h2 class="st rv d1" style="font-size:1.5rem;margin-bottom:0">Healthcare ÃÂ· Federal ÃÂ· Defense ÃÂ· Financial Services</h2>
 <div class="ind-grid">
 <a href="#healthcare" class="ind-card rv d2">
 <div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
 <div class="ind-card-l">INDUSTRY 01</div>
 <h3>Healthcare &amp; Life Sciences</h3>
-<p>Medical devices, SaMD, clinical AI, digital therapeutics â IEC 62366, ISO 14971, FDA premarket submissions, HIPAA, 21 CFR Part 11.</p>
-<div class="ind-card-cta">Explore â</div>
+<p>Medical devices, SaMD, clinical AI, digital therapeutics Ã¢ÂÂ IEC 62366, ISO 14971, FDA premarket submissions, HIPAA, 21 CFR Part 11.</p>
+<div class="ind-card-cta">Explore Ã¢ÂÂ</div>
 </a>
 <a href="#federal" class="ind-card rv d2">
 <div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10L12 4l7 6v11M9 21v-6h6v6"/></svg></div>
 <div class="ind-card-l">INDUSTRY 02</div>
 <h3>Federal Government &amp; Public Sector</h3>
-<p>Civilian agencies, state &amp; local government â OMB M-24-10, Section 508, ADA Title II, FedRAMP, agency AI use case management.</p>
-<div class="ind-card-cta">Explore â</div>
+<p>Civilian agencies, state &amp; local government Ã¢ÂÂ OMB M-24-10, Section 508, ADA Title II, FedRAMP, agency AI use case management.</p>
+<div class="ind-card-cta">Explore Ã¢ÂÂ</div>
 </a>
 <a href="#defense" class="ind-card rv d3">
 <div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/></svg></div>
 <div class="ind-card-l">INDUSTRY 03</div>
 <h3>Defense &amp; Aerospace</h3>
-<p>DoD programs, defense primes, autonomous systems â MIL-STD-1472H, DoDI 5000.95 HSI, human-machine teaming, operator interfaces.</p>
-<div class="ind-card-cta">Explore â</div>
+<p>DoD programs, defense primes, autonomous systems Ã¢ÂÂ MIL-STD-1472H, DoDI 5000.95 HSI, human-machine teaming, operator interfaces.</p>
+<div class="ind-card-cta">Explore Ã¢ÂÂ</div>
 </a>
 <a href="#financial" class="ind-card rv d3">
 <div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
 <div class="ind-card-l">INDUSTRY 04</div>
 <h3>Financial Services</h3>
-<p>Banks, fintech, insurance â SR 11-7 model risk management, ECOA fairness, CFPB AI guidance, FCRA, regulatory examination support.</p>
-<div class="ind-card-cta">Explore â</div>
+<p>Banks, fintech, insurance Ã¢ÂÂ SR 11-7 model risk management, ECOA fairness, CFPB AI guidance, FCRA, regulatory examination support.</p>
+<div class="ind-card-cta">Explore Ã¢ÂÂ</div>
 </a>
 </div>
 </div></section>
@@ -185,19 +212,19 @@ gtag('config', 'G-GC10FF23VN');
 <div class="ind-num">INDUSTRY 01</div>
 <div class="ind-icon-l"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
 <h2 class="ind-title">Healthcare &amp; Life Sciences</h2>
-<p class="ind-lede">"When a clinician misreads a diagnostic interface, the patient pays the cost. Our work makes those interfaces safer â and gets them through FDA premarket review."</p>
+<p class="ind-lede">"When a clinician misreads a diagnostic interface, the patient pays the cost. Our work makes those interfaces safer Ã¢ÂÂ and gets them through FDA premarket review."</p>
 <div class="ind-stat"><div class="ind-stat-l">Market reality</div><div class="ind-stat-v">FDA HFE Required</div><div class="ind-stat-d">IEC 62366 usability engineering is mandatory for all FDA premarket submissions involving software medical devices and SaMD.</div></div>
 </aside>
 <div class="industry-content rv d1">
 <h3>The healthcare context</h3>
-<p>Medical devices, Software as a Medical Device (SaMD), clinical decision support systems, diagnostic AI, digital therapeutics, and electronic health record interfaces all operate under a regulatory framework where <strong>usability engineering is not optional</strong>. IEC 62366-1 â the international standard for medical device usability engineering â is required reading for any FDA premarket submission involving software. The FDA's own guidance document ("Applying Human Factors and Usability Engineering to Medical Devices") makes the same requirements operational.</p>
-<p>Healthcare interfaces fail in predictable ways. Alert fatigue causes clinicians to dismiss meaningful warnings. Cognitive load during high-acuity scenarios produces medication errors. Display layouts inherited from desktop-era EHRs collapse on tablets and bedside terminals. And AI-driven clinical decision support tools â including the rapidly growing class of SaMD â must now satisfy both traditional medical device safety standards and the emerging FDA framework for AI/ML-enabled medical devices. The intersection demands engineering rigor that most design agencies cannot provide.</p>
+<p>Medical devices, Software as a Medical Device (SaMD), clinical decision support systems, diagnostic AI, digital therapeutics, and electronic health record interfaces all operate under a regulatory framework where <strong>usability engineering is not optional</strong>. IEC 62366-1 Ã¢ÂÂ the international standard for medical device usability engineering Ã¢ÂÂ is required reading for any FDA premarket submission involving software. The FDA's own guidance document ("Applying Human Factors and Usability Engineering to Medical Devices") makes the same requirements operational.</p>
+<p>Healthcare interfaces fail in predictable ways. Alert fatigue causes clinicians to dismiss meaningful warnings. Cognitive load during high-acuity scenarios produces medication errors. Display layouts inherited from desktop-era EHRs collapse on tablets and bedside terminals. And AI-driven clinical decision support tools Ã¢ÂÂ including the rapidly growing class of SaMD Ã¢ÂÂ must now satisfy both traditional medical device safety standards and the emerging FDA framework for AI/ML-enabled medical devices. The intersection demands engineering rigor that most design agencies cannot provide.</p>
 <h3>Regulatory landscape</h3>
 <div class="reg-grid">
 <div class="reg"><div class="reg-h">IEC 62366-1</div><div class="reg-d">Mandatory usability engineering process for FDA premarket submissions covering use specification, URRA, formative evaluations, and summative validation.</div></div>
-<div class="reg"><div class="reg-h">ISO 14971</div><div class="reg-d">Risk management for medical devices â integrated with usability engineering to identify and mitigate use-related hazards.</div></div>
+<div class="reg"><div class="reg-h">ISO 14971</div><div class="reg-d">Risk management for medical devices Ã¢ÂÂ integrated with usability engineering to identify and mitigate use-related hazards.</div></div>
 <div class="reg"><div class="reg-h">FDA AI/ML SaMD</div><div class="reg-d">FDA framework for AI and ML-enabled medical devices including Predetermined Change Control Plans and ongoing monitoring requirements.</div></div>
-<div class="reg"><div class="reg-h">HIPAA Â· 21 CFR Part 11</div><div class="reg-d">Privacy and electronic records requirements affecting every patient-facing interface, audit trail, and electronic signature workflow.</div></div>
+<div class="reg"><div class="reg-h">HIPAA ÃÂ· 21 CFR Part 11</div><div class="reg-d">Privacy and electronic records requirements affecting every patient-facing interface, audit trail, and electronic signature workflow.</div></div>
 </div>
 <h3>What we deliver in healthcare</h3>
 <div class="cap-list"><div class="cap-list-l">Capabilities for healthcare clients</div><ul>
@@ -215,7 +242,7 @@ gtag('config', 'G-GC10FF23VN');
 <h3>Typical clients</h3>
 <p>Medical device manufacturers preparing FDA premarket submissions. Digital health companies launching SaMD products. Diagnostic AI developers facing the FDA AI/ML framework. Telehealth platforms scaling clinical workflows. Healthcare systems modernizing EHR interfaces. Biotech companies building patient-facing companion apps. Pharmaceutical companies developing clinical trial interfaces.</p>
 <div class="related">
-<a href="/solutions.html">View Medical Device UX solution â</a>
+<a href="/solutions.html">View Medical Device UX solution Ã¢ÂÂ</a>
 <a href="/practices.html#human-factors" class="sec">Human Factors practice</a>
 <a href="/#contact" class="sec">Discuss your device</a>
 </div>
@@ -240,9 +267,9 @@ gtag('config', 'G-GC10FF23VN');
 <h3>Regulatory landscape</h3>
 <div class="reg-grid">
 <div class="reg"><div class="reg-h">OMB Memorandum M-24-10</div><div class="reg-d">Federal AI governance: Chief AI Officers, AI use case inventory, AIA for rights-impacting and safety-impacting AI, minimum risk management practices.</div></div>
-<div class="reg"><div class="reg-h">Section 508</div><div class="reg-d">Federal accessibility standard for all electronic and information technology â applies to federal employees and citizens accessing federal services.</div></div>
+<div class="reg"><div class="reg-h">Section 508</div><div class="reg-d">Federal accessibility standard for all electronic and information technology Ã¢ÂÂ applies to federal employees and citizens accessing federal services.</div></div>
 <div class="reg"><div class="reg-h">ADA Title II Final Rule</div><div class="reg-d">WCAG 2.1 AA required for state &amp; local government digital services. Large entities by April 2026, smaller by April 2027.</div></div>
-<div class="reg"><div class="reg-h">FedRAMP Â· ATO</div><div class="reg-d">Authority to Operate processes for federal IT systems including AI-enabled services. Security controls mapping required.</div></div>
+<div class="reg"><div class="reg-h">FedRAMP ÃÂ· ATO</div><div class="reg-d">Authority to Operate processes for federal IT systems including AI-enabled services. Security controls mapping required.</div></div>
 </div>
 <h3>What we deliver for federal clients</h3>
 <div class="cap-list"><div class="cap-list-l">Capabilities for federal &amp; public sector clients</div><ul>
@@ -262,7 +289,7 @@ gtag('config', 'G-GC10FF23VN');
 <p>Federal civilian agencies (HHS, SSA, VA, USDA, Department of Education, Department of Labor). Federal contractors and systems integrators (Leidos, Booz Allen Hamilton, Deloitte, Accenture Federal Services, General Dynamics IT). State and local governments preparing for ADA Title II compliance. Federal Inspectors General conducting AI risk assessments. Federal Chief AI Officer offices building governance infrastructure. Federal procurement officers evaluating AI vendor submissions.</p>
 <p><strong>Relevant case study:</strong> Our Social Security Administration engagement modernized the case processing platform serving 70+ million Americans, deployed SSA11y automated accessibility scanning across 12 application modules, and achieved 100% Section 508 compliance with 40% faster task completion times.</p>
 <div class="related">
-<a href="/solutions.html">Federal AI Risk Assessment â</a>
+<a href="/solutions.html">Federal AI Risk Assessment Ã¢ÂÂ</a>
 <a href="/#case-studies" class="sec">SSA case study</a>
 <a href="/#contact" class="sec">Discuss your agency</a>
 </div>
@@ -282,11 +309,11 @@ gtag('config', 'G-GC10FF23VN');
 </aside>
 <div class="industry-content rv d1">
 <h3>The defense context</h3>
-<p>Defense systems engineering operates under a discipline of standards that most consumer-facing UX practitioners have never read. <strong>MIL-STD-1472H</strong> â the U.S. military's human engineering design criteria â runs over 400 pages and specifies everything from control dimensions to alarm prioritization to display readability under specific illumination conditions. <strong>DoDI 5000.95</strong> establishes Human Systems Integration as a required acquisition discipline covering seven domains (Manpower, Personnel, Training, Human Factors Engineering, Safety, Health Hazards, Survivability). <strong>MIL-STD-46855</strong> defines the human engineering program requirements that DoD programs must execute through their lifecycle.</p>
-<p>These standards are not optional. Defense programs that fail to satisfy them face milestone delays, redesign cycles, and operational test failures that can cost hundreds of millions of dollars. Defense primes â Leidos, Lockheed Martin, Raytheon (RTX), Northrop Grumman, BAE Systems, General Dynamics â staff dedicated human factors organizations specifically to satisfy these requirements. The growth area: unmanned systems, autonomous platforms, and AI-enabled decision support, where the human-machine teaming interface is the central engineering challenge.</p>
+<p>Defense systems engineering operates under a discipline of standards that most consumer-facing UX practitioners have never read. <strong>MIL-STD-1472H</strong> Ã¢ÂÂ the U.S. military's human engineering design criteria Ã¢ÂÂ runs over 400 pages and specifies everything from control dimensions to alarm prioritization to display readability under specific illumination conditions. <strong>DoDI 5000.95</strong> establishes Human Systems Integration as a required acquisition discipline covering seven domains (Manpower, Personnel, Training, Human Factors Engineering, Safety, Health Hazards, Survivability). <strong>MIL-STD-46855</strong> defines the human engineering program requirements that DoD programs must execute through their lifecycle.</p>
+<p>These standards are not optional. Defense programs that fail to satisfy them face milestone delays, redesign cycles, and operational test failures that can cost hundreds of millions of dollars. Defense primes Ã¢ÂÂ Leidos, Lockheed Martin, Raytheon (RTX), Northrop Grumman, BAE Systems, General Dynamics Ã¢ÂÂ staff dedicated human factors organizations specifically to satisfy these requirements. The growth area: unmanned systems, autonomous platforms, and AI-enabled decision support, where the human-machine teaming interface is the central engineering challenge.</p>
 <h3>Regulatory landscape</h3>
 <div class="reg-grid">
-<div class="reg"><div class="reg-h">MIL-STD-1472H</div><div class="reg-d">Human engineering design criteria for military systems â the foundational standard for operator interface design across all U.S. military services.</div></div>
+<div class="reg"><div class="reg-h">MIL-STD-1472H</div><div class="reg-d">Human engineering design criteria for military systems Ã¢ÂÂ the foundational standard for operator interface design across all U.S. military services.</div></div>
 <div class="reg"><div class="reg-h">DoDI 5000.95</div><div class="reg-d">Human Systems Integration as required acquisition discipline. 7 HSI domains must be addressed in every DoD program.</div></div>
 <div class="reg"><div class="reg-h">MIL-STD-46855</div><div class="reg-d">Human engineering program requirements specifying what activities must occur, when, and with what documentation through program lifecycle.</div></div>
 <div class="reg"><div class="reg-h">DoD Responsible AI</div><div class="reg-d">DoD AI Strategy and Responsible AI principles affecting AI-enabled defense systems including autonomous platforms.</div></div>
@@ -308,9 +335,9 @@ gtag('config', 'G-GC10FF23VN');
 <div class="stds"><span class="sd">MIL-STD-1472H</span><span class="sd">MIL-STD-1472G</span><span class="sd">MIL-HDBK-759C</span><span class="sd">MIL-STD-46855</span><span class="sd">DoDI 5000.95</span><span class="sd">NASA-STD-3001</span><span class="sd">DO-178C</span><span class="sd">ARP 4761</span><span class="sd">DoD Responsible AI</span></div>
 <h3>Typical clients</h3>
 <p>Defense prime contractors (Leidos, Lockheed Martin, Raytheon/RTX, Northrop Grumman, BAE Systems, General Dynamics, Boeing). DoD program offices managing acquisition programs. Defense research laboratories and FFRDCs (MITRE, JHU APL, MIT Lincoln Lab). Emerging defense tech companies (Anduril, Shield AI, Saronic, Saildrone) building autonomous platforms. NASA centers and aerospace primes with HSI requirements. Special operations and intelligence community customers with classified human factors requirements (cleared personnel available).</p>
-<p><strong>Relevant case study:</strong> Our Leidos defense systems engagement applied MIL-STD-1472H human engineering criteria across operator interfaces, conducted cognitive task analysis identifying 23 critical failure modes via FMEA, designed unified situational awareness displays consolidating 200+ data streams, and validated all designs through human-in-the-loop simulation testing â reducing operator errors by 67%.</p>
+<p><strong>Relevant case study:</strong> Our Leidos defense systems engagement applied MIL-STD-1472H human engineering criteria across operator interfaces, conducted cognitive task analysis identifying 23 critical failure modes via FMEA, designed unified situational awareness displays consolidating 200+ data streams, and validated all designs through human-in-the-loop simulation testing Ã¢ÂÂ reducing operator errors by 67%.</p>
 <div class="related">
-<a href="/solutions.html">Defense Human-Machine Teaming Lab â</a>
+<a href="/solutions.html">Defense Human-Machine Teaming Lab Ã¢ÂÂ</a>
 <a href="/#case-studies" class="sec">Leidos case study</a>
 <a href="/#contact" class="sec">Discuss your program</a>
 </div>
@@ -325,19 +352,19 @@ gtag('config', 'G-GC10FF23VN');
 <div class="ind-num">INDUSTRY 04</div>
 <div class="ind-icon-l"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
 <h2 class="ind-title">Financial Services</h2>
-<p class="ind-lede">"Model risk management is no longer a quant function â it is now a governance function with documented evidence requirements, human oversight controls, and regulatory examination preparation."</p>
+<p class="ind-lede">"Model risk management is no longer a quant function Ã¢ÂÂ it is now a governance function with documented evidence requirements, human oversight controls, and regulatory examination preparation."</p>
 <div class="ind-stat"><div class="ind-stat-l">CFPB AI guidance</div><div class="ind-stat-v">Active enforcement</div><div class="ind-stat-d">CFPB has issued enforcement actions against AI-driven lending and credit decisions, citing ECOA, FCRA, and adverse action notice requirements.</div></div>
 </aside>
 <div class="industry-content rv d1">
 <h3>The financial services context</h3>
-<p>Financial services has the longest history of model risk governance of any commercial sector. The Federal Reserve's <strong>SR 11-7 / OCC 2011-12</strong> supervisory guidance on model risk management has been operational since 2011 â predating the current wave of AI/ML by a decade. Banks have always had model validation functions, model inventories, and ongoing performance monitoring. What's changed is the surface area: AI/ML models for credit decisions, fraud detection, anti-money laundering, customer service, and risk pricing have expanded the scope dramatically while introducing failure modes that traditional model risk management was not designed to handle.</p>
+<p>Financial services has the longest history of model risk governance of any commercial sector. The Federal Reserve's <strong>SR 11-7 / OCC 2011-12</strong> supervisory guidance on model risk management has been operational since 2011 Ã¢ÂÂ predating the current wave of AI/ML by a decade. Banks have always had model validation functions, model inventories, and ongoing performance monitoring. What's changed is the surface area: AI/ML models for credit decisions, fraud detection, anti-money laundering, customer service, and risk pricing have expanded the scope dramatically while introducing failure modes that traditional model risk management was not designed to handle.</p>
 <p>The regulatory environment has tightened in response. The <strong>CFPB has issued AI-specific guidance</strong> on adverse action notices, model explainability, and discriminatory outcomes. The <strong>ECOA</strong> (Equal Credit Opportunity Act) and <strong>Fair Housing Act</strong> apply to algorithmic decisions. The FTC, OCC, FDIC, and state attorneys general have all signaled increased enforcement. The Treasury Department has issued AI risk guidance through OFR and FSOC. Internationally, the <strong>EU AI Act</strong> classifies most consumer credit decisions as high-risk AI, triggering full Article 6 obligations for any financial services firm with EU exposure.</p>
 <h3>Regulatory landscape</h3>
 <div class="reg-grid">
-<div class="reg"><div class="reg-h">SR 11-7 / OCC 2011-12</div><div class="reg-d">Federal Reserve and OCC supervisory guidance on model risk management â the foundational framework now extended to AI/ML.</div></div>
-<div class="reg"><div class="reg-h">ECOA Â· Fair Housing Act</div><div class="reg-d">Fair lending laws applying to algorithmic credit and housing decisions. CFPB enforcement actions citing AI bias have been increasing.</div></div>
+<div class="reg"><div class="reg-h">SR 11-7 / OCC 2011-12</div><div class="reg-d">Federal Reserve and OCC supervisory guidance on model risk management Ã¢ÂÂ the foundational framework now extended to AI/ML.</div></div>
+<div class="reg"><div class="reg-h">ECOA ÃÂ· Fair Housing Act</div><div class="reg-d">Fair lending laws applying to algorithmic credit and housing decisions. CFPB enforcement actions citing AI bias have been increasing.</div></div>
 <div class="reg"><div class="reg-h">CFPB AI Guidance</div><div class="reg-d">Adverse action notice requirements for AI-driven decisions, model explainability obligations, and consumer protection rules.</div></div>
-<div class="reg"><div class="reg-h">EU AI Act Â· DORA</div><div class="reg-d">EU AI Act high-risk classification for consumer credit decisions and DORA operational resilience for ICT systems including AI.</div></div>
+<div class="reg"><div class="reg-h">EU AI Act ÃÂ· DORA</div><div class="reg-d">EU AI Act high-risk classification for consumer credit decisions and DORA operational resilience for ICT systems including AI.</div></div>
 </div>
 <h3>What we deliver for financial services clients</h3>
 <div class="cap-list"><div class="cap-list-l">Capabilities for banking, fintech &amp; insurance clients</div><ul>
@@ -353,11 +380,11 @@ gtag('config', 'G-GC10FF23VN');
 <li><strong>DORA operational resilience documentation</strong> for ICT systems supporting AI deployments</li>
 </ul></div>
 <h3>Standards we work with</h3>
-<div class="stds"><span class="sd">SR 11-7</span><span class="sd">OCC 2011-12</span><span class="sd">ECOA Â· Reg B</span><span class="sd">FCRA</span><span class="sd">CFPB AI Guidance</span><span class="sd">EU AI Act</span><span class="sd">DORA</span><span class="sd">NIST AI RMF</span><span class="sd">PCI-DSS</span><span class="sd">WCAG 2.2 AAA</span></div>
+<div class="stds"><span class="sd">SR 11-7</span><span class="sd">OCC 2011-12</span><span class="sd">ECOA ÃÂ· Reg B</span><span class="sd">FCRA</span><span class="sd">CFPB AI Guidance</span><span class="sd">EU AI Act</span><span class="sd">DORA</span><span class="sd">NIST AI RMF</span><span class="sd">PCI-DSS</span><span class="sd">WCAG 2.2 AAA</span></div>
 <h3>Typical clients</h3>
 <p>National and regional banks managing AI/ML model portfolios under SR 11-7 supervisory guidance. Fintech companies deploying credit, lending, and underwriting AI subject to CFPB scrutiny. Insurance carriers using AI for underwriting, claims, and pricing decisions facing state insurance commissioner attention. Investment management firms deploying AI in research, trading, and client communications. Payment networks managing fraud detection and authentication systems. Mortgage originators subject to fair lending examination. Wealth management platforms balancing personalization with consumer protection.</p>
 <div class="related">
-<a href="/solutions.html">View AI Governance solutions â</a>
+<a href="/solutions.html">View AI Governance solutions Ã¢ÂÂ</a>
 <a href="/practices.html#ai-governance" class="sec">AI Governance practice</a>
 <a href="/#contact" class="sec">Discuss your portfolio</a>
 </div>
@@ -368,7 +395,7 @@ gtag('config', 'G-GC10FF23VN');
 
 <section class="cta-final"><div class="w">
 <h2>Your industry has its <em>own vocabulary</em></h2>
-<p>Whether you measure outcomes in FDA submissions, AIA disclosures, MIL-STD compliance reports, or model risk management exam letters â we speak it. Schedule a free 30-minute consultation to discuss your specific regulatory and engineering landscape.</p>
+<p>Whether you measure outcomes in FDA submissions, AIA disclosures, MIL-STD compliance reports, or model risk management exam letters Ã¢ÂÂ we speak it. Schedule a free 30-minute consultation to discuss your specific regulatory and engineering landscape.</p>
 <div class="cta-btns">
 <a href="/#contact" class="btn-f">Schedule a free consultation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
 <a href="/solutions.html" class="btn-o">Explore productized solutions</a>
@@ -379,13 +406,13 @@ gtag('config', 'G-GC10FF23VN');
 
 <footer class="foot"><div class="w">
 <div class="foot-grid">
-<div><a href="/" class="foot-brand"><svg width="32" height="32" viewBox="0 0 52 52" fill="none"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="rgba(94,234,212,.08)" stroke="#5EEAD4" stroke-width="1.6" stroke-linejoin="round"/><circle cx="26" cy="23" r="5" stroke="#5EEAD4" stroke-width="1.8" fill="none"/><circle cx="26" cy="23" r="2" fill="#5EEAD4"/></svg><span class="foot-brand-text">BrainPulse Inc</span></a><p class="foot-tag">UX engineering for AI systems that humans can trust. AI governance, accessibility, and human factors engineering for safety-critical digital products.</p><p style="font-size:.72rem;color:var(--on-dm)">Â© 2026 BrainPulse Inc. All rights reserved.</p></div>
+<div><a href="/" class="foot-brand"><svg width="32" height="32" viewBox="0 0 52 52" fill="none"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="rgba(94,234,212,.08)" stroke="#5EEAD4" stroke-width="1.6" stroke-linejoin="round"/><circle cx="26" cy="23" r="5" stroke="#5EEAD4" stroke-width="1.8" fill="none"/><circle cx="26" cy="23" r="2" fill="#5EEAD4"/></svg><span class="foot-brand-text">BrainPulse Inc</span></a><p class="foot-tag">UX engineering for AI systems that humans can trust. AI governance, accessibility, and human factors engineering for safety-critical digital products.</p><p style="font-size:.72rem;color:var(--on-dm)">ÃÂ© 2026 BrainPulse Inc. All rights reserved.</p></div>
 <div class="foot-col"><h4>Solutions</h4><a href="/solutions.html">AI Governance Service</a><a href="/solutions.html">Accessibility Subscription</a><a href="/solutions.html">Pattern Library</a><a href="/solutions.html">Medical Device UX</a><a href="/solutions.html">Defense HSI</a><a href="/solutions.html">Executive Workshops</a></div>
 <div class="foot-col"><h4>Practices</h4><a href="/practices.html#ai-governance">AI Governance</a><a href="/practices.html#accessibility">Accessibility</a><a href="/practices.html#human-factors">Human Factors</a><a href="/practices.html#ux-engineering">Emerging Tech</a></div>
 <div class="foot-col"><h4>Industries</h4><a href="/industries.html#healthcare">Healthcare</a><a href="/industries.html#federal">Federal Government</a><a href="/industries.html#defense">Defense &amp; Aerospace</a><a href="/industries.html#financial">Financial Services</a></div>
 <div class="foot-col"><h4>Company</h4><a href="/insights.html">Insights</a><a href="/lab.html">Innovation Lab</a><a href="/#about">About</a><a href="/#contact">Contact</a><a href="https://www.linkedin.com/in/senthil-nagappan" target="_blank" rel="noopener">LinkedIn</a></div>
 </div>
-<div class="foot-bottom"><div>WCAG 2.2 AAA Â· Section 508 Compliant Â· This site practices what we preach</div><div><a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></div></div>
+<div class="foot-bottom"><div>WCAG 2.2 AAA ÃÂ· Section 508 Compliant ÃÂ· This site practices what we preach</div><div><a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></div></div>
 </div></footer>
 
 <script>
