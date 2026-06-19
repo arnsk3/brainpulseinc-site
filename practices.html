@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Areas — AI Governance, Accessibility, Human Factors, UX Engineering | BrainPulse Inc</title>
+<meta name="description" content="Four practice areas defining BrainPulse Inc — AI Governance & Trust, Accessibility & Inclusive Design, Human Factors & Safety Engineering, and UX Engineering & Emerging Tech.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FBF9F6;--bg2:#F5F2ED;--bg3:#ECEAE4;--w:#fff;
+  --ink:#1C1917;--ink2:#292524;--mt:#44403C;--dm:#57534E;
+  --teal:#0D7377;--ts:rgba(13,115,119,.06);--tm:rgba(13,115,119,.14);
+  --peach:#92400E;--ps:rgba(146,64,14,.05);
+  --rose:#9F1239;--rs:rgba(159,18,57,.05);--rm:rgba(159,18,57,.12);
+  --green:#166534;--navy:#1E3A5F;
+  --on-d:#F5F2ED;--on-dm:#C7C2BA;
+  --serif:'Libre Baskerville',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --b1:rgba(28,25,23,.07);--b2:rgba(28,25,23,.12);--b3:rgba(28,25,23,.18);
+  --r:16px;--rl:22px;
+  --ss:0 1px 2px rgba(28,25,23,.03),0 4px 16px rgba(28,25,23,.04);
+  --sl:0 4px 12px rgba(28,25,23,.06),0 12px 32px rgba(28,25,23,.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:var(--teal);text-decoration:none;transition:color .25s}
+a:hover{color:#0A5F62}
+a:focus-visible,button:focus-visible{outline:3px solid var(--teal);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;top:-100px;left:0;background:var(--ink);color:#fff;padding:.85rem 1.25rem;z-index:9999;font-weight:600}
+.skip:focus{top:0}
+.nav{background:rgba(251,249,246,.85);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1280px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--ink)}
+.brand-mark{width:40px;height:40px;flex-shrink:0}
+.brand-text{font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+.brand-text em{font-style:normal;color:var(--teal)}
+.nv{display:flex;align-items:center;gap:.4rem}
+.nv a{font-size:.78rem;color:var(--mt);font-weight:500;padding:.4rem .75rem;border-radius:8px;transition:all .25s}
+.nv a:hover{color:var(--teal);background:var(--ts)}
+.nv a.active{color:var(--teal);background:var(--ts);font-weight:600}
+.nav-cta{background:var(--ink);color:#fff;padding:.55rem 1rem;border-radius:100px;font-size:.74rem;font-weight:600;display:inline-flex;align-items:center;gap:.35rem;transition:all .3s}
+.nav-cta:hover{background:var(--teal);color:#fff;transform:translateY(-1px)}
+.mbtn{display:none;background:none;border:none;cursor:pointer;padding:8px;min-width:44px;min-height:44px;color:var(--ink)}
+.w{max-width:1280px;margin:0 auto;padding:0 1.5rem}
+section{padding:4rem 0}
+.sl{font-family:var(--mono);font-size:.62rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.75rem;display:inline-flex;align-items:center;gap:.5rem}
+.sl::before{content:'';width:24px;height:1px;background:var(--teal)}
+.st{font-family:var(--serif);font-size:clamp(1.65rem,3.6vw,2.6rem);line-height:1.15;color:var(--ink);letter-spacing:-.02em;margin-bottom:.85rem;max-width:42ch}
+.st em{font-style:italic;color:var(--teal)}
+.ss{font-size:.92rem;color:var(--mt);line-height:1.7;max-width:60ch;margin-bottom:2.5rem}
+.hero{padding:4rem 0 3rem;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.hero-chip{display:inline-flex;align-items:center;gap:.45rem;background:var(--ts);border:1px solid var(--tm);color:var(--teal);padding:.4rem .85rem;border-radius:100px;font-size:.68rem;font-weight:600;margin-bottom:1.25rem;font-family:var(--mono);letter-spacing:.04em}
+.hero-chip .h-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:var(--serif);font-size:clamp(2rem,4.5vw,3.5rem);line-height:1.1;color:var(--ink);letter-spacing:-.02em;margin-bottom:1.25rem;max-width:26ch}
+.hero h1 em{font-style:italic;color:var(--teal)}
+.hero-lede{font-size:1.05rem;color:var(--mt);line-height:1.7;max-width:65ch;margin-bottom:1.5rem}
+.practice{padding:5rem 0;border-top:1px solid var(--b1)}
+.practice:nth-child(even){background:var(--bg2)}
+.practice-grid{display:grid;grid-template-columns:.4fr .6fr;gap:3rem;align-items:start}
+.practice-sidebar{position:sticky;top:5rem}
+.practice-num{font-family:var(--mono);font-size:.65rem;color:var(--peach);letter-spacing:.15em;font-weight:600;margin-bottom:.6rem}
+.practice-icon{width:64px;height:64px;border-radius:16px;background:var(--w);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+.practice-icon svg{width:32px;height:32px;stroke:var(--teal)}
+.practice-title{font-family:var(--serif);font-size:2.1rem;line-height:1.15;color:var(--ink);letter-spacing:-.015em;margin-bottom:.85rem}
+.practice-lede{font-size:.92rem;color:var(--mt);line-height:1.7;margin-bottom:1.5rem;font-style:italic;border-left:3px solid var(--teal);padding-left:1rem}
+.practice-content h3{font-family:var(--serif);font-size:1.25rem;color:var(--ink);margin:1.75rem 0 .75rem}
+.practice-content h3:first-of-type{margin-top:0}
+.practice-content p{font-size:.88rem;color:var(--mt);line-height:1.8;margin-bottom:.85rem}
+.practice-content p strong{color:var(--ink);font-weight:600}
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+.cap{background:var(--w);border:1px solid var(--b1);border-radius:14px;padding:1rem 1.15rem;transition:all .3s}
+.cap:hover{border-color:var(--teal);transform:translateY(-2px)}
+.cap-h{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:.3rem}
+.cap-d{font-size:.7rem;color:var(--mt);line-height:1.5}
+.stds{display:flex;flex-wrap:wrap;gap:.3rem;margin:1.25rem 0}
+.sd{font-family:var(--mono);font-size:.55rem;padding:.3rem .55rem;border-radius:6px;background:var(--w);border:1px solid var(--b2);color:var(--mt);transition:all .25s}
+.sd:hover{border-color:var(--teal);color:var(--teal);background:var(--ts)}
+.deliv{background:var(--w);border:1px solid var(--b2);border-radius:16px;padding:1.5rem;margin:1.5rem 0}
+.deliv-l{font-family:var(--mono);font-size:.55rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.deliv ul{list-style:none;padding:0}
+.deliv li{font-size:.75rem;color:var(--mt);padding:.3rem 0 .3rem 1rem;position:relative;line-height:1.5;border-bottom:1px solid var(--b1)}
+.deliv li:last-child{border-bottom:none}
+.deliv li::before{content:'';position:absolute;left:0;top:.7rem;width:5px;height:5px;border-radius:50%;background:var(--teal)}
+.related{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem}
+.related a{display:inline-flex;align-items:center;gap:.35rem;background:var(--ink);color:#fff;padding:.55rem .95rem;border-radius:100px;font-size:.72rem;font-weight:600;text-decoration:none;transition:all .3s}
+.related a:hover{background:var(--teal);transform:translateY(-1px)}
+.related .sec{background:transparent;color:var(--ink);border:1px solid var(--b2)}
+.related .sec:hover{border-color:var(--teal);color:var(--teal);background:var(--ts)}
+.cta-final{background:var(--ink);color:var(--on-d);padding:4rem 0;text-align:center}
+.cta-final h2{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.3rem);line-height:1.2;color:#fff;letter-spacing:-.015em;margin-bottom:1rem;max-width:32ch;margin-left:auto;margin-right:auto}
+.cta-final h2 em{font-style:italic;color:#5EEAD4}
+.cta-final p{font-size:.88rem;color:var(--on-dm);max-width:55ch;margin:0 auto 1.75rem;line-height:1.7}
+.cta-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.btn-f{background:#fff;color:var(--ink);padding:.85rem 1.5rem;border-radius:100px;font-weight:700;font-size:.82rem;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem;min-height:44px}
+.btn-f:hover{background:#5EEAD4;color:var(--ink);transform:translateY(-2px)}
+.btn-o{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:.85rem 1.5rem;border-radius:100px;font-weight:700;font-size:.82rem;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem;min-height:44px}
+.btn-o:hover{border-color:#5EEAD4;color:#5EEAD4}
+.foot{background:var(--ink);color:var(--on-dm);padding:3rem 0 2rem;border-top:1px solid rgba(255,255,255,.05)}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.foot-brand{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;color:#fff;text-decoration:none}
+.foot-brand-text{font-family:var(--serif);font-size:1rem;font-weight:700}
+.foot-tag{font-size:.78rem;color:var(--on-dm);line-height:1.7;max-width:36ch;margin-bottom:1rem}
+.foot-col h4{color:#fff;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.85rem;font-family:var(--mono)}
+.foot-col a{display:block;color:var(--on-dm);font-size:.78rem;padding:.25rem 0;transition:color .25s}
+.foot-col a:hover{color:#5EEAD4}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;font-size:.72rem;color:var(--on-dm)}
+.foot-bottom a{color:var(--on-dm)}
+.rv{opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.show{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.h-dot{animation:none}}
+@media(max-width:1024px){.practice-grid{grid-template-columns:1fr;gap:2rem}.practice-sidebar{position:static}.cap-grid{grid-template-columns:1fr}.foot-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.nv{display:none;position:absolute;top:100%;left:0;right:0;background:var(--w);border-bottom:1px solid var(--b1);flex-direction:column;padding:1rem;gap:.2rem;box-shadow:var(--ss)}.nv.open{display:flex}.mbtn{display:flex;align-items:center;justify-content:center}.foot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+<nav class="nav" aria-label="Main navigation">
+<div class="nav-inner">
+  <a href="/" class="brand" aria-label="BrainPulse Inc home">
+    <svg class="brand-mark" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke="#0D7377" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="26" cy="23" r="5" stroke="#0D7377" stroke-width="1.8" fill="none"/>
+      <circle cx="26" cy="23" r="2" fill="#0D7377"/>
+    </svg>
+    <span class="brand-text">Brain<em>Pulse</em></span>
+  </a>
+  <div class="nv">
+    <a href="/">Home</a>
+    <a href="/solutions.html">Solutions</a>
+    <a href="/practices.html" class="active">Practices</a>
+    <a href="/industries.html">Industries</a>
+    <a href="/insights.html">Insights</a>
+    <a href="/lab.html">Lab</a>
+    <a href="/#case-studies">Work</a>
+    <a href="/#about">About</a>
+  </div>
+  <a href="/#contact" class="nav-cta">Book a call <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  <button class="mbtn" aria-label="Toggle menu" onclick="document.querySelector('.nv').classList.toggle('open')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</div>
+</nav>
+
+<main id="main">
+
+<section class="hero">
+<div class="w">
+  <div class="hero-chip rv"><span class="h-dot"></span>Four practices · One integrated team</div>
+  <h1 class="rv d1">The four practices that define our <em>engineering rigor</em></h1>
+  <p class="hero-lede rv d2">BrainPulse is organized around four deep practice areas — each led with specialization, but always integrated when projects demand it. AI governance designs need accessibility engineering. Medical device UX needs human factors. Defense interfaces need both safety analysis and production-ready code. Most engagements draw on all four practices, delivered by a team that won't ask you to translate between disciplines.</p>
+</div>
+</section>
+<section id="ai-governance" class="practice">
+<div class="w">
+<div class="practice-grid">
+  <aside class="practice-sidebar rv">
+    <div class="practice-num">PRACTICE 01</div>
+    <div class="practice-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L3 7v6c0 5 4 9 9 10 5-1 9-5 9-10V7l-9-5z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <h2 class="practice-title">AI Governance &amp; Trust</h2>
+    <p class="practice-lede">"Most agencies design pretty AI dashboards. We architect the governance that makes those dashboards trustworthy to regulators, executives, and operators."</p>
+  </aside>
+  <div class="practice-content rv d1">
+    <h3>What this practice does</h3>
+    <p>The AI Governance &amp; Trust practice is BrainPulse's flagship offering — and our most differentiated capability. We design and engineer the <strong>governance layer</strong> that sits between AI models and the humans who deploy, audit, and depend on them. This means model cards, algorithmic impact assessments, human-in-the-loop oversight UIs, TEVV reporting dashboards, audit trail visualizations, and AI Bill of Materials documentation — all built to align with NIST AI RMF, EU AI Act, ISO/IEC 42001, and emerging US federal requirements.</p>
+    <p>Unlike pure-play AI consultancies that focus on model development, we focus on <strong>the human-facing infrastructure</strong> that makes AI deployments defensible. When a regulator asks "show me how you validated this model," our work is what your team shows them. When a board member asks "what's our AI risk exposure," our dashboards answer the question.</p>
+    <h3>Core capabilities</h3>
+    <div class="cap-grid">
+      <div class="cap"><div class="cap-h">Governance dashboards</div><div class="cap-d">NIST AI RMF, EU AI Act, ISO/IEC 42001 visualizations with full lifecycle tracking</div></div>
+      <div class="cap"><div class="cap-h">Algorithmic impact assessments</div><div class="cap-d">Interactive AIA tools for rights-impacting and safety-impacting AI systems</div></div>
+      <div class="cap"><div class="cap-h">Model cards</div><div class="cap-d">Training data provenance, performance benchmarks, fairness indicators, limitations</div></div>
+      <div class="cap"><div class="cap-h">Human-in-the-loop UIs</div><div class="cap-d">Configurable approval gates, override mechanisms, escalation workflows</div></div>
+      <div class="cap"><div class="cap-h">TEVV reporting</div><div class="cap-d">Test, Evaluation, Verification, Validation dashboards with drift detection</div></div>
+      <div class="cap"><div class="cap-h">Audit trail tools</div><div class="cap-d">Compliance evidence packages for Congressional reviews and IG audits</div></div>
+      <div class="cap"><div class="cap-h">AI Bill of Materials</div><div class="cap-d">Supply chain transparency documentation for OMB M-24-10 and EU AI Act</div></div>
+      <div class="cap"><div class="cap-h">Risk tiering systems</div><div class="cap-d">Automated classification (Critical / High / Medium / Low) with escalation</div></div>
+    </div>
+    <h3>Standards &amp; frameworks we work with</h3>
+    <div class="stds"><span class="sd">NIST AI RMF 1.0</span><span class="sd">EU AI Act</span><span class="sd">ISO/IEC 42001</span><span class="sd">ISO/IEC 23894</span><span class="sd">OMB M-24-10</span><span class="sd">White House AI EO</span><span class="sd">NIST AI 600-1 (GenAI)</span><span class="sd">OWASP LLM Top 10</span><span class="sd">MITRE ATLAS</span><span class="sd">AI BoM</span></div>
+    <div class="deliv">
+      <div class="deliv-l">Typical engagement deliverables</div>
+      <ul>
+        <li>NIST AI RMF compliance assessment with maturity scoring across Govern, Map, Measure, Manage</li>
+        <li>Production-ready React/TypeScript AI governance dashboard with full WCAG 2.2 AAA compliance</li>
+        <li>Algorithmic impact assessment templates and interactive AIA submission tools</li>
+        <li>Model card library with consistent format across all deployed AI systems</li>
+        <li>Human-in-the-loop oversight interface with configurable confidence thresholds</li>
+        <li>TEVV monitoring dashboard with drift detection, bias monitoring, performance degradation alerts</li>
+        <li>Audit trail visualization tool with compliance evidence export</li>
+        <li>AI Bill of Materials documentation per OMB M-24-10 and EU AI Act requirements</li>
+        <li>EU AI Act risk classification assessment and remediation roadmap</li>
+      </ul>
+    </div>
+    <h3>When clients call us for this practice</h3>
+    <p>Federal agencies preparing for OMB M-24-10 compliance. Enterprises facing EU AI Act enforcement (Aug 2026). Financial services implementing model risk management. Healthcare systems deploying clinical AI. Defense contractors building autonomous decision-support systems. Any organization where AI decisions affect rights, safety, or legal liability — and where "trust us, the model works" is no longer acceptable to regulators or executives.</p>
+    <div class="related">
+      <a href="/solutions.html">View AI governance solutions →</a>
+      <a href="/#case-studies" class="sec">See federal AI case study</a>
+      <a href="/#contact" class="sec">Discuss your AI deployment</a>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+<section id="accessibility" class="practice">
+<div class="w">
+<div class="practice-grid">
+  <aside class="practice-sidebar rv">
+    <div class="practice-num">PRACTICE 02</div>
+    <div class="practice-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="4" r="2"/>
+        <path d="M19 13v-2a7 7 0 0 0-14 0v2"/>
+        <path d="M5 13l3 7M19 13l-3 7M12 13v9"/>
+      </svg>
+    </div>
+    <h2 class="practice-title">Accessibility &amp; Inclusive Design</h2>
+    <p class="practice-lede">"Accessibility isn't a checklist at the end of a project. It's the architecture decision that everything else gets built on."</p>
+  </aside>
+  <div class="practice-content rv d1">
+    <h3>What this practice does</h3>
+    <p>The Accessibility &amp; Inclusive Design practice treats accessibility as <strong>systems engineering</strong>, not as a compliance afterthought. We don't run quick audits and hand over remediation lists — we build the organizational programs, design system foundations, automated testing infrastructure, and ongoing governance that make WCAG 2.2 AAA, Section 508, and ADA Title II compliance a permanent property of your products rather than a one-time achievement.</p>
+    <p>This is the practice that grew out of Senthil's enterprise accessibility leadership at <strong>Best Buy</strong> (where he built the enterprise inclusive design program from the ground up) and the <strong>Social Security Administration</strong> (where he deployed SSA11y — automated accessibility scanning — across 12 application modules). Our work is informed by direct experience training engineering teams of 60+ people, building component libraries used by 8+ product teams, and shipping accessible interfaces to user populations exceeding 70 million people.</p>
+    <h3>Core capabilities</h3>
+    <div class="cap-grid">
+      <div class="cap"><div class="cap-h">WCAG 2.2 AAA compliance</div><div class="cap-d">The highest accessibility standard — 7:1 contrast, 44px touch targets, comprehensive support</div></div>
+      <div class="cap"><div class="cap-h">Section 508 compliance</div><div class="cap-d">Federal accessibility compliance with VPAT documentation and audit support</div></div>
+      <div class="cap"><div class="cap-h">ADA Title II preparation</div><div class="cap-d">State and local government compliance for 2026-2027 enforcement deadline</div></div>
+      <div class="cap"><div class="cap-h">European Accessibility Act</div><div class="cap-d">EU EAA compliance for products serving European markets, effective June 2025</div></div>
+      <div class="cap"><div class="cap-h">Accessibility design systems</div><div class="cap-d">Component libraries with accessibility baked into tokens, props, and documentation</div></div>
+      <div class="cap"><div class="cap-h">CI/CD automation</div><div class="cap-d">axe-core, Pa11y, SSA11y integrated into build pipelines to prevent regression</div></div>
+      <div class="cap"><div class="cap-h">Screen reader validation</div><div class="cap-d">Manual testing with JAWS, NVDA, VoiceOver across all critical user flows</div></div>
+      <div class="cap"><div class="cap-h">Enterprise programs</div><div class="cap-d">Training, accessibility champions networks, governance frameworks, scorecards</div></div>
+    </div>
+    <h3>Standards &amp; frameworks we work with</h3>
+    <div class="stds"><span class="sd">WCAG 2.2 AAA</span><span class="sd">WCAG 2.2 AA</span><span class="sd">Section 508</span><span class="sd">ADA Title II</span><span class="sd">ADA Title III</span><span class="sd">European Accessibility Act</span><span class="sd">EN 301 549</span><span class="sd">ARIA 1.2</span><span class="sd">ATAG 2.0</span><span class="sd">VPAT 2.5</span></div>
+    <div class="deliv">
+      <div class="deliv-l">Typical engagement deliverables</div>
+      <ul>
+        <li>Comprehensive accessibility audit with prioritized findings (severity, user impact, regulatory risk)</li>
+        <li>WCAG 2.2 AA or AAA compliant React/Angular component library with Storybook documentation</li>
+        <li>Accessibility design tokens encoding contrast, focus, touch targets, and spacing requirements</li>
+        <li>CI/CD pipeline integration with axe-core, Pa11y, or custom SSA11y scanning</li>
+        <li>VPAT documentation for all major products with quarterly update cadence</li>
+        <li>Accessibility training program (typically 12 modules) with developer and designer tracks</li>
+        <li>Accessibility champions network with embedded SMEs across product teams</li>
+        <li>Accessibility governance framework with quarterly audit cadence and escalation paths</li>
+        <li>Screen reader validation reports with JAWS, NVDA, and VoiceOver findings</li>
+      </ul>
+    </div>
+    <h3>When clients call us for this practice</h3>
+    <p>State and local government agencies racing the 2026-2027 ADA Title II deadline. Federal contractors with Section 508 audit obligations. Enterprises that have received ADA demand letters or want to prevent them. Healthcare and education organizations with diverse user populations. EU-facing products preparing for European Accessibility Act enforcement. Any organization where exclusion of users with disabilities is now a legal, financial, and reputational liability — not just a missed market opportunity.</p>
+    <div class="related">
+      <a href="/solutions.html">View accessibility solutions →</a>
+      <a href="/#case-studies" class="sec">See Best Buy case study</a>
+      <a href="/#contact" class="sec">Request an audit</a>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+<section id="human-factors" class="practice">
+<div class="w">
+<div class="practice-grid">
+  <aside class="practice-sidebar rv">
+    <div class="practice-num">PRACTICE 03</div>
+    <div class="practice-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v6M12 22v-6M22 12h-6M2 12h6M19 5l-4 4M5 19l4-4M19 19l-4-4M5 5l4 4"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    </div>
+    <h2 class="practice-title">Human Factors &amp; Safety Engineering</h2>
+    <p class="practice-lede">"This is where 'usability' stops being a preference and starts being a safety requirement. When operator errors have consequences, design becomes engineering."</p>
+  </aside>
+  <div class="practice-content rv d1">
+    <h3>What this practice does</h3>
+    <p>The Human Factors &amp; Safety Engineering practice applies <strong>established engineering standards</strong> to interfaces where errors carry real consequences — defense operator stations where misclicks can endanger lives, medical devices where workflow errors affect patient outcomes, autonomous systems where situational awareness determines mission success. This isn't UX design with safety language sprinkled on top. It's the disciplined application of MIL-STD-1472H, ISO 14971, IEC 62366, and DoDI 5000.95 to interactive systems.</p>
+    <p>Our methodology integrates <strong>cognitive task analysis</strong>, <strong>Failure Mode and Effects Analysis (FMEA)</strong>, <strong>Use-Related Risk Analysis (URRA)</strong>, and <strong>human-in-the-loop simulation testing</strong>. We don't ship designs based on what looks clean in Figma. We ship designs validated against operator workload measurements, error probability estimates, and human performance benchmarks. Every interaction has a documented basis in evidence — not opinion.</p>
+    <h3>Core capabilities</h3>
+    <div class="cap-grid">
+      <div class="cap"><div class="cap-h">MIL-STD-1472H</div><div class="cap-d">Human engineering design criteria for military systems and defense operator interfaces</div></div>
+      <div class="cap"><div class="cap-h">ISO 14971</div><div class="cap-d">Medical device risk management with integrated usability and human error analysis</div></div>
+      <div class="cap"><div class="cap-h">IEC 62366</div><div class="cap-d">Medical device usability engineering process for FDA premarket submissions</div></div>
+      <div class="cap"><div class="cap-h">DoDI 5000.95 HSI</div><div class="cap-d">Human Systems Integration across all 7 HSI domains for DoD programs</div></div>
+      <div class="cap"><div class="cap-h">Cognitive task analysis</div><div class="cap-d">Mapping decision sequences, information dependencies, and cognitive bottlenecks</div></div>
+      <div class="cap"><div class="cap-h">FMEA</div><div class="cap-d">Failure Mode and Effects Analysis with human error probability estimates</div></div>
+      <div class="cap"><div class="cap-h">Use-Related Risk Analysis</div><div class="cap-d">URRA integrated with ISO 14971 hazard analysis for medical devices</div></div>
+      <div class="cap"><div class="cap-h">Operator validation</div><div class="cap-d">Human-in-the-loop simulation testing with workload measurement (NASA-TLX)</div></div>
+    </div>
+    <h3>Standards &amp; frameworks we work with</h3>
+    <div class="stds"><span class="sd">MIL-STD-1472H</span><span class="sd">MIL-STD-1472G</span><span class="sd">MIL-HDBK-759C</span><span class="sd">ISO 14971</span><span class="sd">IEC 62366-1</span><span class="sd">IEC 62366-2</span><span class="sd">FDA HFE Guidance</span><span class="sd">DoDI 5000.95</span><span class="sd">MIL-STD-46855</span><span class="sd">NASA-STD-3001</span></div>
+    <div class="deliv">
+      <div class="deliv-l">Typical engagement deliverables</div>
+      <ul>
+        <li>MIL-STD-1472H compliance assessment with documented findings and remediation roadmap</li>
+        <li>Cognitive task analysis report mapping decision sequences and information dependencies</li>
+        <li>Use specification defining intended users, environments, and use scenarios (IEC 62366)</li>
+        <li>Use-Related Risk Analysis (URRA) integrated with ISO 14971 hazard analysis</li>
+        <li>FMEA documentation with severity, occurrence, detection ratings and mitigation strategies</li>
+        <li>Operator interface design validated through human-in-the-loop simulation</li>
+        <li>Workload assessment with NASA-TLX baseline and post-redesign measurements</li>
+        <li>Complete usability engineering file ready for FDA premarket submission</li>
+        <li>HSI program plan covering all 7 HSI domains for DoD program milestones</li>
+      </ul>
+    </div>
+    <h3>When clients call us for this practice</h3>
+    <p>Defense contractors developing operator interfaces for command and control systems, unmanned platforms, or autonomous decision-support. Medical device manufacturers preparing FDA 510(k), De Novo, or PMA submissions. Autonomous vehicle programs validating human-machine handoff scenarios. Industrial control system designers managing safety-critical workflows. Any organization where the question "what happens when an operator makes a mistake" requires a documented engineering answer, not a hand-wave.</p>
+    <div class="related">
+      <a href="/solutions.html">View safety solutions →</a>
+      <a href="/#case-studies" class="sec">See Leidos case study</a>
+      <a href="/#contact" class="sec">Discuss your program</a>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+<section id="ux-engineering" class="practice">
+<div class="w">
+<div class="practice-grid">
+  <aside class="practice-sidebar rv">
+    <div class="practice-num">PRACTICE 04</div>
+    <div class="practice-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="16 18 22 12 16 6"/>
+        <polyline points="8 6 2 12 8 18"/>
+        <line x1="12" y1="3" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <h2 class="practice-title">UX Engineering &amp; Emerging Tech</h2>
+    <p class="practice-lede">"We don't hand off Figma files and disappear. We ship the React, the design system, the documentation, and the team training that keeps the work alive."</p>
+  </aside>
+  <div class="practice-content rv d1">
+    <h3>What this practice does</h3>
+    <p>The UX Engineering &amp; Emerging Tech practice is where BrainPulse delivers <strong>production-ready code</strong>, not just visual designs. We build React, Angular, and Vue.js frontends with accessible component libraries documented in Storybook. We use LLM-accelerated SysML modeling to compress weeks of systems engineering work into hours. And we work at the leading edge of multimodal AI experiences, AR/VR/XR for safety training, and data visualization for complex regulated environments.</p>
+    <p>This practice exists because too many design agencies stop at the handoff. They deliver Figma files, write a few specs, and consider their job done — leaving engineering teams to interpret, often resulting in implementations that drift from the design intent and fail accessibility audits. We close that gap by shipping <strong>the actual code</strong> alongside the design — with accessibility tokens, automated testing, and documentation that survives the transition into your team's ongoing development cycle.</p>
+    <h3>Core capabilities</h3>
+    <div class="cap-grid">
+      <div class="cap"><div class="cap-h">Production frontend code</div><div class="cap-d">React, Angular, Vue.js, Next.js with TypeScript and accessibility baked in</div></div>
+      <div class="cap"><div class="cap-h">Design systems</div><div class="cap-d">Component libraries with Storybook documentation, accessibility tokens, and theming</div></div>
+      <div class="cap"><div class="cap-h">LLM-accelerated SysML</div><div class="cap-d">Auto-generate SysML diagrams from natural language requirements specifications</div></div>
+      <div class="cap"><div class="cap-h">Multimodal AI experiences</div><div class="cap-d">Voice, gesture, text, and visual interaction patterns for AI-powered products</div></div>
+      <div class="cap"><div class="cap-h">AR/VR/XR</div><div class="cap-d">Immersive training experiences for safety-critical operator certification</div></div>
+      <div class="cap"><div class="cap-h">Data visualization</div><div class="cap-d">D3.js, Plotly, custom visualizations for complex regulated data displays</div></div>
+      <div class="cap"><div class="cap-h">Dashboard products</div><div class="cap-d">BI tools, monitoring interfaces, real-time data streams with accessibility</div></div>
+      <div class="cap"><div class="cap-h">Digital twin interfaces</div><div class="cap-d">3D visualization and control interfaces for digital twin platforms</div></div>
+    </div>
+    <h3>Technology stack we deliver in</h3>
+    <div class="stds"><span class="sd">React 18</span><span class="sd">Next.js 14</span><span class="sd">Angular 17</span><span class="sd">Vue 3</span><span class="sd">TypeScript</span><span class="sd">Tailwind</span><span class="sd">Storybook</span><span class="sd">D3.js</span><span class="sd">Three.js</span><span class="sd">WebXR</span><span class="sd">SysML 2.0</span><span class="sd">Figma</span></div>
+    <div class="deliv">
+      <div class="deliv-l">Typical engagement deliverables</div>
+      <ul>
+        <li>Production-ready React, Angular, or Vue frontend codebase with TypeScript</li>
+        <li>Component library (50-200 components) with Storybook documentation</li>
+        <li>Accessibility design tokens covering color, typography, spacing, focus, motion</li>
+        <li>Figma design system mirroring the code components with accessibility annotations</li>
+        <li>LLM-accelerated SysML model generation tooling for systems engineering teams</li>
+        <li>Data visualization components (charts, maps, timelines) with full accessibility</li>
+        <li>AR/VR/XR prototype for operator training scenarios with WebXR delivery</li>
+        <li>Multimodal AI experience prototypes integrating voice, gesture, and visual inputs</li>
+        <li>Engineering team training on the delivered codebase and ongoing maintenance</li>
+      </ul>
+    </div>
+    <h3>When clients call us for this practice</h3>
+    <p>Product teams that need both design and production code from a single team. Engineering organizations frustrated by design handoffs that miss accessibility, performance, or implementation realities. Defense and aerospace programs using SysML for systems engineering who want to accelerate model development with LLM tooling. AI product teams designing multimodal experiences that require both interaction design and engineering depth. Organizations exploring AR/VR/XR for operator training, simulation, or immersive data visualization who need an integrated design-and-engineering partner.</p>
+    <div class="related">
+      <a href="/solutions.html">View engineering solutions →</a>
+      <a href="/#case-studies" class="sec">See SSA case study</a>
+      <a href="/#contact" class="sec">Discuss your stack</a>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+<section class="cta-final">
+<div class="w">
+  <h2>Most engagements draw on <em>all four practices</em></h2>
+  <p>An AI governance dashboard project needs the AI Governance practice, the Accessibility practice, the Human Factors practice (for high-risk human-in-the-loop UIs), and the UX Engineering practice (to ship the code). That's not four contracts. That's one integrated team.</p>
+  <div class="cta-btns">
+    <a href="/#contact" class="btn-f">Schedule a free consultation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    <a href="/solutions.html" class="btn-o">Explore productized solutions</a>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer class="foot">
+<div class="w">
+  <div class="foot-grid">
+    <div>
+      <a href="/" class="foot-brand">
+        <svg width="32" height="32" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+          <path d="M26 4L46 15V37L26 48L6 37V15Z" fill="rgba(94,234,212,.08)" stroke="#5EEAD4" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="26" cy="23" r="5" stroke="#5EEAD4" stroke-width="1.8" fill="none"/>
+          <circle cx="26" cy="23" r="2" fill="#5EEAD4"/>
+        </svg>
+        <span class="foot-brand-text">BrainPulse Inc</span>
+      </a>
+      <p class="foot-tag">UX engineering for AI systems that humans can trust. AI governance, accessibility, and human factors engineering for safety-critical digital products.</p>
+      <p style="font-size:.72rem;color:var(--on-dm)">© 2026 BrainPulse Inc. All rights reserved.</p>
+    </div>
+    <div class="foot-col">
+      <h4>Solutions</h4>
+      <a href="/solutions.html">AI Governance Service</a>
+      <a href="/solutions.html">Accessibility Subscription</a>
+      <a href="/solutions.html">Pattern Library</a>
+      <a href="/solutions.html">Medical Device UX</a>
+      <a href="/solutions.html">Defense HSI</a>
+      <a href="/solutions.html">Executive Workshops</a>
+    </div>
+    <div class="foot-col">
+      <h4>Practices</h4>
+      <a href="/practices.html#ai-governance">AI Governance</a>
+      <a href="/practices.html#accessibility">Accessibility</a>
+      <a href="/practices.html#human-factors">Human Factors</a>
+      <a href="/practices.html#ux-engineering">Emerging Tech</a>
+    </div>
+    <div class="foot-col">
+      <h4>Resources</h4>
+      <a href="/insights.html">Insights</a>
+      <a href="/lab.html">Innovation Lab</a>
+      <a href="/industries.html">Industries</a>
+      <a href="/#case-studies">Case Studies</a>
+    </div>
+    <div class="foot-col">
+      <h4>Company</h4>
+      <a href="/#about">About</a>
+      <a href="/#process">Process</a>
+      <a href="/#contact">Contact</a>
+      <a href="https://www.linkedin.com/in/senthil-nagappan" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <div>WCAG 2.2 AAA · Section 508 Compliant · This site practices what we preach</div>
+    <div><a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></div>
+  </div>
+</div>
+</footer>
+
+<script>
+const observer=new IntersectionObserver(e=>{e.forEach(t=>{t.isIntersecting&&t.target.classList.add('show')})},{threshold:.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.rv').forEach(e=>observer.observe(e));
+</script>
+</body>
+</html>
