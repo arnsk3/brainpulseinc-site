@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industries — Healthcare, Federal, Defense, Financial Services | BrainPulse Inc</title>
+<meta name="description" content="BrainPulse Inc serves healthcare, federal government, defense, and financial services — industries where AI governance, accessibility, and human factors engineering are regulatory requirements, not optional features.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#FBF9F6;--bg2:#F5F2ED;--w:#fff;--ink:#1C1917;--mt:#44403C;--teal:#0D7377;--ts:rgba(13,115,119,.06);--tm:rgba(13,115,119,.14);--peach:#92400E;--ps:rgba(146,64,14,.05);--rose:#9F1239;--rs:rgba(159,18,57,.05);--navy:#1E3A5F;--green:#166534;--on-d:#F5F2ED;--on-dm:#C7C2BA;--serif:'Libre Baskerville',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.22,1,.36,1);--b1:rgba(28,25,23,.07);--b2:rgba(28,25,23,.12);--rl:22px;--ss:0 1px 2px rgba(28,25,23,.03),0 4px 16px rgba(28,25,23,.04);--sl:0 4px 12px rgba(28,25,23,.06),0 12px 32px rgba(28,25,23,.06)}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:var(--teal);text-decoration:none;transition:color .25s}
+a:hover{color:#0A5F62}
+a:focus-visible,button:focus-visible{outline:3px solid var(--teal);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;top:-100px;left:0;background:var(--ink);color:#fff;padding:.85rem 1.25rem;z-index:9999;font-weight:600}
+.skip:focus{top:0}
+.nav{background:rgba(251,249,246,.85);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1280px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--ink)}
+.brand-mark{width:40px;height:40px;flex-shrink:0}
+.brand-text{font-family:var(--serif);font-size:1.05rem;font-weight:700}
+.brand-text em{font-style:normal;color:var(--teal)}
+.nv{display:flex;align-items:center;gap:.4rem}
+.nv a{font-size:.78rem;color:var(--mt);font-weight:500;padding:.4rem .75rem;border-radius:8px}
+.nv a:hover{color:var(--teal);background:var(--ts)}
+.nv a.active{color:var(--teal);background:var(--ts);font-weight:600}
+.nav-cta{background:var(--ink);color:#fff;padding:.55rem 1rem;border-radius:100px;font-size:.74rem;font-weight:600;display:inline-flex;align-items:center;gap:.35rem}
+.nav-cta:hover{background:var(--teal);transform:translateY(-1px)}
+.mbtn{display:none;background:none;border:none;cursor:pointer;padding:8px;min-width:44px;min-height:44px;color:var(--ink)}
+.w{max-width:1280px;margin:0 auto;padding:0 1.5rem}
+section{padding:4rem 0}
+.sl{font-family:var(--mono);font-size:.62rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.75rem;display:inline-flex;align-items:center;gap:.5rem}
+.sl::before{content:'';width:24px;height:1px;background:var(--teal)}
+.st{font-family:var(--serif);font-size:clamp(1.65rem,3.6vw,2.6rem);line-height:1.15;color:var(--ink);letter-spacing:-.02em;margin-bottom:.85rem}
+.st em{font-style:italic;color:var(--teal)}
+.hero{padding:4rem 0 2.5rem;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.hero-chip{display:inline-flex;align-items:center;gap:.45rem;background:var(--ts);border:1px solid var(--tm);color:var(--teal);padding:.4rem .85rem;border-radius:100px;font-size:.68rem;font-weight:600;margin-bottom:1.25rem;font-family:var(--mono)}
+.hero-chip .h-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:var(--serif);font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.1;color:var(--ink);letter-spacing:-.02em;margin-bottom:1.25rem;max-width:26ch}
+.hero h1 em{font-style:italic;color:var(--teal)}
+.hero-lede{font-size:1.05rem;color:var(--mt);line-height:1.7;max-width:65ch;margin-bottom:1.5rem}
+.ind-overview{padding:3rem 0;background:var(--w);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2rem}
+.ind-card{background:var(--bg);border:1px solid var(--b1);border-radius:var(--rl);padding:1.5rem;text-decoration:none;color:inherit;transition:all .35s var(--ease);display:flex;flex-direction:column}
+.ind-card:hover{transform:translateY(-3px);box-shadow:var(--sl);border-color:var(--b2)}
+.ind-card-icon{width:48px;height:48px;border-radius:12px;background:var(--w);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.ind-card-icon svg{width:24px;height:24px;stroke:var(--teal)}
+.ind-card-l{font-family:var(--mono);font-size:.55rem;color:var(--peach);letter-spacing:.1em;font-weight:600;margin-bottom:.3rem}
+.ind-card h3{font-family:var(--serif);font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.25}
+.ind-card p{font-size:.72rem;color:var(--mt);line-height:1.6;margin-bottom:.85rem;flex:1}
+.ind-card-cta{font-family:var(--mono);font-size:.6rem;color:var(--teal);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.industry{padding:5rem 0;border-top:1px solid var(--b1)}
+.industry:nth-child(even){background:var(--bg2)}
+.industry-grid{display:grid;grid-template-columns:.35fr .65fr;gap:3rem;align-items:start}
+.industry-sidebar{position:sticky;top:5rem}
+.ind-num{font-family:var(--mono);font-size:.65rem;color:var(--peach);letter-spacing:.15em;font-weight:600;margin-bottom:.6rem}
+.ind-icon-l{width:64px;height:64px;border-radius:16px;background:var(--w);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+.ind-icon-l svg{width:32px;height:32px;stroke:var(--teal)}
+.ind-title{font-family:var(--serif);font-size:2.1rem;line-height:1.15;color:var(--ink);letter-spacing:-.015em;margin-bottom:.85rem}
+.ind-lede{font-size:.92rem;color:var(--mt);line-height:1.7;margin-bottom:1.5rem;font-style:italic;border-left:3px solid var(--teal);padding-left:1rem}
+.ind-stat{background:var(--w);border:1px solid var(--b2);border-radius:14px;padding:1rem 1.2rem;margin-top:1.25rem}
+.ind-stat-l{font-family:var(--mono);font-size:.5rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:.2rem}
+.ind-stat-v{font-family:var(--serif);font-size:1.4rem;color:var(--ink);font-weight:700;line-height:1.1}
+.ind-stat-d{font-size:.65rem;color:var(--mt);margin-top:.25rem;line-height:1.5}
+.industry-content h3{font-family:var(--serif);font-size:1.3rem;color:var(--ink);margin:1.75rem 0 .75rem}
+.industry-content h3:first-of-type{margin-top:0}
+.industry-content p{font-size:.88rem;color:var(--mt);line-height:1.8;margin-bottom:.85rem}
+.industry-content p strong{color:var(--ink);font-weight:600}
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.25rem 0 1.5rem}
+.reg{background:var(--w);border:1px solid var(--b1);border-radius:12px;padding:.85rem 1.1rem;transition:all .3s}
+.reg:hover{border-color:var(--teal)}
+.reg-h{font-family:var(--mono);font-size:.7rem;color:var(--ink);font-weight:700;margin-bottom:.2rem}
+.reg-d{font-size:.7rem;color:var(--mt);line-height:1.55}
+.cap-list{background:var(--w);border:1px solid var(--b2);border-radius:14px;padding:1.25rem 1.4rem;margin:1.5rem 0}
+.cap-list-l{font-family:var(--mono);font-size:.55rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.cap-list ul{list-style:none;padding:0}
+.cap-list li{font-size:.78rem;color:var(--mt);padding:.35rem 0 .35rem 1.1rem;position:relative;line-height:1.55;border-bottom:1px solid var(--b1)}
+.cap-list li:last-child{border-bottom:none}
+.cap-list li::before{content:'';position:absolute;left:0;top:.6rem;width:5px;height:5px;border-radius:50%;background:var(--teal)}
+.cap-list li strong{color:var(--ink);font-weight:600}
+.stds{display:flex;flex-wrap:wrap;gap:.3rem;margin:1.25rem 0}
+.sd{font-family:var(--mono);font-size:.55rem;padding:.3rem .55rem;border-radius:6px;background:var(--w);border:1px solid var(--b2);color:var(--mt)}
+.sd:hover{border-color:var(--teal);color:var(--teal);background:var(--ts)}
+.related{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:1.5rem}
+.related a{display:inline-flex;align-items:center;gap:.35rem;background:var(--ink);color:#fff;padding:.55rem .95rem;border-radius:100px;font-size:.72rem;font-weight:600;text-decoration:none;transition:all .3s}
+.related a:hover{background:var(--teal);transform:translateY(-1px)}
+.related .sec{background:transparent;color:var(--ink);border:1px solid var(--b2)}
+.related .sec:hover{border-color:var(--teal);color:var(--teal);background:var(--ts)}
+.cta-final{background:var(--ink);color:var(--on-d);padding:4rem 0;text-align:center}
+.cta-final h2{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.3rem);line-height:1.2;color:#fff;letter-spacing:-.015em;margin-bottom:1rem;max-width:32ch;margin-left:auto;margin-right:auto}
+.cta-final h2 em{font-style:italic;color:#5EEAD4}
+.cta-final p{font-size:.88rem;color:var(--on-dm);max-width:55ch;margin:0 auto 1.75rem;line-height:1.7}
+.cta-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.btn-f{background:#fff;color:var(--ink);padding:.85rem 1.5rem;border-radius:100px;font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:.4rem;min-height:44px}
+.btn-f:hover{background:#5EEAD4;color:var(--ink);transform:translateY(-2px)}
+.btn-o{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:.85rem 1.5rem;border-radius:100px;font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:.4rem;min-height:44px}
+.btn-o:hover{border-color:#5EEAD4;color:#5EEAD4}
+.foot{background:var(--ink);color:var(--on-dm);padding:3rem 0 2rem;border-top:1px solid rgba(255,255,255,.05)}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.foot-brand{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;color:#fff;text-decoration:none}
+.foot-brand-text{font-family:var(--serif);font-size:1rem;font-weight:700}
+.foot-tag{font-size:.78rem;color:var(--on-dm);line-height:1.7;max-width:36ch;margin-bottom:1rem}
+.foot-col h4{color:#fff;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.85rem;font-family:var(--mono)}
+.foot-col a{display:block;color:var(--on-dm);font-size:.78rem;padding:.25rem 0}
+.foot-col a:hover{color:#5EEAD4}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;font-size:.72rem;color:var(--on-dm)}
+.foot-bottom a{color:var(--on-dm)}
+.rv{opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.show{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.h-dot{animation:none}}
+@media(max-width:1024px){.ind-grid{grid-template-columns:1fr 1fr}.industry-grid{grid-template-columns:1fr;gap:2rem}.industry-sidebar{position:static}.reg-grid{grid-template-columns:1fr}.foot-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.nv{display:none;position:absolute;top:100%;left:0;right:0;background:var(--w);border-bottom:1px solid var(--b1);flex-direction:column;padding:1rem;gap:.2rem;box-shadow:var(--ss)}.nv.open{display:flex}.mbtn{display:flex;align-items:center;justify-content:center}.ind-grid{grid-template-columns:1fr}.foot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+<nav class="nav"><div class="nav-inner">
+<a href="/" class="brand"><svg class="brand-mark" viewBox="0 0 52 52" fill="none"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="#F0F4F8" stroke="#0D7377" stroke-width="1.6" stroke-linejoin="round"/><circle cx="26" cy="23" r="5" stroke="#0D7377" stroke-width="1.8" fill="none"/><circle cx="26" cy="23" r="2" fill="#0D7377"/></svg><span class="brand-text">Brain<em>Pulse</em></span></a>
+<div class="nv"><a href="/">Home</a><a href="/solutions.html">Solutions</a><a href="/practices.html">Practices</a><a href="/industries.html" class="active">Industries</a><a href="/insights.html">Insights</a><a href="/lab.html">Lab</a><a href="/#case-studies">Work</a><a href="/#about">About</a></div>
+<a href="/#contact" class="nav-cta">Book a call <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+<button class="mbtn" onclick="document.querySelector('.nv').classList.toggle('open')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div></nav>
+
+<main id="main">
+
+<section class="hero"><div class="w">
+<div class="hero-chip rv"><span class="h-dot"></span>Four industries · One specialist team</div>
+<h1 class="rv d1">Built for industries where <em>errors have consequences</em></h1>
+<p class="hero-lede rv d2">BrainPulse focuses on four verticals where the intersection of AI governance, accessibility, and human factors engineering creates regulatory, safety, and reputational stakes that pure-play design agencies are not equipped to handle. Each industry brings its own standards, its own enforcement regime, and its own engineering vocabulary. We speak all four fluently.</p>
+</div></section>
+
+<section class="ind-overview"><div class="w">
+<div class="sl rv">Verticals we serve</div>
+<h2 class="st rv d1" style="font-size:1.5rem;margin-bottom:0">Healthcare · Federal · Defense · Financial Services</h2>
+<div class="ind-grid">
+<a href="#healthcare" class="ind-card rv d2">
+<div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+<div class="ind-card-l">INDUSTRY 01</div>
+<h3>Healthcare &amp; Life Sciences</h3>
+<p>Medical devices, SaMD, clinical AI, digital therapeutics — IEC 62366, ISO 14971, FDA premarket submissions, HIPAA, 21 CFR Part 11.</p>
+<div class="ind-card-cta">Explore →</div>
+</a>
+<a href="#federal" class="ind-card rv d2">
+<div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10L12 4l7 6v11M9 21v-6h6v6"/></svg></div>
+<div class="ind-card-l">INDUSTRY 02</div>
+<h3>Federal Government &amp; Public Sector</h3>
+<p>Civilian agencies, state &amp; local government — OMB M-24-10, Section 508, ADA Title II, FedRAMP, agency AI use case management.</p>
+<div class="ind-card-cta">Explore →</div>
+</a>
+<a href="#defense" class="ind-card rv d3">
+<div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/></svg></div>
+<div class="ind-card-l">INDUSTRY 03</div>
+<h3>Defense &amp; Aerospace</h3>
+<p>DoD programs, defense primes, autonomous systems — MIL-STD-1472H, DoDI 5000.95 HSI, human-machine teaming, operator interfaces.</p>
+<div class="ind-card-cta">Explore →</div>
+</a>
+<a href="#financial" class="ind-card rv d3">
+<div class="ind-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+<div class="ind-card-l">INDUSTRY 04</div>
+<h3>Financial Services</h3>
+<p>Banks, fintech, insurance — SR 11-7 model risk management, ECOA fairness, CFPB AI guidance, FCRA, regulatory examination support.</p>
+<div class="ind-card-cta">Explore →</div>
+</a>
+</div>
+</div></section>
+<section id="healthcare" class="industry">
+<div class="w">
+<div class="industry-grid">
+<aside class="industry-sidebar rv">
+<div class="ind-num">INDUSTRY 01</div>
+<div class="ind-icon-l"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+<h2 class="ind-title">Healthcare &amp; Life Sciences</h2>
+<p class="ind-lede">"When a clinician misreads a diagnostic interface, the patient pays the cost. Our work makes those interfaces safer — and gets them through FDA premarket review."</p>
+<div class="ind-stat"><div class="ind-stat-l">Market reality</div><div class="ind-stat-v">FDA HFE Required</div><div class="ind-stat-d">IEC 62366 usability engineering is mandatory for all FDA premarket submissions involving software medical devices and SaMD.</div></div>
+</aside>
+<div class="industry-content rv d1">
+<h3>The healthcare context</h3>
+<p>Medical devices, Software as a Medical Device (SaMD), clinical decision support systems, diagnostic AI, digital therapeutics, and electronic health record interfaces all operate under a regulatory framework where <strong>usability engineering is not optional</strong>. IEC 62366-1 — the international standard for medical device usability engineering — is required reading for any FDA premarket submission involving software. The FDA's own guidance document ("Applying Human Factors and Usability Engineering to Medical Devices") makes the same requirements operational.</p>
+<p>Healthcare interfaces fail in predictable ways. Alert fatigue causes clinicians to dismiss meaningful warnings. Cognitive load during high-acuity scenarios produces medication errors. Display layouts inherited from desktop-era EHRs collapse on tablets and bedside terminals. And AI-driven clinical decision support tools — including the rapidly growing class of SaMD — must now satisfy both traditional medical device safety standards and the emerging FDA framework for AI/ML-enabled medical devices. The intersection demands engineering rigor that most design agencies cannot provide.</p>
+<h3>Regulatory landscape</h3>
+<div class="reg-grid">
+<div class="reg"><div class="reg-h">IEC 62366-1</div><div class="reg-d">Mandatory usability engineering process for FDA premarket submissions covering use specification, URRA, formative evaluations, and summative validation.</div></div>
+<div class="reg"><div class="reg-h">ISO 14971</div><div class="reg-d">Risk management for medical devices — integrated with usability engineering to identify and mitigate use-related hazards.</div></div>
+<div class="reg"><div class="reg-h">FDA AI/ML SaMD</div><div class="reg-d">FDA framework for AI and ML-enabled medical devices including Predetermined Change Control Plans and ongoing monitoring requirements.</div></div>
+<div class="reg"><div class="reg-h">HIPAA · 21 CFR Part 11</div><div class="reg-d">Privacy and electronic records requirements affecting every patient-facing interface, audit trail, and electronic signature workflow.</div></div>
+</div>
+<h3>What we deliver in healthcare</h3>
+<div class="cap-list"><div class="cap-list-l">Capabilities for healthcare clients</div><ul>
+<li><strong>Complete IEC 62366 usability engineering files</strong> ready for FDA 510(k), De Novo, or PMA submissions</li>
+<li><strong>Use specifications and URRA</strong> integrated with ISO 14971 hazard analysis and risk management</li>
+<li><strong>Formative and summative validation testing</strong> with 15+ representative users per user group per FDA guidance</li>
+<li><strong>Clinical decision support UI design</strong> for AI-enabled SaMD with FDA-compliant transparency and explainability</li>
+<li><strong>EHR workflow optimization</strong> reducing alert fatigue, cognitive load, and documentation burden</li>
+<li><strong>Medical device interface design</strong> for bedside monitors, infusion pumps, surgical robotics, diagnostic imaging</li>
+<li><strong>WCAG 2.2 AAA accessibility</strong> for patient portals, telehealth platforms, and clinical applications</li>
+<li><strong>21 CFR Part 11 compliance design</strong> for electronic records, audit trails, and electronic signatures</li>
+</ul></div>
+<h3>Standards we work with</h3>
+<div class="stds"><span class="sd">IEC 62366-1</span><span class="sd">IEC 62366-2</span><span class="sd">ISO 14971</span><span class="sd">ISO 13485</span><span class="sd">FDA HFE Guidance</span><span class="sd">FDA AI/ML SaMD</span><span class="sd">21 CFR Part 11</span><span class="sd">HIPAA</span><span class="sd">HL7 FHIR</span><span class="sd">WCAG 2.2 AAA</span></div>
+<h3>Typical clients</h3>
+<p>Medical device manufacturers preparing FDA premarket submissions. Digital health companies launching SaMD products. Diagnostic AI developers facing the FDA AI/ML framework. Telehealth platforms scaling clinical workflows. Healthcare systems modernizing EHR interfaces. Biotech companies building patient-facing companion apps. Pharmaceutical companies developing clinical trial interfaces.</p>
+<div class="related">
+<a href="/solutions.html">View Medical Device UX solution →</a>
+<a href="/practices.html#human-factors" class="sec">Human Factors practice</a>
+<a href="/#contact" class="sec">Discuss your device</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="federal" class="industry">
+<div class="w">
+<div class="industry-grid">
+<aside class="industry-sidebar rv">
+<div class="ind-num">INDUSTRY 02</div>
+<div class="ind-icon-l"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10L12 4l7 6v11M9 21v-6h6v6"/></svg></div>
+<h2 class="ind-title">Federal Government &amp; Public Sector</h2>
+<p class="ind-lede">"Federal AI deployments now require documented governance, public AI use case disclosure, and Section 508 accessibility. We've built the infrastructure that makes this operational."</p>
+<div class="ind-stat"><div class="ind-stat-l">Federal AI</div><div class="ind-stat-v">1,200+ Use Cases</div><div class="ind-stat-d">Federal AI use cases requiring documented assessment under OMB Memo M-24-10. Each requires AIA, risk classification, and ongoing monitoring.</div></div>
+</aside>
+<div class="industry-content rv d1">
+<h3>The federal context</h3>
+<p>Federal civilian agencies, state and local governments, and the federal contractor ecosystem operate under a regulatory framework that converged dramatically in 2024-2026. Three forces collided: <strong>OMB Memorandum M-24-10</strong> mandating AI governance at every CFO Act agency; the <strong>ADA Title II final rule</strong> requiring WCAG 2.1 AA compliance from state and local governments by 2026-2027; and the <strong>Section 508 standards</strong> that have governed federal IT accessibility for decades but now apply to a vastly expanded surface area of AI-enabled federal services.</p>
+<p>The result: every federal agency CIO and Chief AI Officer is now responsible for building infrastructure their predecessors did not have. AI use case inventories. Algorithmic impact assessments. Public disclosure mechanisms. Section 508 conformance documentation. Citizen-facing service interfaces that meet both accessibility and AI transparency requirements. The agencies that pull this off will be the model for the next decade. The ones that don't will be the subject of inspector general findings, GAO audits, and Congressional inquiries.</p>
+<h3>Regulatory landscape</h3>
+<div class="reg-grid">
+<div class="reg"><div class="reg-h">OMB Memorandum M-24-10</div><div class="reg-d">Federal AI governance: Chief AI Officers, AI use case inventory, AIA for rights-impacting and safety-impacting AI, minimum risk management practices.</div></div>
+<div class="reg"><div class="reg-h">Section 508</div><div class="reg-d">Federal accessibility standard for all electronic and information technology — applies to federal employees and citizens accessing federal services.</div></div>
+<div class="reg"><div class="reg-h">ADA Title II Final Rule</div><div class="reg-d">WCAG 2.1 AA required for state &amp; local government digital services. Large entities by April 2026, smaller by April 2027.</div></div>
+<div class="reg"><div class="reg-h">FedRAMP · ATO</div><div class="reg-d">Authority to Operate processes for federal IT systems including AI-enabled services. Security controls mapping required.</div></div>
+</div>
+<h3>What we deliver for federal clients</h3>
+<div class="cap-list"><div class="cap-list-l">Capabilities for federal &amp; public sector clients</div><ul>
+<li><strong>Federal AI Risk Assessment</strong> service satisfying full OMB M-24-10 requirements with ATO support package</li>
+<li><strong>AI use case inventory and classification</strong> per M-24-10 categories (rights-impacting, safety-impacting, neither)</li>
+<li><strong>Algorithmic impact assessments (AIAs)</strong> for each rights/safety-impacting AI deployment</li>
+<li><strong>Public AI use case disclosure</strong> per White House transparency requirements</li>
+<li><strong>Section 508 compliance audits, remediation, and VPAT documentation</strong> across agency digital portfolios</li>
+<li><strong>ADA Title II compliance roadmaps</strong> for state and local governments approaching 2026-2027 deadlines</li>
+<li><strong>Citizen-facing service redesign</strong> with full accessibility and AI transparency integration</li>
+<li><strong>SSA11y-style CI/CD accessibility automation</strong> for federal application development pipelines</li>
+<li><strong>NIST AI RMF implementation</strong> aligned with federal Chief AI Officer responsibilities</li>
+</ul></div>
+<h3>Standards we work with</h3>
+<div class="stds"><span class="sd">OMB M-24-10</span><span class="sd">Section 508</span><span class="sd">ADA Title II</span><span class="sd">NIST AI RMF</span><span class="sd">FedRAMP</span><span class="sd">FISMA</span><span class="sd">21st Century IDEA Act</span><span class="sd">WCAG 2.2 AAA</span><span class="sd">VPAT 2.5</span><span class="sd">USWDS</span></div>
+<h3>Typical clients</h3>
+<p>Federal civilian agencies (HHS, SSA, VA, USDA, Department of Education, Department of Labor). Federal contractors and systems integrators (Leidos, Booz Allen Hamilton, Deloitte, Accenture Federal Services, General Dynamics IT). State and local governments preparing for ADA Title II compliance. Federal Inspectors General conducting AI risk assessments. Federal Chief AI Officer offices building governance infrastructure. Federal procurement officers evaluating AI vendor submissions.</p>
+<p><strong>Relevant case study:</strong> Our Social Security Administration engagement modernized the case processing platform serving 70+ million Americans, deployed SSA11y automated accessibility scanning across 12 application modules, and achieved 100% Section 508 compliance with 40% faster task completion times.</p>
+<div class="related">
+<a href="/solutions.html">Federal AI Risk Assessment →</a>
+<a href="/#case-studies" class="sec">SSA case study</a>
+<a href="/#contact" class="sec">Discuss your agency</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="defense" class="industry">
+<div class="w">
+<div class="industry-grid">
+<aside class="industry-sidebar rv">
+<div class="ind-num">INDUSTRY 03</div>
+<div class="ind-icon-l"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/></svg></div>
+<h2 class="ind-title">Defense &amp; Aerospace</h2>
+<p class="ind-lede">"Operator interfaces in defense systems are not UX problems. They are human factors engineering problems with documented failure modes, validated cognitive workload measurements, and lives at stake."</p>
+<div class="ind-stat"><div class="ind-stat-l">DoD HMI investment</div><div class="ind-stat-v">$2.3B annually</div><div class="ind-stat-d">DoD spending on human-machine interface engineering across unmanned systems, autonomous platforms, and operator stations.</div></div>
+</aside>
+<div class="industry-content rv d1">
+<h3>The defense context</h3>
+<p>Defense systems engineering operates under a discipline of standards that most consumer-facing UX practitioners have never read. <strong>MIL-STD-1472H</strong> — the U.S. military's human engineering design criteria — runs over 400 pages and specifies everything from control dimensions to alarm prioritization to display readability under specific illumination conditions. <strong>DoDI 5000.95</strong> establishes Human Systems Integration as a required acquisition discipline covering seven domains (Manpower, Personnel, Training, Human Factors Engineering, Safety, Health Hazards, Survivability). <strong>MIL-STD-46855</strong> defines the human engineering program requirements that DoD programs must execute through their lifecycle.</p>
+<p>These standards are not optional. Defense programs that fail to satisfy them face milestone delays, redesign cycles, and operational test failures that can cost hundreds of millions of dollars. Defense primes — Leidos, Lockheed Martin, Raytheon (RTX), Northrop Grumman, BAE Systems, General Dynamics — staff dedicated human factors organizations specifically to satisfy these requirements. The growth area: unmanned systems, autonomous platforms, and AI-enabled decision support, where the human-machine teaming interface is the central engineering challenge.</p>
+<h3>Regulatory landscape</h3>
+<div class="reg-grid">
+<div class="reg"><div class="reg-h">MIL-STD-1472H</div><div class="reg-d">Human engineering design criteria for military systems — the foundational standard for operator interface design across all U.S. military services.</div></div>
+<div class="reg"><div class="reg-h">DoDI 5000.95</div><div class="reg-d">Human Systems Integration as required acquisition discipline. 7 HSI domains must be addressed in every DoD program.</div></div>
+<div class="reg"><div class="reg-h">MIL-STD-46855</div><div class="reg-d">Human engineering program requirements specifying what activities must occur, when, and with what documentation through program lifecycle.</div></div>
+<div class="reg"><div class="reg-h">DoD Responsible AI</div><div class="reg-d">DoD AI Strategy and Responsible AI principles affecting AI-enabled defense systems including autonomous platforms.</div></div>
+</div>
+<h3>What we deliver for defense clients</h3>
+<div class="cap-list"><div class="cap-list-l">Capabilities for defense &amp; aerospace clients</div><ul>
+<li><strong>Defense Human-Machine Teaming Lab</strong> productized solution for unmanned systems and autonomous platforms</li>
+<li><strong>MIL-STD-1472H compliance assessments</strong> with documented findings and remediation roadmaps</li>
+<li><strong>Cognitive task analysis</strong> for operator decision sequences under varying workload conditions</li>
+<li><strong>Function allocation analysis</strong> between human operators and autonomous systems</li>
+<li><strong>FMEA and human error analysis</strong> with human error probability estimates and mitigation controls</li>
+<li><strong>Operator interface design</strong> for command and control, ISR, mission planning, and weapons systems</li>
+<li><strong>NASA-TLX cognitive workload measurement</strong> with baseline and post-redesign validation</li>
+<li><strong>Human-in-the-loop simulation testing</strong> with documented test plans and results</li>
+<li><strong>HSI program plans</strong> covering all 7 HSI domains for DoD program milestones</li>
+<li><strong>Operational test and evaluation</strong> support with documented operator validation</li>
+</ul></div>
+<h3>Standards we work with</h3>
+<div class="stds"><span class="sd">MIL-STD-1472H</span><span class="sd">MIL-STD-1472G</span><span class="sd">MIL-HDBK-759C</span><span class="sd">MIL-STD-46855</span><span class="sd">DoDI 5000.95</span><span class="sd">NASA-STD-3001</span><span class="sd">DO-178C</span><span class="sd">ARP 4761</span><span class="sd">DoD Responsible AI</span></div>
+<h3>Typical clients</h3>
+<p>Defense prime contractors (Leidos, Lockheed Martin, Raytheon/RTX, Northrop Grumman, BAE Systems, General Dynamics, Boeing). DoD program offices managing acquisition programs. Defense research laboratories and FFRDCs (MITRE, JHU APL, MIT Lincoln Lab). Emerging defense tech companies (Anduril, Shield AI, Saronic, Saildrone) building autonomous platforms. NASA centers and aerospace primes with HSI requirements. Special operations and intelligence community customers with classified human factors requirements (cleared personnel available).</p>
+<p><strong>Relevant case study:</strong> Our Leidos defense systems engagement applied MIL-STD-1472H human engineering criteria across operator interfaces, conducted cognitive task analysis identifying 23 critical failure modes via FMEA, designed unified situational awareness displays consolidating 200+ data streams, and validated all designs through human-in-the-loop simulation testing — reducing operator errors by 67%.</p>
+<div class="related">
+<a href="/solutions.html">Defense Human-Machine Teaming Lab →</a>
+<a href="/#case-studies" class="sec">Leidos case study</a>
+<a href="/#contact" class="sec">Discuss your program</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="financial" class="industry">
+<div class="w">
+<div class="industry-grid">
+<aside class="industry-sidebar rv">
+<div class="ind-num">INDUSTRY 04</div>
+<div class="ind-icon-l"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+<h2 class="ind-title">Financial Services</h2>
+<p class="ind-lede">"Model risk management is no longer a quant function — it is now a governance function with documented evidence requirements, human oversight controls, and regulatory examination preparation."</p>
+<div class="ind-stat"><div class="ind-stat-l">CFPB AI guidance</div><div class="ind-stat-v">Active enforcement</div><div class="ind-stat-d">CFPB has issued enforcement actions against AI-driven lending and credit decisions, citing ECOA, FCRA, and adverse action notice requirements.</div></div>
+</aside>
+<div class="industry-content rv d1">
+<h3>The financial services context</h3>
+<p>Financial services has the longest history of model risk governance of any commercial sector. The Federal Reserve's <strong>SR 11-7 / OCC 2011-12</strong> supervisory guidance on model risk management has been operational since 2011 — predating the current wave of AI/ML by a decade. Banks have always had model validation functions, model inventories, and ongoing performance monitoring. What's changed is the surface area: AI/ML models for credit decisions, fraud detection, anti-money laundering, customer service, and risk pricing have expanded the scope dramatically while introducing failure modes that traditional model risk management was not designed to handle.</p>
+<p>The regulatory environment has tightened in response. The <strong>CFPB has issued AI-specific guidance</strong> on adverse action notices, model explainability, and discriminatory outcomes. The <strong>ECOA</strong> (Equal Credit Opportunity Act) and <strong>Fair Housing Act</strong> apply to algorithmic decisions. The FTC, OCC, FDIC, and state attorneys general have all signaled increased enforcement. The Treasury Department has issued AI risk guidance through OFR and FSOC. Internationally, the <strong>EU AI Act</strong> classifies most consumer credit decisions as high-risk AI, triggering full Article 6 obligations for any financial services firm with EU exposure.</p>
+<h3>Regulatory landscape</h3>
+<div class="reg-grid">
+<div class="reg"><div class="reg-h">SR 11-7 / OCC 2011-12</div><div class="reg-d">Federal Reserve and OCC supervisory guidance on model risk management — the foundational framework now extended to AI/ML.</div></div>
+<div class="reg"><div class="reg-h">ECOA · Fair Housing Act</div><div class="reg-d">Fair lending laws applying to algorithmic credit and housing decisions. CFPB enforcement actions citing AI bias have been increasing.</div></div>
+<div class="reg"><div class="reg-h">CFPB AI Guidance</div><div class="reg-d">Adverse action notice requirements for AI-driven decisions, model explainability obligations, and consumer protection rules.</div></div>
+<div class="reg"><div class="reg-h">EU AI Act · DORA</div><div class="reg-d">EU AI Act high-risk classification for consumer credit decisions and DORA operational resilience for ICT systems including AI.</div></div>
+</div>
+<h3>What we deliver for financial services clients</h3>
+<div class="cap-list"><div class="cap-list-l">Capabilities for banking, fintech &amp; insurance clients</div><ul>
+<li><strong>Model risk management interfaces</strong> aligned with SR 11-7 / OCC 2011-12 for AI/ML model inventories</li>
+<li><strong>Algorithmic impact assessments</strong> for credit, lending, fraud, and consumer-facing AI decisions</li>
+<li><strong>Adverse action notice generators</strong> meeting CFPB requirements for AI-driven decisions</li>
+<li><strong>Model explainability interfaces</strong> for adversely affected applicants and regulatory examiners</li>
+<li><strong>Fair lending monitoring dashboards</strong> with subgroup performance tracking and bias detection</li>
+<li><strong>Human-in-the-loop oversight controls</strong> for high-risk credit and lending decisions</li>
+<li><strong>Model audit trails</strong> ready for regulatory examination by Federal Reserve, OCC, FDIC, CFPB</li>
+<li><strong>EU AI Act compliance design</strong> for financial services firms with EU exposure</li>
+<li><strong>WCAG 2.2 AAA accessibility</strong> for consumer banking, mortgage, and insurance interfaces</li>
+<li><strong>DORA operational resilience documentation</strong> for ICT systems supporting AI deployments</li>
+</ul></div>
+<h3>Standards we work with</h3>
+<div class="stds"><span class="sd">SR 11-7</span><span class="sd">OCC 2011-12</span><span class="sd">ECOA · Reg B</span><span class="sd">FCRA</span><span class="sd">CFPB AI Guidance</span><span class="sd">EU AI Act</span><span class="sd">DORA</span><span class="sd">NIST AI RMF</span><span class="sd">PCI-DSS</span><span class="sd">WCAG 2.2 AAA</span></div>
+<h3>Typical clients</h3>
+<p>National and regional banks managing AI/ML model portfolios under SR 11-7 supervisory guidance. Fintech companies deploying credit, lending, and underwriting AI subject to CFPB scrutiny. Insurance carriers using AI for underwriting, claims, and pricing decisions facing state insurance commissioner attention. Investment management firms deploying AI in research, trading, and client communications. Payment networks managing fraud detection and authentication systems. Mortgage originators subject to fair lending examination. Wealth management platforms balancing personalization with consumer protection.</p>
+<div class="related">
+<a href="/solutions.html">View AI Governance solutions →</a>
+<a href="/practices.html#ai-governance" class="sec">AI Governance practice</a>
+<a href="/#contact" class="sec">Discuss your portfolio</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="cta-final"><div class="w">
+<h2>Your industry has its <em>own vocabulary</em></h2>
+<p>Whether you measure outcomes in FDA submissions, AIA disclosures, MIL-STD compliance reports, or model risk management exam letters — we speak it. Schedule a free 30-minute consultation to discuss your specific regulatory and engineering landscape.</p>
+<div class="cta-btns">
+<a href="/#contact" class="btn-f">Schedule a free consultation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+<a href="/solutions.html" class="btn-o">Explore productized solutions</a>
+</div>
+</div></section>
+
+</main>
+
+<footer class="foot"><div class="w">
+<div class="foot-grid">
+<div><a href="/" class="foot-brand"><svg width="32" height="32" viewBox="0 0 52 52" fill="none"><path d="M26 4L46 15V37L26 48L6 37V15Z" fill="rgba(94,234,212,.08)" stroke="#5EEAD4" stroke-width="1.6" stroke-linejoin="round"/><circle cx="26" cy="23" r="5" stroke="#5EEAD4" stroke-width="1.8" fill="none"/><circle cx="26" cy="23" r="2" fill="#5EEAD4"/></svg><span class="foot-brand-text">BrainPulse Inc</span></a><p class="foot-tag">UX engineering for AI systems that humans can trust. AI governance, accessibility, and human factors engineering for safety-critical digital products.</p><p style="font-size:.72rem;color:var(--on-dm)">© 2026 BrainPulse Inc. All rights reserved.</p></div>
+<div class="foot-col"><h4>Solutions</h4><a href="/solutions.html">AI Governance Service</a><a href="/solutions.html">Accessibility Subscription</a><a href="/solutions.html">Pattern Library</a><a href="/solutions.html">Medical Device UX</a><a href="/solutions.html">Defense HSI</a><a href="/solutions.html">Executive Workshops</a></div>
+<div class="foot-col"><h4>Practices</h4><a href="/practices.html#ai-governance">AI Governance</a><a href="/practices.html#accessibility">Accessibility</a><a href="/practices.html#human-factors">Human Factors</a><a href="/practices.html#ux-engineering">Emerging Tech</a></div>
+<div class="foot-col"><h4>Industries</h4><a href="/industries.html#healthcare">Healthcare</a><a href="/industries.html#federal">Federal Government</a><a href="/industries.html#defense">Defense &amp; Aerospace</a><a href="/industries.html#financial">Financial Services</a></div>
+<div class="foot-col"><h4>Company</h4><a href="/insights.html">Insights</a><a href="/lab.html">Innovation Lab</a><a href="/#about">About</a><a href="/#contact">Contact</a><a href="https://www.linkedin.com/in/senthil-nagappan" target="_blank" rel="noopener">LinkedIn</a></div>
+</div>
+<div class="foot-bottom"><div>WCAG 2.2 AAA · Section 508 Compliant · This site practices what we preach</div><div><a href="mailto:senthil@brainpulseinc.com">senthil@brainpulseinc.com</a></div></div>
+</div></footer>
+
+<script>
+const observer=new IntersectionObserver(e=>{e.forEach(t=>{t.isIntersecting&&t.target.classList.add('show')})},{threshold:.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.rv').forEach(e=>observer.observe(e));
+</script>
+</body>
+</html>
